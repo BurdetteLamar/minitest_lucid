@@ -7,13 +7,6 @@ Use ```minitest_lucid``` to improve error messages from ```minitest```.
 
 - [Hash](#hash)
 
-### Hash
-
-#### Minitest
-
-#### make_my_diffs_pretty!
-
-#### Lucid
-
+@[:markdown](hash/template.md)
 
 
