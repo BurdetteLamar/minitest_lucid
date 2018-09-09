@@ -4,24 +4,8 @@ class MinitestLucidTest < Minitest::Test
 
   # make_my_diffs_pretty!
 
-  def zzz_test_version
+  def test_version
     refute_nil ::MinitestLucid::VERSION
-  end
-
-  def zzz_test_string
-    assert_equal('foo', 'bar')
-  end
-
-  def zzz_test_dir
-    expected = Dir.new(File.dirname(__FILE__))
-    actual = Dir.new(File.join(File.dirname(__FILE__), '..'))
-    assert_equal(expected, actual)
-  end
-
-  def zzz_test_file
-    expected = File.new(__FILE__)
-    actual = File.new(File.join(File.dirname(__FILE__), 'test_helper.rb'))
-    assert_equal(expected, actual)
   end
 
   def test_hash
@@ -41,9 +25,9 @@ class MinitestLucidTest < Minitest::Test
         :tauro => 'cia ina do ip ocat doat.',
         :amcae => 'Utatu cilaa cit siat commag seqa.',
     }
-    expected = <<EOT
-MinitestLucidTest#test_hash:
-Exception:
+    msg = 'My message'
+    lucid = <<EOT
+Message:  #{msg}
 elucidation = {
     :missing_pairs => {
       :offab => 'Ut dolore ua consal vaba caea.',
@@ -70,14 +54,9 @@ elucidation = {
 }
 EOT
     x = assert_raises (Minitest::Assertion) do
-      assert_equal(expected, actual)
+      assert_equal(expected, actual, msg)
     end
-    # puts '++++++++++++++++++++'
-    # puts expected
-    # puts '++++++++++++++++++++'
-    # puts x.message
-    # puts '++++++++++++++++++++'
-    # assert_match(Regexp.new(Regexp.escape(expected)), x.message)
+    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
   end
 
 end

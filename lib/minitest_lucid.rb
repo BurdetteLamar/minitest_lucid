@@ -64,6 +64,7 @@ module Minitest
         end
       end
       lines = ['']
+      lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       h.each_pair do |category, items|
         lines.push("    #{pretty(category)} => {")
@@ -81,6 +82,7 @@ module Minitest
         lines.push('    },')
       end
       lines.push('}')
+      lines.push('')
       message = lines.join("\n")
       new_exception = exception.exception(message)
       new_exception.set_backtrace(exception.backtrace)
