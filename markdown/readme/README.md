@@ -40,7 +40,7 @@ end
 The default message:
 
 ```default.txt```:
-```diff
+```
 --- expected
 +++ actual
 @@ -1 +1 @@
@@ -51,7 +51,7 @@ The default message:
 Message using ```make_my_diffs_pretty!```:
 
 ```better.txt```:
-```diff
+```
 --- expected
 +++ actual
 @@ -1,6 +1,6 @@
@@ -71,7 +71,7 @@ Message using ```make_my_diffs_pretty!```:
 Message using ```minitest_lucid```
 
 ```lucid.txt```:
-```ruby
+```
 
 elucidation = {
     :missing_pairs => {

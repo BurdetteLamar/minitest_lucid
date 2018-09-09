@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'set'
 
 require 'minitest_lucid/version'
 
