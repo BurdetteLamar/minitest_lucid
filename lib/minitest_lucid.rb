@@ -33,13 +33,20 @@ module Minitest
         break if elucidation_method
       end
       if elucidation_method
-        send(elucidation_method, exception, expected, actual, msg)
+        lines = ['']
+        lines.push("Message:  #{msg}") if msg
+        send(elucidation_method, exception, expected, actual, lines)
+        lines.push('')
+        message = lines.join("\n")
+        new_exception = exception.exception(message)
+        new_exception.set_backtrace(exception.backtrace)
+        raise new_exception
       else
         raise
       end
     end
 
-    def elucidate_hash(exception, expected, actual, msg)
+    def elucidate_hash(exception, expected, actual, lines)
       expected_keys = expected.keys
       actual_keys = actual.keys
       keys = Set.new(expected_keys + actual_keys)
@@ -66,8 +73,6 @@ module Minitest
           else
         end
       end
-      lines = ['']
-      lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       h.each_pair do |category, items|
         lines.push("  #{pretty(category)} => {")
@@ -85,21 +90,14 @@ module Minitest
         lines.push('  },')
       end
       lines.push('}')
-      lines.push('')
-      message = lines.join("\n")
-      new_exception = exception.exception(message)
-      new_exception.set_backtrace(exception.backtrace)
-      raise new_exception
     end
 
-    def elucidate_set(exception, expected, actual, msg)
+    def elucidate_set(exception, expected, actual, lines)
       result = {
           :missing => expected.difference(actual),
           :unexpected => actual.difference(expected),
           :ok => expected.intersection(actual),
       }
-      lines = ['']
-      lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       result.each_pair do |category, items|
         lines.push("  #{pretty(category)} => {")
@@ -109,14 +107,9 @@ module Minitest
         lines.push('  },')
       end
       lines.push('}')
-      lines.push('')
-      message = lines.join("\n")
-      new_exception = exception.exception(message)
-      new_exception.set_backtrace(exception.backtrace)
-      raise new_exception
     end
 
-    def elucidate_struct(exception, expected, actual, msg)
+    def elucidate_struct(exception, expected, actual, lines)
       expected_members = expected.members
       actual_members = actual.members
       members = Set.new(expected_members + actual_members)
@@ -133,8 +126,6 @@ module Minitest
           h[:changed_values].store(member, [expected_value, actual_value])
         end
       end
-      lines = ['']
-      lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       h.each_pair do |category, items|
         lines.push("  #{pretty(category)} => {")
@@ -152,11 +143,6 @@ module Minitest
         lines.push('  },')
       end
       lines.push('}')
-      lines.push('')
-      message = lines.join("\n")
-      new_exception = exception.exception(message)
-      new_exception.set_backtrace(exception.backtrace)
-      raise new_exception
     end
 
     def elucidate_each(exception, expected, actual, msg)
