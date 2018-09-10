@@ -20,24 +20,27 @@ module Minitest
     def elucidate(exception, expected, actual, msg)
       elucidation_method = nil
       {
-          [:each_pair] => :elucidate_each_pair,
+          [:each_pair, :keys] => :elucidate_hash,
+          [:each_pair, :members] => :elucidate_struct,
+          [:intersection, :difference] => :elucidate_set,
+          [:each] => :elucidate_each,
       }.each_pair do |discriminant_methods, method|
+        elucidation_method = method
         discriminant_methods.each do |discriminant_method|
-          next unless expected.respond_to?(discriminant_method)
-          next unless actual.respond_to?(discriminant_method)
-          elucidation_method = method
-          break
+          elucidation_method = nil unless expected.respond_to?(discriminant_method)
+          elucidation_method = nil unless actual.respond_to?(discriminant_method)
         end
         break if elucidation_method
       end
       if elucidation_method
+        puts elucidation_method
         send(elucidation_method, exception, expected, actual, msg)
       else
         raise
       end
     end
 
-    def elucidate_each_pair(exception, expected, actual, msg)
+    def elucidate_hash(exception, expected, actual, msg)
       expected_keys = expected.keys
       actual_keys = actual.keys
       keys = Set.new(expected_keys + actual_keys)
@@ -88,6 +91,109 @@ module Minitest
       new_exception = exception.exception(message)
       new_exception.set_backtrace(exception.backtrace)
       raise new_exception
+    end
+
+    def elucidate_struct(exception, expected, actual, msg)
+      expected_members = expected.members
+      actual_members = actual.members
+      members = Set.new(expected_members + actual_members)
+      h = {
+          :changed_values => {},
+          :ok_values => {},
+      }
+      members.each do |member|
+        expected_value = expected[member]
+        actual_value = actual[member]
+        if expected_value == actual_value
+          h[:ok_values].store(member, expected_value)
+        else
+          h[:changed_values].store(member, [expected_value, actual_value])
+        end
+      end
+      lines = ['']
+      lines.push("Message:  #{msg}") if msg
+      lines.push('elucidation = {')
+      h.each_pair do |category, items|
+        lines.push("    #{pretty(category)} => {")
+        items.each_pair do |member, value|
+          if value.instance_of?(Array)
+            expected, actual = *value
+            lines.push("      #{pretty(member)} => {")
+            lines.push("        :expected => #{pretty(expected)},")
+            lines.push("        :got      => #{pretty(actual)},")
+            lines.push('      },')
+          else
+            lines.push("      #{pretty(member)} => #{pretty(value)},")
+          end
+        end
+        lines.push('    },')
+      end
+      lines.push('}')
+      lines.push('')
+      message = lines.join("\n")
+      new_exception = exception.exception(message)
+      new_exception.set_backtrace(exception.backtrace)
+      raise new_exception
+    end
+
+    def elucidate_set(exception, expected, actual, msg)
+      return unless objects_can_handle([:intersection, :difference], expected, actual)
+      result = {
+          :missing => expected.difference(actual),
+          :unexpected => actual.difference(expected),
+          :ok => expected.intersection(actual),
+      }
+      attrs = {
+          :expected_class => expected.class,
+          :actual_class => actual.class,
+          :methods => [:each_pair],
+      }
+      put_element('analysis', attrs) do
+        result.each_pair do |key, value|
+          put_element(key.to_s, value)
+        end
+      end
+      true
+    end
+
+    def elucidate_each(exception, expected, actual, msg)
+      return unless objects_can_handle([:each], expected, actual)
+      sdiff = Diff::LCS.sdiff(expected, actual)
+      changes = {}
+      statuses = {
+          '!' => 'changed',
+          '+' => 'unexpected',
+          '-' => 'missing',
+          '=' => 'unchanged'
+      }
+      sdiff.each_with_index do |change, i|
+        status = statuses.fetch(change.action)
+        key = "change_#{i}"
+        change_data = {
+            :status => status,
+            :old => "pos=#{change.old_position} ele=#{change.old_element}",
+            :new => "pos=#{change.new_position} ele=#{change.new_element}",
+        }
+        changes.store(key, change_data)
+      end
+      attrs = {
+          :expected_class => expected.class,
+          :actual_class => actual.class,
+          :methods => [:each_pair],
+      }
+      put_element('analysis', attrs) do
+        changes.each_pair do |key, change_data|
+          status = change_data.delete(:status)
+          change_data.delete(:old) if status == 'unexpected'
+          change_data.delete(:new) if status == 'missing'
+          put_element(status) do
+            change_data.each_pair do |k, v|
+              put_element(k.to_s, v)
+            end
+          end
+        end
+      end
+      true
     end
 
     def pretty(arg)
