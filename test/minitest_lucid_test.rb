@@ -84,23 +84,22 @@ EOT
     lucid = <<EOT
 Message:  #{msg}
 elucidation = {
-    :missing => {
-      'Eser in dolo eaata labor ut.',
-      'Ipaat paal doat iruat ala magabor.',
-      'Laboab vaga dat maaua in venima.',
-    },
-    :unexpected => {
-      'eser in dolo eaata labor ut.',
-      'ipaat paal doat iruat ala magabor.',
-      'laboab vaga dat maaua in venima.',
-    },
-    :ok => {
-      'Cia ina do ip ocat doat.',
-      'Dua sarat rad noad maat caea.',
-      'Ut dolore ua consal vaba caea.',
-      'Sunt sed te coma teu alaaame.',
-    },
-}
+  :missing => {
+    'Eser in dolo eaata labor ut.',
+    'Ipaat paal doat iruat ala magabor.',
+    'Laboab vaga dat maaua in venima.',
+  },
+  :unexpected => {
+    'eser in dolo eaata labor ut.',
+    'ipaat paal doat iruat ala magabor.',
+    'laboab vaga dat maaua in venima.',
+  },
+  :ok => {
+    'Cia ina do ip ocat doat.',
+    'Dua sarat rad noad maat caea.',
+    'Ut dolore ua consal vaba caea.',
+    'Sunt sed te coma teu alaaame.',
+  },
 EOT
     x = assert_raises (Minitest::Assertion) do
       assert_equal(expected, actual, msg)
@@ -143,30 +142,30 @@ EOT
     lucid = <<EOT
 Message:  #{msg}
 elucidation = {
-    :changed_values => {
-      :lor => {
-        :expected => 'Eser in dolo eaata labor ut.',
-        :got      => 'eser in dolo eaata labor ut.',
-      },
-      :dolo => {
-        :expected => 'Ipaat paal doat iruat ala magabor.',
-        :got      => 'ipaat paal doat iruat ala magabor.',
-      },
-      :laboru => {
-        :expected => 'Laboab vaga dat maaua in venima.',
-        :got      => 'laboab vaga dat maaua in venima.',
-      },
-      :amcae => {
-        :expected => 'Eser in dolo eaata labor ut.',
-        :got      => 'eser in dolo eaata labor ut.',
-      },
+  :changed_values => {
+    :lor => {
+      :expected => 'Eser in dolo eaata labor ut.',
+      :got      => 'eser in dolo eaata labor ut.',
     },
-    :ok_values => {
-      :tauro => 'Cia ina do ip ocat doat.',
-      :loquens => 'Dua sarat rad noad maat caea.',
-      :offab => 'Ut dolore ua consal vaba caea.',
-      :moam => 'Sunt sed te coma teu alaaame.',
+    :dolo => {
+      :expected => 'Ipaat paal doat iruat ala magabor.',
+      :got      => 'ipaat paal doat iruat ala magabor.',
     },
+    :laboru => {
+      :expected => 'Laboab vaga dat maaua in venima.',
+      :got      => 'laboab vaga dat maaua in venima.',
+    },
+    :amcae => {
+      :expected => 'Eser in dolo eaata labor ut.',
+      :got      => 'eser in dolo eaata labor ut.',
+    },
+  },
+  :ok_values => {
+    :tauro => 'Cia ina do ip ocat doat.',
+    :loquens => 'Dua sarat rad noad maat caea.',
+    :offab => 'Ut dolore ua consal vaba caea.',
+    :moam => 'Sunt sed te coma teu alaaame.',
+  },
 }
 EOT
     x = assert_raises (Minitest::Assertion) do

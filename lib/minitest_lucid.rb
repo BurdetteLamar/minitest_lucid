@@ -102,11 +102,11 @@ module Minitest
       lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       result.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("  #{pretty(category)} => {")
         items.each do |member|
-          lines.push("      #{pretty(member)},")
+          lines.push("    #{pretty(member)},")
         end
-        lines.push('    },')
+        lines.push('  },')
       end
       lines.push('}')
       lines.push('')
@@ -137,19 +137,19 @@ module Minitest
       lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       h.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("  #{pretty(category)} => {")
         items.each_pair do |member, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("      #{pretty(member)} => {")
-            lines.push("        :expected => #{pretty(expected)},")
-            lines.push("        :got      => #{pretty(actual)},")
-            lines.push('      },')
+            lines.push("    #{pretty(member)} => {")
+            lines.push("      :expected => #{pretty(expected)},")
+            lines.push("      :got      => #{pretty(actual)},")
+            lines.push('    },')
           else
-            lines.push("      #{pretty(member)} => #{pretty(value)},")
+            lines.push("    #{pretty(member)} => #{pretty(value)},")
           end
         end
-        lines.push('    },')
+        lines.push('  },')
       end
       lines.push('}')
       lines.push('')
