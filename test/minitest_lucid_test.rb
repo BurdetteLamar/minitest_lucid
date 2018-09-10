@@ -29,27 +29,76 @@ class MinitestLucidTest < Minitest::Test
     lucid = <<EOT
 Message:  #{msg}
 elucidation = {
-    :missing_pairs => {
-      :offab => 'Ut dolore ua consal vaba caea.',
-      :moam => 'Sunt sed te coma teu alaaame.',
+  :missing_pairs => {
+    :offab => 'Ut dolore ua consal vaba caea.',
+    :moam => 'Sunt sed te coma teu alaaame.',
+  },
+  :unexpected_pairs => {
+    :laboru => 'Laboab vaga dat maaua in venima.',
+    :amcae => 'Utatu cilaa cit siat commag seqa.',
+  },
+  :changed_values => {
+    :tauro => {
+      :expected => 'Cia ina do ip ocat doat.',
+      :got      => 'cia ina do ip ocat doat.',
     },
-    :unexpected_pairs => {
-      :laboru => 'Laboab vaga dat maaua in venima.',
-      :amcae => 'Utatu cilaa cit siat commag seqa.',
+    :loquens => {
+      :expected => 'Dua sarat rad noad maat caea.',
+      :got      => 'dua sarat rad noad maat caea.',
     },
-    :changed_values => {
-      :tauro => {
-        :expected => 'Cia ina do ip ocat doat.',
-        :got      => 'cia ina do ip ocat doat.',
-      },
-      :loquens => {
-        :expected => 'Dua sarat rad noad maat caea.',
-        :got      => 'dua sarat rad noad maat caea.',
-      },
+  },
+  :ok_pairs => {
+    :lor => 'Eser in dolo eaata labor ut.',
+    :dolo => 'Ipaat paal doat iruat ala magabor.',
+  },
+}
+EOT
+    x = assert_raises (Minitest::Assertion) do
+      assert_equal(expected, actual, msg)
+    end
+    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+  end
+
+  def test_set
+    expected = Set.new([
+        'Cia ina do ip ocat doat.',
+        'Dua sarat rad noad maat caea.',
+        'Eser in dolo eaata labor ut.',
+        'Ipaat paal doat iruat ala magabor.',
+        'Ut dolore ua consal vaba caea.',
+        'Sunt sed te coma teu alaaame.',
+        'Laboab vaga dat maaua in venima.',
+        'Eser in dolo eaata labor ut.',
+    ])
+    actual = Set.new([
+        'Cia ina do ip ocat doat.',
+        'Dua sarat rad noad maat caea.',
+        'eser in dolo eaata labor ut.',
+        'ipaat paal doat iruat ala magabor.',
+        'Ut dolore ua consal vaba caea.',
+        'Sunt sed te coma teu alaaame.',
+        'laboab vaga dat maaua in venima.',
+        'eser in dolo eaata labor ut.',
+    ])
+    msg = 'My message'
+    lucid = <<EOT
+Message:  #{msg}
+elucidation = {
+    :missing => {
+      'Eser in dolo eaata labor ut.',
+      'Ipaat paal doat iruat ala magabor.',
+      'Laboab vaga dat maaua in venima.',
     },
-    :ok_pairs => {
-      :lor => 'Eser in dolo eaata labor ut.',
-      :dolo => 'Ipaat paal doat iruat ala magabor.',
+    :unexpected => {
+      'eser in dolo eaata labor ut.',
+      'ipaat paal doat iruat ala magabor.',
+      'laboab vaga dat maaua in venima.',
+    },
+    :ok => {
+      'Cia ina do ip ocat doat.',
+      'Dua sarat rad noad maat caea.',
+      'Ut dolore ua consal vaba caea.',
+      'Sunt sed te coma teu alaaame.',
     },
 }
 EOT
@@ -61,14 +110,14 @@ EOT
 
   def test_struct
     Struct.new('MyStruct',
-        :tauro,
-        :loquens,
-        :lor,
-        :dolo,
-        :offab,
-        :moam,
-        :laboru,
-        :amcae,
+               :tauro,
+               :loquens,
+               :lor,
+               :dolo,
+               :offab,
+               :moam,
+               :laboru,
+               :amcae,
     )
     expected = Struct::MyStruct.new(
         'Cia ina do ip ocat doat.',

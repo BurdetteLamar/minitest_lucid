@@ -33,7 +33,6 @@ module Minitest
         break if elucidation_method
       end
       if elucidation_method
-        puts elucidation_method
         send(elucidation_method, exception, expected, actual, msg)
       else
         raise
@@ -71,17 +70,41 @@ module Minitest
       lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       h.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("  #{pretty(category)} => {")
         items.each_pair do |key, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("      #{pretty(key)} => {")
-            lines.push("        :expected => #{pretty(expected)},")
-            lines.push("        :got      => #{pretty(actual)},")
-            lines.push('      },')
+            lines.push("    #{pretty(key)} => {")
+            lines.push("      :expected => #{pretty(expected)},")
+            lines.push("      :got      => #{pretty(actual)},")
+            lines.push('    },')
           else
-            lines.push("      #{pretty(key)} => #{pretty(value)},")
+            lines.push("    #{pretty(key)} => #{pretty(value)},")
           end
+        end
+        lines.push('  },')
+      end
+      lines.push('}')
+      lines.push('')
+      message = lines.join("\n")
+      new_exception = exception.exception(message)
+      new_exception.set_backtrace(exception.backtrace)
+      raise new_exception
+    end
+
+    def elucidate_set(exception, expected, actual, msg)
+      result = {
+          :missing => expected.difference(actual),
+          :unexpected => actual.difference(expected),
+          :ok => expected.intersection(actual),
+      }
+      lines = ['']
+      lines.push("Message:  #{msg}") if msg
+      lines.push('elucidation = {')
+      result.each_pair do |category, items|
+        lines.push("    #{pretty(category)} => {")
+        items.each do |member|
+          lines.push("      #{pretty(member)},")
         end
         lines.push('    },')
       end
@@ -134,26 +157,6 @@ module Minitest
       new_exception = exception.exception(message)
       new_exception.set_backtrace(exception.backtrace)
       raise new_exception
-    end
-
-    def elucidate_set(exception, expected, actual, msg)
-      return unless objects_can_handle([:intersection, :difference], expected, actual)
-      result = {
-          :missing => expected.difference(actual),
-          :unexpected => actual.difference(expected),
-          :ok => expected.intersection(actual),
-      }
-      attrs = {
-          :expected_class => expected.class,
-          :actual_class => actual.class,
-          :methods => [:each_pair],
-      }
-      put_element('analysis', attrs) do
-        result.each_pair do |key, value|
-          put_element(key.to_s, value)
-        end
-      end
-      true
     end
 
     def elucidate_each(exception, expected, actual, msg)
