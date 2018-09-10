@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'diff/lcs'
 require 'set'
 
 require 'minitest_lucid/version'
@@ -20,17 +21,14 @@ module Minitest
     def elucidate(exception, expected, actual, msg)
       elucidation_method = nil
       {
-          [:each_pair, :keys] => :elucidate_hash,
-          [:each_pair, :members] => :elucidate_struct,
-          [:intersection, :difference] => :elucidate_set,
-          [:each] => :elucidate_each,
-      }.each_pair do |discriminant_methods, method|
+          Hash => :elucidate_hash,
+          Struct => :elucidate_struct,
+          Set => :elucidate_set,
+      }.each_pair do |klass, method|
+        next unless expected.kind_of?(klass)
+        next unless actual.kind_of?(klass)
         elucidation_method = method
-        discriminant_methods.each do |discriminant_method|
-          elucidation_method = nil unless expected.respond_to?(discriminant_method)
-          elucidation_method = nil unless actual.respond_to?(discriminant_method)
-        end
-        break if elucidation_method
+        break
       end
       if elucidation_method
         lines = ['']
@@ -46,6 +44,51 @@ module Minitest
       else
         raise
       end
+    end
+
+    def elucidate_array(exception, expected, actual, lines)
+      sdiff = Diff::LCS.sdiff(expected, actual)
+      changes = {}
+      statuses = {
+          '!' => 'changed',
+          '+' => 'unexpected',
+          '-' => 'missing',
+          '=' => 'unchanged'
+      }
+      sdiff.each_with_index do |change, i|
+        status = statuses.fetch(change.action)
+        key = "change_#{i}"
+        change_data = {
+            :status => status,
+            :old => "pos=#{change.old_position} ele=#{change.old_element}",
+            :new => "pos=#{change.new_position} ele=#{change.new_element}",
+        }
+        changes.store(key, change_data)
+      end
+      p changes
+      lines.push('elucidation = {')
+      changes.each_pair do |category, change_data|
+        p category
+        status = change_data.delete(:status)
+        change_data.delete(:old) if status == 'unexpected'
+        change_data.delete(:new) if status == 'missing'
+        change_data.each_pair do |k, v|
+          p [k, v]
+        end
+      end
+      lines.push('}')
+      # put_element('analysis', attrs) do
+      #   changes.each_pair do |key, change_data|
+      #     status = change_data.delete(:status)
+      #     change_data.delete(:old) if status == 'unexpected'
+      #     change_data.delete(:new) if status == 'missing'
+      #     put_element(status) do
+      #       change_data.each_pair do |k, v|
+      #         put_element(k.to_s, v)
+      #       end
+      #     end
+      #   end
+      # end
     end
 
     def elucidate_hash(exception, expected, actual, lines)
@@ -145,46 +188,6 @@ module Minitest
         lines.push('  },')
       end
       lines.push('}')
-    end
-
-    def elucidate_each(exception, expected, actual, msg)
-      return unless objects_can_handle([:each], expected, actual)
-      sdiff = Diff::LCS.sdiff(expected, actual)
-      changes = {}
-      statuses = {
-          '!' => 'changed',
-          '+' => 'unexpected',
-          '-' => 'missing',
-          '=' => 'unchanged'
-      }
-      sdiff.each_with_index do |change, i|
-        status = statuses.fetch(change.action)
-        key = "change_#{i}"
-        change_data = {
-            :status => status,
-            :old => "pos=#{change.old_position} ele=#{change.old_element}",
-            :new => "pos=#{change.new_position} ele=#{change.new_element}",
-        }
-        changes.store(key, change_data)
-      end
-      attrs = {
-          :expected_class => expected.class,
-          :actual_class => actual.class,
-          :methods => [:each_pair],
-      }
-      put_element('analysis', attrs) do
-        changes.each_pair do |key, change_data|
-          status = change_data.delete(:status)
-          change_data.delete(:old) if status == 'unexpected'
-          change_data.delete(:new) if status == 'missing'
-          put_element(status) do
-            change_data.each_pair do |k, v|
-              put_element(k.to_s, v)
-            end
-          end
-        end
-      end
-      true
     end
 
     def pretty(arg)

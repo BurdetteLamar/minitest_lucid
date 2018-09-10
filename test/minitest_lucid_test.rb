@@ -8,6 +8,56 @@ class MinitestLucidTest < Minitest::Test
     refute_nil ::MinitestLucid::VERSION
   end
 
+  def zzz_test_array
+    expected = [
+        'Cia ina do ip ocat doat.',
+        'Dua sarat rad noad maat caea.',
+        'Eser in dolo eaata labor ut.',
+        'Ipaat paal doat iruat ala magabor.',
+        'Ut dolore ua consal vaba caea.',
+        'Sunt sed te coma teu alaaame.',
+        'Laboab vaga dat maaua in venima.',
+        'Eser in dolo eaata labor ut.',
+    ]
+    actual = [
+        'Cia ina do ip ocat doat.',
+        'Dua sarat rad noad maat caea.',
+        'eser in dolo eaata labor ut.',
+        'ipaat paal doat iruat ala magabor.',
+        'Ut dolore ua consal vaba caea.',
+        'Sunt sed te coma teu alaaame.',
+        'laboab vaga dat maaua in venima.',
+        'eser in dolo eaata labor ut.',
+    ]
+    msg = 'My message'
+    lucid = <<EOT
+Message:  #{msg}
+Expected class:  #{expected.class}
+Actual class:  #{actual.class}
+elucidation = {
+  :missing => {
+    'Eser in dolo eaata labor ut.',
+    'Ipaat paal doat iruat ala magabor.',
+    'Laboab vaga dat maaua in venima.',
+  },
+  :unexpected => {
+    'eser in dolo eaata labor ut.',
+    'ipaat paal doat iruat ala magabor.',
+    'laboab vaga dat maaua in venima.',
+  },
+  :ok => {
+    'Cia ina do ip ocat doat.',
+    'Dua sarat rad noad maat caea.',
+    'Ut dolore ua consal vaba caea.',
+    'Sunt sed te coma teu alaaame.',
+  },
+EOT
+    x = assert_raises (Minitest::Assertion) do
+      assert_equal(expected, actual, msg)
+    end
+    # assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+  end
+
   def test_hash
     expected = {
         :tauro => 'Cia ina do ip ocat doat.',
