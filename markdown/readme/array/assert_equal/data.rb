@@ -1,0 +1,48 @@
+def expected
+  [
+      'Si alit vagna nonse.',
+      'Serci nosa deaaboat iama.',
+      'Pa ipsab occata seqa.',
+      'Oaba dunt sicid eur.',
+      'Esam est tat sumaan.',
+      'Ad do ea labat.',
+      'Cupis doluaan adat duat.',
+      'Dolla aua am maab.',
+      'In na idat nonsa.',
+      'Eniat noaeaa in venia.',
+      'Non utat rad et.',
+      'Volu siamc moloab cupi.',
+      'Lababor rat vent essa.',
+      'Modola cula ocaadia amea.',
+      'Ania est exeaat sicid.',
+      'Adipsu miate eiuat naam.',
+      'Dolor eaae doat volu.',
+      'Adiatur anaaa qui eius.',
+      'Ad laam utet seri.',
+      'Prem do laan pa.',
+  ]
+end
+def actual
+  [
+      'Esam est tat sumaan.',
+      'Ad do ea labat.',
+      'Cupis doluaan adat duat.',
+      'Dolla aua am maab.',
+      'Si alit vagna nonse.',
+      'Serci nosa deaaboat iama.',
+      'Fugame cupis do iramaa.',
+      'Eiusmagat do labore utatur.',
+      'Lababor rat vent essa.',
+      'Modola cula ocaadia amea.',
+      'Ania est exeaat sicid.',
+      'Adipsu miate eiuat naam.',
+      'In na idat nonsa.',
+      'Eniat noaeaa in venia.',
+      'Non utat rad et.',
+      'Volu siamc moloab cupi.',
+      'Dolor eaae doat volu.',
+      'Adiatur anaaa qui eius.',
+      'Ad laam utet seri.',
+      'Prem do laan pa.',
+  ]
+end

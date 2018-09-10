@@ -35,6 +35,8 @@ module Minitest
       if elucidation_method
         lines = ['']
         lines.push("Message:  #{msg}") if msg
+        lines.push("Expected class:  #{expected.class}")
+        lines.push("Actual class:  #{actual.class}")
         send(elucidation_method, exception, expected, actual, lines)
         lines.push('')
         message = lines.join("\n")

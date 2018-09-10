@@ -28,6 +28,8 @@ class MinitestLucidTest < Minitest::Test
     msg = 'My message'
     lucid = <<EOT
 Message:  #{msg}
+Expected class:  #{expected.class}
+Actual class:  #{actual.class}
 elucidation = {
   :missing_pairs => {
     :offab => 'Ut dolore ua consal vaba caea.',
@@ -83,6 +85,8 @@ EOT
     msg = 'My message'
     lucid = <<EOT
 Message:  #{msg}
+Expected class:  #{expected.class}
+Actual class:  #{actual.class}
 elucidation = {
   :missing => {
     'Eser in dolo eaata labor ut.',
@@ -141,6 +145,8 @@ EOT
     msg = 'My message'
     lucid = <<EOT
 Message:  #{msg}
+Expected class:  #{expected.class}
+Actual class:  #{actual.class}
 elucidation = {
   :changed_values => {
     :lor => {
