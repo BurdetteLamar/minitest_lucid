@@ -106,40 +106,26 @@ elucidation = {
 }
 EOT
 
-    # To test when kind_of?
     my_expected = MyHash.new.merge(expected)
     my_actual = MyHash.new.merge(actual)
-
-    msg = 'Hash and Hash'
-    lucid = format(lucid_format, msg, expected.class, actual.class)
-    x = assert_raises (Minitest::Assertion) do
-      assert_equal(expected, actual, msg)
+    [
+        [expected, actual],
+        [my_expected, actual],
+        [expected, my_actual],
+        [my_expected, my_actual]
+    ].each do |pair|
+      exp, act = *pair
+      msg = "#{exp.class} and #{act.class}"
+      x = assert_raises (Minitest::Assertion) do
+        assert_equal(exp, act, msg)
+      end
+      lucid = format(lucid_format, msg, exp.class, act.class)
+      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
     end
-    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
-
-    msg = 'MyHash and Hash'
-    lucid = format(lucid_format, msg, my_expected.class, actual.class)
-    x = assert_raises (Minitest::Assertion) do
-      assert_equal(my_expected, actual, msg)
-    end
-    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
-
-    msg = 'Hash and MyHash'
-    lucid = format(lucid_format, msg, expected.class, my_actual.class)
-    x = assert_raises (Minitest::Assertion) do
-      assert_equal(expected, my_actual, msg)
-    end
-    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
-
-    msg = 'MyHash and MyHash'
-    lucid = format(lucid_format, msg, my_expected.class, my_actual.class)
-    x = assert_raises (Minitest::Assertion) do
-      assert_equal(my_expected, my_actual, msg)
-    end
-    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
 
   end
 
+  class MySet < Set; end
   def test_set
     expected = Set.new([
         'Cia ina do ip ocat doat.',
@@ -162,10 +148,10 @@ EOT
         'eser in dolo eaata labor ut.',
     ])
     msg = 'My message'
-    lucid = <<EOT
-Message:  #{msg}
-Expected class:  #{expected.class}
-Actual class:  #{actual.class}
+    lucid_format = <<EOT
+Message:  %s
+Expected class:  %s
+Actual class:  %s
 elucidation = {
   :missing => {
     'Eser in dolo eaata labor ut.',
@@ -184,10 +170,22 @@ elucidation = {
     'Sunt sed te coma teu alaaame.',
   },
 EOT
-    x = assert_raises (Minitest::Assertion) do
-      assert_equal(expected, actual, msg)
+    my_expected = MySet.new.merge(expected)
+    my_actual = MySet.new.merge(actual)
+    [
+        [expected, actual],
+        [my_expected, actual],
+        [expected, my_actual],
+        [my_expected, my_actual]
+    ].each do |pair|
+      exp, act = *pair
+      msg = "#{exp.class} and #{act.class}"
+      x = assert_raises (Minitest::Assertion) do
+        assert_equal(exp, act, msg)
+      end
+      lucid = format(lucid_format, msg, exp.class, act.class)
+      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
     end
-    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
   end
 
   def test_struct
