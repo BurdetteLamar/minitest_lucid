@@ -26,26 +26,29 @@ module Minitest
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
 
     def elucidate(exception, expected, actual, msg)
-      elucidation_method = nil
-      # Determine whether one of the objects is directly elucidatable.
-      if ELUCIDATABLE_CLASSES.include?(expected.class)
-        if actual.kind_of?(expected.class)
-          elucidation_method = METHOD_FOR_CLASS.fetch(expected.class)
+      # Lookup objects in hash.
+      def lookup(one_object, other_object)
+        if ELUCIDATABLE_CLASSES.include?(one_object.class)
+          if other_object.kind_of?(one_object.class)
+            return METHOD_FOR_CLASS.fetch(one_object.class)
+          end
         end
-      elsif ELUCIDATABLE_CLASSES.include?(actual.class)
-        if expected.kind_of?(actual.class)
-          elucidation_method = METHOD_FOR_CLASS.fetch(actual.class)
-        end
+        nil
       end
-      unless elucidation_method
-        # Poll with kind_of?.
+      # Poll with kind_of?.
+      def poll(expected, actual)
         METHOD_FOR_CLASS.each_pair do |klass, method|
           next unless expected.kind_of?(klass)
           next unless actual.kind_of?(klass)
-          elucidation_method = method
+          return method
           break
         end
+        nil
       end
+      elucidation_method  =
+          lookup(expected, actual) ||
+          lookup(actual, expected) ||
+          poll(expected, actual)
       if elucidation_method
         lines = ['']
         lines.push("Message:  #{msg}") if msg
