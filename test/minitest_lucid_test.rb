@@ -58,6 +58,7 @@ EOT
     # assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
   end
 
+  class MyHash < Hash; end
   def test_hash
     expected = {
         :tauro => 'Cia ina do ip ocat doat.',
@@ -75,11 +76,10 @@ EOT
         :tauro => 'cia ina do ip ocat doat.',
         :amcae => 'Utatu cilaa cit siat commag seqa.',
     }
-    msg = 'My message'
-    lucid = <<EOT
-Message:  #{msg}
-Expected class:  #{expected.class}
-Actual class:  #{actual.class}
+    lucid_format = <<EOT
+Message:  %s
+Expected class:  %s
+Actual class:  %s
 elucidation = {
   :missing_pairs => {
     :offab => 'Ut dolore ua consal vaba caea.',
@@ -105,10 +105,39 @@ elucidation = {
   },
 }
 EOT
+
+    # To test when kind_of?
+    my_expected = MyHash.new.merge(expected)
+    my_actual = MyHash.new.merge(actual)
+
+    msg = 'Hash and Hash'
+    lucid = format(lucid_format, msg, expected.class, actual.class)
     x = assert_raises (Minitest::Assertion) do
       assert_equal(expected, actual, msg)
     end
     assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+
+    msg = 'MyHash and Hash'
+    lucid = format(lucid_format, msg, my_expected.class, actual.class)
+    x = assert_raises (Minitest::Assertion) do
+      assert_equal(my_expected, actual, msg)
+    end
+    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+
+    msg = 'Hash and MyHash'
+    lucid = format(lucid_format, msg, expected.class, my_actual.class)
+    x = assert_raises (Minitest::Assertion) do
+      assert_equal(expected, my_actual, msg)
+    end
+    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+
+    msg = 'MyHash and MyHash'
+    lucid = format(lucid_format, msg, my_expected.class, my_actual.class)
+    x = assert_raises (Minitest::Assertion) do
+      assert_equal(my_expected, my_actual, msg)
+    end
+    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+
   end
 
   def test_set
