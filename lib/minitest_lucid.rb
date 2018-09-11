@@ -18,17 +18,33 @@ module Minitest
       end
     end
 
+    METHOD_FOR_CLASS = {
+        Struct => :elucidate_struct,
+        Hash => :elucidate_hash,
+        Set => :elucidate_set,
+    }
+    ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
+
     def elucidate(exception, expected, actual, msg)
       elucidation_method = nil
-      {
-          Hash => :elucidate_hash,
-          Struct => :elucidate_struct,
-          Set => :elucidate_set,
-      }.each_pair do |klass, method|
-        next unless expected.kind_of?(klass)
-        next unless actual.kind_of?(klass)
-        elucidation_method = method
-        break
+      # Determine whether one of the objects is directly elucidatable.
+      if ELUCIDATABLE_CLASSES.include?(expected.class)
+        if actual.kind_of?(expected.class)
+          elucidation_method = METHOD_FOR_CLASS.fetch(expected.class)
+        end
+      elsif ELUCIDATABLE_CLASSES.include?(actual.class)
+        if expected.kind_of?(actual.class)
+          elucidation_method = METHOD_FOR_CLASS.fetch(actual.class)
+        end
+      end
+      unless elucidation_method
+        # Poll with kind_of?.
+        METHOD_FOR_CLASS.each_pair do |klass, method|
+          next unless expected.kind_of?(klass)
+          next unless actual.kind_of?(klass)
+          elucidation_method = method
+          break
+        end
       end
       if elucidation_method
         lines = ['']
@@ -116,6 +132,7 @@ module Minitest
           when actual_value
             h[:unexpected_pairs].store(key, actual_value)
           else
+            fail [expected_value, actual_value].inspect
         end
       end
       lines.push('elucidation = {')
