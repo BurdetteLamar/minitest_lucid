@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'diff/lcs'
 require 'set'
 
 require 'minitest_lucid/version'
@@ -17,27 +18,93 @@ module Minitest
       end
     end
 
+    METHOD_FOR_CLASS = {
+        Struct => :elucidate_struct,
+        Hash => :elucidate_hash,
+        Array => :elucidate_array,
+        Set => :elucidate_set,
+    }
+    ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
+
     def elucidate(exception, expected, actual, msg)
-      elucidation_method = nil
-      {
-          [:each_pair] => :elucidate_each_pair,
-      }.each_pair do |discriminant_methods, method|
-        discriminant_methods.each do |discriminant_method|
-          next unless expected.respond_to?(discriminant_method)
-          next unless actual.respond_to?(discriminant_method)
-          elucidation_method = method
+      # Lookup objects in hash.
+      def lookup(one_object, other_object)
+        if ELUCIDATABLE_CLASSES.include?(one_object.class)
+          if other_object.kind_of?(one_object.class)
+            return METHOD_FOR_CLASS.fetch(one_object.class)
+          end
+        end
+        nil
+      end
+      # Poll with kind_of?.
+      def poll(expected, actual)
+        METHOD_FOR_CLASS.each_pair do |klass, method|
+          next unless expected.kind_of?(klass)
+          next unless actual.kind_of?(klass)
+          return method
           break
         end
-        break if elucidation_method
+        nil
       end
+      elucidation_method  =
+          lookup(expected, actual) ||
+          lookup(actual, expected) ||
+          poll(expected, actual)
       if elucidation_method
-        send(elucidation_method, exception, expected, actual, msg)
+        lines = ['']
+        lines.push("Message:  #{msg}") if msg
+        lines.push("Expected class:  #{expected.class}")
+        lines.push("Actual class:  #{actual.class}")
+        send(elucidation_method, exception, expected, actual, lines)
+        lines.push('')
+        message = lines.join("\n")
+        new_exception = exception.exception(message)
+        new_exception.set_backtrace(exception.backtrace)
+        raise new_exception
       else
         raise
       end
     end
 
-    def elucidate_each_pair(exception, expected, actual, msg)
+    def elucidate_array(exception, expected, actual, lines)
+      sdiff = Diff::LCS.sdiff(expected, actual)
+      changes = {}
+      statuses = {
+          '!' => 'changed',
+          '+' => 'unexpected',
+          '-' => 'missing',
+          '=' => 'unchanged'
+      }
+      sdiff.each_with_index do |change, i|
+        status = statuses.fetch(change.action)
+        key = "change_#{i}"
+        change_data = {
+            :status => status,
+            :"old_index_#{change.old_position}" => change.old_element.inspect,
+            :"new_index_#{change.new_position}" => change.new_element.inspect,
+        }
+        changes.store(key, change_data)
+      end
+      lines.push('elucidation = [')
+      changes.each_pair do |category, change_data|
+        status = change_data.delete(:status)
+        if status == 'unexpected'
+          change_data.delete_if {|key, value| key.match(/old/) }
+        end
+        if status == 'missing'
+          change_data.delete_if {|key, value| key.match(/new/) }
+        end
+        lines.push('  {')
+        lines.push("  :status => :#{status},")
+        change_data.each_pair do |k, v|
+          lines.push("  :#{k} => #{v},")
+        end
+        lines.push('  },')
+      end
+      lines.push(']')
+    end
+
+    def elucidate_hash(exception, expected, actual, lines)
       expected_keys = expected.keys
       actual_keys = actual.keys
       keys = Set.new(expected_keys + actual_keys)
@@ -62,32 +129,79 @@ module Minitest
           when actual_value
             h[:unexpected_pairs].store(key, actual_value)
           else
+            fail [expected_value, actual_value].inspect
         end
       end
-      lines = ['']
-      lines.push("Message:  #{msg}") if msg
       lines.push('elucidation = {')
       h.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("  #{pretty(category)} => {")
         items.each_pair do |key, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("      #{pretty(key)} => {")
-            lines.push("        :expected => #{pretty(expected)},")
-            lines.push("        :got      => #{pretty(actual)},")
-            lines.push('      },')
+            lines.push("    #{pretty(key)} => {")
+            lines.push("      :expected => #{pretty(expected)},")
+            lines.push("      :got      => #{pretty(actual)},")
+            lines.push('    },')
           else
-            lines.push("      #{pretty(key)} => #{pretty(value)},")
+            lines.push("    #{pretty(key)} => #{pretty(value)},")
           end
         end
-        lines.push('    },')
+        lines.push('  },')
       end
       lines.push('}')
-      lines.push('')
-      message = lines.join("\n")
-      new_exception = exception.exception(message)
-      new_exception.set_backtrace(exception.backtrace)
-      raise new_exception
+    end
+
+    def elucidate_set(exception, expected, actual, lines)
+      result = {
+          :missing => expected.difference(actual),
+          :unexpected => actual.difference(expected),
+          :ok => expected.intersection(actual),
+      }
+      lines.push('elucidation = {')
+      result.each_pair do |category, items|
+        lines.push("  #{pretty(category)} => {")
+        items.each do |member|
+          lines.push("    #{pretty(member)},")
+        end
+        lines.push('  },')
+      end
+      lines.push('}')
+    end
+
+    def elucidate_struct(exception, expected, actual, lines)
+      expected_members = expected.members
+      actual_members = actual.members
+      members = Set.new(expected_members + actual_members)
+      h = {
+          :changed_values => {},
+          :ok_values => {},
+      }
+      members.each do |member|
+        expected_value = expected[member]
+        actual_value = actual[member]
+        if expected_value == actual_value
+          h[:ok_values].store(member, expected_value)
+        else
+          h[:changed_values].store(member, [expected_value, actual_value])
+        end
+      end
+      lines.push('elucidation = {')
+      h.each_pair do |category, items|
+        lines.push("  #{pretty(category)} => {")
+        items.each_pair do |member, value|
+          if value.instance_of?(Array)
+            expected, actual = *value
+            lines.push("    #{pretty(member)} => {")
+            lines.push("      :expected => #{pretty(expected)},")
+            lines.push("      :got      => #{pretty(actual)},")
+            lines.push('    },')
+          else
+            lines.push("    #{pretty(member)} => #{pretty(value)},")
+          end
+        end
+        lines.push('  },')
+      end
+      lines.push('}')
     end
 
     def pretty(arg)
