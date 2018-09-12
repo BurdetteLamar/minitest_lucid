@@ -21,6 +21,7 @@ module Minitest
     METHOD_FOR_CLASS = {
         Struct => :elucidate_struct,
         Hash => :elucidate_hash,
+        Array => :elucidate_array,
         Set => :elucidate_set,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
@@ -79,35 +80,28 @@ module Minitest
         key = "change_#{i}"
         change_data = {
             :status => status,
-            :old => "pos=#{change.old_position} ele=#{change.old_element}",
-            :new => "pos=#{change.new_position} ele=#{change.new_element}",
+            :"old_index_#{change.old_position}" => change.old_element.inspect,
+            :"new_index_#{change.new_position}" => change.new_element.inspect,
         }
         changes.store(key, change_data)
       end
-      p changes
-      lines.push('elucidation = {')
+      lines.push('elucidation = [')
       changes.each_pair do |category, change_data|
-        p category
         status = change_data.delete(:status)
-        change_data.delete(:old) if status == 'unexpected'
-        change_data.delete(:new) if status == 'missing'
-        change_data.each_pair do |k, v|
-          p [k, v]
+        if status == 'unexpected'
+          change_data.delete_if {|key, value| key.match(/old/) }
         end
+        if status == 'missing'
+          change_data.delete_if {|key, value| key.match(/new/) }
+        end
+        lines.push('  {')
+        lines.push("  :status => :#{status},")
+        change_data.each_pair do |k, v|
+          lines.push("  :#{k} => #{v},")
+        end
+        lines.push('  },')
       end
-      lines.push('}')
-      # put_element('analysis', attrs) do
-      #   changes.each_pair do |key, change_data|
-      #     status = change_data.delete(:status)
-      #     change_data.delete(:old) if status == 'unexpected'
-      #     change_data.delete(:new) if status == 'missing'
-      #     put_element(status) do
-      #       change_data.each_pair do |k, v|
-      #         put_element(k.to_s, v)
-      #       end
-      #     end
-      #   end
-      # end
+      lines.push(']')
     end
 
     def elucidate_hash(exception, expected, actual, lines)

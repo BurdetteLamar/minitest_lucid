@@ -8,7 +8,8 @@ class MinitestLucidTest < Minitest::Test
     refute_nil ::MinitestLucid::VERSION
   end
 
-  def zzz_test_array
+  class MyArray < Array; end
+  def test_array
     expected = [
         'Cia ina do ip ocat doat.',
         'Dua sarat rad noad maat caea.',
@@ -21,41 +22,84 @@ class MinitestLucidTest < Minitest::Test
     ]
     actual = [
         'Cia ina do ip ocat doat.',
-        'Dua sarat rad noad maat caea.',
-        'eser in dolo eaata labor ut.',
-        'ipaat paal doat iruat ala magabor.',
+        'dua sarat rad noad maat caea.',
         'Ut dolore ua consal vaba caea.',
         'Sunt sed te coma teu alaaame.',
+        'Eser in dolo eaata labor ut.',
+        'Ipaat paal doat iruat ala magabor.',
         'laboab vaga dat maaua in venima.',
-        'eser in dolo eaata labor ut.',
+        'Eser in dolo eaata labor ut.',
     ]
-    msg = 'My message'
-    lucid = <<EOT
-Message:  #{msg}
-Expected class:  #{expected.class}
-Actual class:  #{actual.class}
-elucidation = {
-  :missing => {
-    'Eser in dolo eaata labor ut.',
-    'Ipaat paal doat iruat ala magabor.',
-    'Laboab vaga dat maaua in venima.',
+    lucid_format = <<EOT
+Message:  %s
+Expected class:  %s
+Actual class:  %s
+elucidation = [
+  {
+    :status => :unchanged,
+    :old_index_0 => "Cia ina do ip ocat doat.",
+    :new_index_0 => "Cia ina do ip ocat doat.",
   },
-  :unexpected => {
-    'eser in dolo eaata labor ut.',
-    'ipaat paal doat iruat ala magabor.',
-    'laboab vaga dat maaua in venima.',
+  {
+    :status => :changed,
+    :old_index_1 => "Dua sarat rad noad maat caea.",
+    :new_index_1 => "dua sarat rad noad maat caea.",
   },
-  :ok => {
-    'Cia ina do ip ocat doat.',
-    'Dua sarat rad noad maat caea.',
-    'Ut dolore ua consal vaba caea.',
-    'Sunt sed te coma teu alaaame.',
+  {
+    :status => :missing,
+    :old_index_2 => "Eser in dolo eaata labor ut.",
   },
+  {
+    :status => :missing,
+    :old_index_3 => "Ipaat paal doat iruat ala magabor.",
+  },
+  {
+    :status => :unchanged,
+    :old_index_4 => "Ut dolore ua consal vaba caea.",
+    :new_index_2 => "Ut dolore ua consal vaba caea.",
+  },
+  {
+    :status => :unchanged,
+    :old_index_5 => "Sunt sed te coma teu alaaame.",
+    :new_index_3 => "Sunt sed te coma teu alaaame.",
+  },
+  {
+    :status => :changed,
+    :old_index_6 => "Laboab vaga dat maaua in venima.",
+    :new_index_4 => "Eser in dolo eaata labor ut.",
+  },
+  {
+    :status => :unexpected,
+    :new_index_5 => "Ipaat paal doat iruat ala magabor.",
+  },
+  {
+    :status => :unexpected,
+    :new_index_6 => "laboab vaga dat maaua in venima.",
+  },
+  {
+    :status => :unchanged,
+    :old_index_7 => "Eser in dolo eaata labor ut.",
+    :new_index_7 => "Eser in dolo eaata labor ut.",
+  },
+]
+
 EOT
-    x = assert_raises (Minitest::Assertion) do
-      assert_equal(expected, actual, msg)
+    my_expected = MyArray.new + expected
+    my_actual = MyArray.new + actual
+    [
+        [expected, actual],
+        [my_expected, actual],
+        [expected, my_actual],
+        [my_expected, my_actual]
+    ].each do |pair|
+      exp, act = *pair
+      msg = "#{exp.class} and #{act.class}"
+      x = assert_raises (Minitest::Assertion) do
+        assert_equal(exp, act, msg)
+      end
+      lucid = format(lucid_format, msg, exp.class, act.class)
+      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
     end
-    # assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
   end
 
   class MyHash < Hash; end
