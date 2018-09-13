@@ -1,4 +1,4 @@
-require 'minitest/autorun'
+require 'minitest'
 require 'diff/lcs'
 require 'set'
 
@@ -26,26 +26,28 @@ module Minitest
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
 
+    # Lookup objects in hash.
+    def lookup(one_object, other_object)
+      if ELUCIDATABLE_CLASSES.include?(one_object.class)
+        if other_object.kind_of?(one_object.class)
+          return METHOD_FOR_CLASS.fetch(one_object.class)
+        end
+      end
+      nil
+    end
+
+    # Poll with kind_of?.
+    def poll(expected, actual)
+      METHOD_FOR_CLASS.each_pair do |klass, method|
+        next unless expected.kind_of?(klass)
+        next unless actual.kind_of?(klass)
+        return method
+        break
+      end
+      nil
+    end
+
     def elucidate(exception, expected, actual, msg)
-      # Lookup objects in hash.
-      def lookup(one_object, other_object)
-        if ELUCIDATABLE_CLASSES.include?(one_object.class)
-          if other_object.kind_of?(one_object.class)
-            return METHOD_FOR_CLASS.fetch(one_object.class)
-          end
-        end
-        nil
-      end
-      # Poll with kind_of?.
-      def poll(expected, actual)
-        METHOD_FOR_CLASS.each_pair do |klass, method|
-          next unless expected.kind_of?(klass)
-          next unless actual.kind_of?(klass)
-          return method
-          break
-        end
-        nil
-      end
       elucidation_method  =
           lookup(expected, actual) ||
           lookup(actual, expected) ||
@@ -218,5 +220,5 @@ module Minitest
     end
 
   end
-  
+
 end

@@ -1,4 +1,4 @@
-require 'minitest_lucid'
+require 'test_helper'
 
 class MinitestLucidTest < Minitest::Test
 
@@ -9,7 +9,7 @@ class MinitestLucidTest < Minitest::Test
   end
 
   class MyArray < Array; end
-  def test_array
+  def zzz_test_array
     expected = [
         'Cia ina do ip ocat doat.',
         'Dua sarat rad noad maat caea.',
