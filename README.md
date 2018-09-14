@@ -1,9 +1,64 @@
 # Minitest Lucid
 
-Use ```minitest_lucid``` to improve error messages from ```minitest```.
+Use ```minitest_lucid``` to improve assertion messages from ```minitest```.
 
+## Usage
+
+To use ```minitest_lucid```, install the gem and then in your tests,
+
+```ruby
+require 'minitest_lucid'
+```
+
+instead of
+
+```ruby
+require 'minitest/autorun'
+```
+
+No other code change is required.
+
+For example, change this test
+
+```not_lucid.rb```:
+```ruby
+require 'minitest/autorun'
+
+class MyTest < Minitest::Test
+
+  def test_foo
+    expected = {:a => 0, :b => 1}
+    actual = {}
+    assert_equal(expected, actual)
+  end
+end
+```
+
+to this
+
+```lucid.rb```:
+```ruby
+require 'minitest_lucid'
+
+class MyTest < Minitest::Test
+
+  def test_foo
+    expected = {:a => 0, :b => 1}
+    actual = {}
+    assert_equal(expected, actual)
+  end
+end
+```
+
+See example outputs below.
 
 ## Supported Classes
+
+For supported classes, method ```assert_equal``` gets elucidated handling.
+
+For other classes and assertion methods, the original assertion behaviors are unchanged.
+
+The supported classes:
 
 - [Hash](#hash)
 - [Set](#set)
@@ -422,7 +477,8 @@ def actual
     'Noabor modo autaa aata.',
     'Ad irab ut cupar.',
     )
-end```
+end
+```
 
 The default ```Minitest::Assertion``` message:
 

@@ -1,4 +1,4 @@
-require 'minitest'
+require 'minitest/autorun'
 require 'diff/lcs'
 require 'set'
 
