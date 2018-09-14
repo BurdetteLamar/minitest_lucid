@@ -19,7 +19,7 @@ module Minitest
     METHOD_FOR_CLASS = {
         Hash => :elucidate_hash,
         Set => :elucidate_set,
-        # Struct => :elucidate_struct,
+        Struct => :elucidate_struct,
         # Array => :elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
@@ -200,23 +200,31 @@ module Minitest
           h[:changed_values].store(member, [expected_value, actual_value])
         end
       end
-      lines.push('elucidation = {')
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
       h.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => {")
+        lines.push("    #{pretty(category)} => {")
         items.each_pair do |member, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("    #{pretty(member)} => {")
-            lines.push("      :expected => #{pretty(expected)},")
-            lines.push("      :got      => #{pretty(actual)},")
-            lines.push('    },')
+            lines.push("      #{pretty(member)} => {")
+            lines.push("        :expected => #{pretty(expected)},")
+            lines.push("        :got      => #{pretty(actual)},")
+            lines.push('      },')
           else
-            lines.push("    #{pretty(member)} => #{pretty(value)},")
+            lines.push("      #{pretty(member)} => #{pretty(value)},")
           end
         end
-        lines.push('  },')
+        lines.push('    },')
       end
-      lines.push('}')
+      lines.push('  }')
     end
 
     def pretty(arg)
