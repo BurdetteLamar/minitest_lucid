@@ -289,72 +289,176 @@ EOT
   
 
 
-  def zzz_test_struct
+  def test_struct
     Struct.new('MyStruct',
-               :tauro,
-               :loquens,
-               :lor,
-               :dolo,
-               :offab,
-               :moam,
-               :laboru,
-               :amcae,
+               :cat,
+               :etur,
+               :est,
+               :iam,
+               :ent,
+               :et,
+               :aabor,
+               :quaa,
+               :quipa,
+               :estat,
+               :deseqama,
+               :dolor,
+               :occat,
+               :enim,
+               :sing,
+               :ea,
+               :sicingaeaada,
+               :labam,
+               :eaaua,
+               :suaa,
+               :amea,
+               :magat,
+               :lam,
+               :re,
+               :ex,
     )
     expected = Struct::MyStruct.new(
-        'Cia ina do ip ocat doat.',
-        'Dua sarat rad noad maat caea.',
-        'Eser in dolo eaata labor ut.',
-        'Ipaat paal doat iruat ala magabor.',
-        'Ut dolore ua consal vaba caea.',
-        'Sunt sed te coma teu alaaame.',
-        'Laboab vaga dat maaua in venima.',
-        'Eser in dolo eaata labor ut.',
-    )
+        'Venia con maga qaboadaa.',
+        'Esea alit ut ofabo.',
+        'Etuata ing mina famcom.',
+        'Irur ciat nullum nis.',
+        'Sin maga eaaec aate.',
+        'Idua amag la ip.',
+        'Dolo cida maal exceaad.',
+        'Exce exea autat alabaa.',
+        'Oat adaa eser qatat.',
+        'Paar seaali ocaabor prabo.',
+        'Cona catat exat dolo.',
+        'Miat dat adid labo.',
+        'Coam ea naat caatati.',
+        'Idaat cat do in.',
+        'Ut quatat adaat excae.',
+        'Adip iatatet auaa vea.',
+        'In ex con ent.',
+        'Oatiat in amcons adaature.',
+        'Exatate labo ulla re.',
+        'Auta te esta para.',
+        'Ipia sea commol magna.',
+        'Endenia eur in aliamaga.',
+        'Noabor modo autaa aata.',
+        'Ad irab ut cupar.',
+        'Si voaabor alit occaaa.',
+        )
     actual = Struct::MyStruct.new(
-        'Cia ina do ip ocat doat.',
-        'Dua sarat rad noad maat caea.',
-        'eser in dolo eaata labor ut.',
-        'ipaat paal doat iruat ala magabor.',
-        'Ut dolore ua consal vaba caea.',
-        'Sunt sed te coma teu alaaame.',
-        'laboab vaga dat maaua in venima.',
-        'eser in dolo eaata labor ut.',
+        'venia con maga qaboadaa.',
+        'esea alit ut ofabo.',
+        'etuata ing mina famcom.',
+        'irur ciat nullum nis.',
+        'Sin maga eaaec aate.',
+        'Idua amag la ip.',
+        'Dolo cida maal exceaad.',
+        'Exce exea autat alabaa.',
+        'oat adaa eser qatat.',
+        'paar seaali ocaabor prabo.',
+        'cona catat exat dolo.',
+        'miat dat adid labo.',
+        'Coam ea naat caatati.',
+        'Idaat cat do in.',
+        'Ut quatat adaat excae.',
+        'Adip iatatet auaa vea.',
+        'in ex con ent.',
+        'oatiat in amcons adaature.',
+        'exatate labo ulla re.',
+        'auta te esta para.',
+        'Ipia sea commol magna.',
+        'Endenia eur in aliamaga.',
+        'Noabor modo autaa aata.',
+        'Ad irab ut cupar.',
     )
     msg = 'My message'
-    lucid = <<EOT
-Message:  #{msg}
-Expected class:  #{expected.class}
-Actual class:  #{actual.class}
-elucidation = {
-  :changed_values => {
-    :lor => {
-      :expected => 'Eser in dolo eaata labor ut.',
-      :got      => 'eser in dolo eaata labor ut.',
-    },
-    :dolo => {
-      :expected => 'Ipaat paal doat iruat ala magabor.',
-      :got      => 'ipaat paal doat iruat ala magabor.',
-    },
-    :laboru => {
-      :expected => 'Laboab vaga dat maaua in venima.',
-      :got      => 'laboab vaga dat maaua in venima.',
-    },
-    :amcae => {
-      :expected => 'Eser in dolo eaata labor ut.',
-      :got      => 'eser in dolo eaata labor ut.',
-    },
+    lucid_format = <<EOT
+
+{
+  :message => 'My message',
+  :expected => {
+    :class => %s,
+    :size => 25,
   },
-  :ok_values => {
-    :tauro => 'Cia ina do ip ocat doat.',
-    :loquens => 'Dua sarat rad noad maat caea.',
-    :offab => 'Ut dolore ua consal vaba caea.',
-    :moam => 'Sunt sed te coma teu alaaame.',
+  :actual => {
+    :class => %s,
+    :size => 25,
   },
+  :elucidation => {
+    :changed_values => {
+      :cat => {
+        :expected => 'Venia con maga qaboadaa.',
+        :got      => 'venia con maga qaboadaa.',
+      },
+      :etur => {
+        :expected => 'Esea alit ut ofabo.',
+        :got      => 'esea alit ut ofabo.',
+      },
+      :est => {
+        :expected => 'Etuata ing mina famcom.',
+        :got      => 'etuata ing mina famcom.',
+      },
+      :iam => {
+        :expected => 'Irur ciat nullum nis.',
+        :got      => 'irur ciat nullum nis.',
+      },
+      :quipa => {
+        :expected => 'Oat adaa eser qatat.',
+        :got      => 'oat adaa eser qatat.',
+      },
+      :estat => {
+        :expected => 'Paar seaali ocaabor prabo.',
+        :got      => 'paar seaali ocaabor prabo.',
+      },
+      :deseqama => {
+        :expected => 'Cona catat exat dolo.',
+        :got      => 'cona catat exat dolo.',
+      },
+      :dolor => {
+        :expected => 'Miat dat adid labo.',
+        :got      => 'miat dat adid labo.',
+      },
+      :sicingaeaada => {
+        :expected => 'In ex con ent.',
+        :got      => 'in ex con ent.',
+      },
+      :labam => {
+        :expected => 'Oatiat in amcons adaature.',
+        :got      => 'oatiat in amcons adaature.',
+      },
+      :eaaua => {
+        :expected => 'Exatate labo ulla re.',
+        :got      => 'exatate labo ulla re.',
+      },
+      :suaa => {
+        :expected => 'Auta te esta para.',
+        :got      => 'auta te esta para.',
+      },
+      :ex => {
+        :expected => 'Si voaabor alit occaaa.',
+        :got      => nil,
+      },
+    },
+    :ok_values => {
+      :ent => 'Sin maga eaaec aate.',
+      :et => 'Idua amag la ip.',
+      :aabor => 'Dolo cida maal exceaad.',
+      :quaa => 'Exce exea autat alabaa.',
+      :occat => 'Coam ea naat caatati.',
+      :enim => 'Idaat cat do in.',
+      :sing => 'Ut quatat adaat excae.',
+      :ea => 'Adip iatatet auaa vea.',
+      :amea => 'Ipia sea commol magna.',
+      :magat => 'Endenia eur in aliamaga.',
+      :lam => 'Noabor modo autaa aata.',
+      :re => 'Ad irab ut cupar.',
+    },
+  }
 }
 EOT
     x = assert_raises (Minitest::Assertion) do
       assert_equal(expected, actual, msg)
     end
+    lucid = format(lucid_format, expected.class, actual.class)
     assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
   end
 

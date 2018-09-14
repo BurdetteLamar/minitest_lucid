@@ -7,10 +7,13 @@ Use ```minitest_lucid``` to improve error messages from ```minitest```.
 
 - [Hash](#hash)
 - [Set](#set)
+- [Struct](#struct)
 
 @[:markdown](hash/template.md)
 
 @[:markdown](set/template.md)
+
+@[:markdown](struct/template.md)
 
 
 

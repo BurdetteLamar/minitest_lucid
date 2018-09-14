@@ -7,6 +7,7 @@ Use ```minitest_lucid``` to improve error messages from ```minitest```.
 
 - [Hash](#hash)
 - [Set](#set)
+- [Struct](#struct)
 
 ### Hash
 
@@ -324,6 +325,246 @@ Message using ```minitest_lucid```
       'Irud ming fat int.',
       'Siaa miaation vagna alaa.',
       'Tatua ididun offia doaut.',
+    },
+  }
+}
+```
+
+### Struct
+
+#### assert_equal
+
+Here are structs, expected and actual, to be compared.
+
+```data.rb```:
+```ruby
+Struct.new('MyStruct',
+           :cat,
+           :etur,
+           :est,
+           :iam,
+           :ent,
+           :et,
+           :aabor,
+           :quaa,
+           :quipa,
+           :estat,
+           :deseqama,
+           :dolor,
+           :occat,
+           :enim,
+           :sing,
+           :ea,
+           :sicingaeaada,
+           :labam,
+           :eaaua,
+           :suaa,
+           :amea,
+           :magat,
+           :lam,
+           :re,
+           :ex,
+           )
+def expected
+  Struct::MyStruct.new(
+    'Venia con maga qaboadaa.',
+    'Esea alit ut ofabo.',
+    'Etuata ing mina famcom.',
+    'Irur ciat nullum nis.',
+    'Sin maga eaaec aate.',
+    'Idua amag la ip.',
+    'Dolo cida maal exceaad.',
+    'Exce exea autat alabaa.',
+    'Oat adaa eser qatat.',
+    'Paar seaali ocaabor prabo.',
+    'Cona catat exat dolo.',
+    'Miat dat adid labo.',
+    'Coam ea naat caatati.',
+    'Idaat cat do in.',
+    'Ut quatat adaat excae.',
+    'Adip iatatet auaa vea.',
+    'In ex con ent.',
+    'Oatiat in amcons adaature.',
+    'Exatate labo ulla re.',
+    'Auta te esta para.',
+    'Ipia sea commol magna.',
+    'Endenia eur in aliamaga.',
+    'Noabor modo autaa aata.',
+    'Ad irab ut cupar.',
+    'Si voaabor alit occaaa.',
+    )
+end
+
+def actual
+  Struct::MyStruct.new(
+    'venia con maga qaboadaa.',
+    'esea alit ut ofabo.',
+    'etuata ing mina famcom.',
+    'irur ciat nullum nis.',
+    'Sin maga eaaec aate.',
+    'Idua amag la ip.',
+    'Dolo cida maal exceaad.',
+    'Exce exea autat alabaa.',
+    'oat adaa eser qatat.',
+    'paar seaali ocaabor prabo.',
+    'cona catat exat dolo.',
+    'miat dat adid labo.',
+    'Coam ea naat caatati.',
+    'Idaat cat do in.',
+    'Ut quatat adaat excae.',
+    'Adip iatatet auaa vea.',
+    'in ex con ent.',
+    'oatiat in amcons adaature.',
+    'exatate labo ulla re.',
+    'auta te esta para.',
+    'Ipia sea commol magna.',
+    'Endenia eur in aliamaga.',
+    'Noabor modo autaa aata.',
+    'Ad irab ut cupar.',
+    )
+end```
+
+The default ```Minitest::Assertion``` message:
+
+```default.txt```:
+```diff
+--- expected
++++ actual
+@@ -1 +1 @@
+-#<struct Struct::MyStruct cat="Venia con maga qaboadaa.", etur="Esea alit ut ofabo.", est="Etuata ing mina famcom.", iam="Irur ciat nullum nis.", ent="Sin maga eaaec aate.", et="Idua amag la ip.", aabor="Dolo cida maal exceaad.", quaa="Exce exea autat alabaa.", quipa="Oat adaa eser qatat.", estat="Paar seaali ocaabor prabo.", deseqama="Cona catat exat dolo.", dolor="Miat dat adid labo.", occat="Coam ea naat caatati.", enim="Idaat cat do in.", sing="Ut quatat adaat excae.", ea="Adip iatatet auaa vea.", sicingaeaada="In ex con ent.", labam="Oatiat in amcons adaature.", eaaua="Exatate labo ulla re.", suaa="Auta te esta para.", amea="Ipia sea commol magna.", magat="Endenia eur in aliamaga.", lam="Noabor modo autaa aata.", re="Ad irab ut cupar.", ex="Si voaabor alit occaaa.">
++#<struct Struct::MyStruct cat="venia con maga qaboadaa.", etur="esea alit ut ofabo.", est="etuata ing mina famcom.", iam="irur ciat nullum nis.", ent="Sin maga eaaec aate.", et="Idua amag la ip.", aabor="Dolo cida maal exceaad.", quaa="Exce exea autat alabaa.", quipa="oat adaa eser qatat.", estat="paar seaali ocaabor prabo.", deseqama="cona catat exat dolo.", dolor="miat dat adid labo.", occat="Coam ea naat caatati.", enim="Idaat cat do in.", sing="Ut quatat adaat excae.", ea="Adip iatatet auaa vea.", sicingaeaada="in ex con ent.", labam="oatiat in amcons adaature.", eaaua="exatate labo ulla re.", suaa="auta te esta para.", amea="Ipia sea commol magna.", magat="Endenia eur in aliamaga.", lam="Noabor modo autaa aata.", re="Ad irab ut cupar.", ex=nil>
+```
+
+Message using ```make_my_diffs_pretty!```:
+
+```better.txt```:
+```diff
+--- expected
++++ actual
+@@ -1,26 +1,26 @@
+ #<struct Struct::MyStruct
+- cat="Venia con maga qaboadaa.",
+- etur="Esea alit ut ofabo.",
+- est="Etuata ing mina famcom.",
+- iam="Irur ciat nullum nis.",
++ cat="venia con maga qaboadaa.",
++ etur="esea alit ut ofabo.",
++ est="etuata ing mina famcom.",
++ iam="irur ciat nullum nis.",
+  ent="Sin maga eaaec aate.",
+  et="Idua amag la ip.",
+  aabor="Dolo cida maal exceaad.",
+  quaa="Exce exea autat alabaa.",
+- quipa="Oat adaa eser qatat.",
+- estat="Paar seaali ocaabor prabo.",
+- deseqama="Cona catat exat dolo.",
+- dolor="Miat dat adid labo.",
++ quipa="oat adaa eser qatat.",
++ estat="paar seaali ocaabor prabo.",
++ deseqama="cona catat exat dolo.",
++ dolor="miat dat adid labo.",
+  occat="Coam ea naat caatati.",
+  enim="Idaat cat do in.",
+  sing="Ut quatat adaat excae.",
+  ea="Adip iatatet auaa vea.",
+- sicingaeaada="In ex con ent.",
+- labam="Oatiat in amcons adaature.",
+- eaaua="Exatate labo ulla re.",
+- suaa="Auta te esta para.",
++ sicingaeaada="in ex con ent.",
++ labam="oatiat in amcons adaature.",
++ eaaua="exatate labo ulla re.",
++ suaa="auta te esta para.",
+  amea="Ipia sea commol magna.",
+  magat="Endenia eur in aliamaga.",
+  lam="Noabor modo autaa aata.",
+  re="Ad irab ut cupar.",
+- ex="Si voaabor alit occaaa.">
++ ex=nil>
+```
+
+Message using ```minitest_lucid```
+
+```lucid.txt```:
+```ruby
+
+{
+  :expected => {
+    :class => Struct::MyStruct,
+    :size => 25,
+  },
+  :actual => {
+    :class => Struct::MyStruct,
+    :size => 25,
+  },
+  :elucidation => {
+    :changed_values => {
+      :cat => {
+        :expected => 'Venia con maga qaboadaa.',
+        :got      => 'venia con maga qaboadaa.',
+      },
+      :etur => {
+        :expected => 'Esea alit ut ofabo.',
+        :got      => 'esea alit ut ofabo.',
+      },
+      :est => {
+        :expected => 'Etuata ing mina famcom.',
+        :got      => 'etuata ing mina famcom.',
+      },
+      :iam => {
+        :expected => 'Irur ciat nullum nis.',
+        :got      => 'irur ciat nullum nis.',
+      },
+      :quipa => {
+        :expected => 'Oat adaa eser qatat.',
+        :got      => 'oat adaa eser qatat.',
+      },
+      :estat => {
+        :expected => 'Paar seaali ocaabor prabo.',
+        :got      => 'paar seaali ocaabor prabo.',
+      },
+      :deseqama => {
+        :expected => 'Cona catat exat dolo.',
+        :got      => 'cona catat exat dolo.',
+      },
+      :dolor => {
+        :expected => 'Miat dat adid labo.',
+        :got      => 'miat dat adid labo.',
+      },
+      :sicingaeaada => {
+        :expected => 'In ex con ent.',
+        :got      => 'in ex con ent.',
+      },
+      :labam => {
+        :expected => 'Oatiat in amcons adaature.',
+        :got      => 'oatiat in amcons adaature.',
+      },
+      :eaaua => {
+        :expected => 'Exatate labo ulla re.',
+        :got      => 'exatate labo ulla re.',
+      },
+      :suaa => {
+        :expected => 'Auta te esta para.',
+        :got      => 'auta te esta para.',
+      },
+      :ex => {
+        :expected => 'Si voaabor alit occaaa.',
+        :got      => nil,
+      },
+    },
+    :ok_values => {
+      :ent => 'Sin maga eaaec aate.',
+      :et => 'Idua amag la ip.',
+      :aabor => 'Dolo cida maal exceaad.',
+      :quaa => 'Exce exea autat alabaa.',
+      :occat => 'Coam ea naat caatati.',
+      :enim => 'Idaat cat do in.',
+      :sing => 'Ut quatat adaat excae.',
+      :ea => 'Adip iatatet auaa vea.',
+      :amea => 'Ipia sea commol magna.',
+      :magat => 'Endenia eur in aliamaga.',
+      :lam => 'Noabor modo autaa aata.',
+      :re => 'Ad irab ut cupar.',
     },
   }
 }
