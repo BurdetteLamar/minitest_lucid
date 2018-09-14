@@ -40,7 +40,6 @@ module Minitest
         next unless expected.kind_of?(klass)
         next unless actual.kind_of?(klass)
         return method
-        break
       end
       nil
     end
@@ -53,7 +52,7 @@ module Minitest
       if elucidation_method
         lines = ['']
         lines.push('{')
-        lines.push("  :message =>  #{msg}") if msg
+        lines.push("  :message => '#{msg}',") if msg
         send(elucidation_method, exception, expected, actual, lines)
         lines.push('}')
         lines.push('')
@@ -133,30 +132,30 @@ module Minitest
         end
       end
       lines.push('  :expected => {')
-      lines.push("    :class => #{expected.class}")
-      lines.push("    :size => #{expected.size}")
-      lines.push('  }')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
       lines.push('  :actual => {')
-      lines.push("    :class => #{actual.class}")
-      lines.push("    :size => #{actual.size}")
-      lines.push('  }')
-      lines.push('elucidation = {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
       h.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => {")
+        lines.push("    #{pretty(category)} => {")
         items.each_pair do |key, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("    #{pretty(key)} => {")
-            lines.push("      :expected => #{pretty(expected)},")
-            lines.push("      :got      => #{pretty(actual)},")
-            lines.push('    },')
+            lines.push("      #{pretty(key)} => {")
+            lines.push("        :expected => #{pretty(expected)},")
+            lines.push("        :got      => #{pretty(actual)},")
+            lines.push('      },')
           else
-            lines.push("    #{pretty(key)} => #{pretty(value)},")
+            lines.push("      #{pretty(key)} => #{pretty(value)},")
           end
         end
-        lines.push('  },')
+        lines.push('    },')
       end
-      lines.push('}')
+      lines.push('  }')
     end
 
     def elucidate_set(exception, expected, actual, lines)

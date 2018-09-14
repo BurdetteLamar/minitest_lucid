@@ -1,57 +1,57 @@
 
 {
   :expected => {
-    :class => Hash
-    :size => 19
-  }
+    :class => Hash,
+    :size => 19,
+  },
   :actual => {
-    :class => Hash
-    :size => 19
+    :class => Hash,
+    :size => 19,
+  },
+  :elucidation => {
+    :missing_pairs => {
+      :dolupi => 'Parali coal alit qad.',
+      :suata => 'Fadi iame adati na.',
+      :occaag => 'Co nulab nost paat.',
+      :ut => 'Param ad dua idatu.',
+      :anis => 'Sint adipi et aut.',
+    },
+    :unexpected_pairs => {
+      :euaaag => 'Enta adaad idess utetu.',
+      :eaarisau => 'Taabore magn naatat in.',
+      :esedat => 'Dola labor eu null.',
+      :cat => 'Cullum pa quip magat.',
+      :eua => 'Quat comm laal inaa.',
+    },
+    :changed_values => {
+      :enaam => {
+        :expected => 'La ofadi aliq caat.',
+        :got      => 'la ofadi aliq caat.',
+      },
+      :vent => {
+        :expected => 'Do velaa volor na.',
+        :got      => 'do velaa volor na.',
+      },
+      :labor => {
+        :expected => 'Aut tatat proam iat.',
+        :got      => 'aut tatat proam iat.',
+      },
+      :cidaa => {
+        :expected => 'Enia adiaamea deseaat eliqui.',
+        :got      => 'enia adiaamea deseaat eliqui.',
+      },
+    },
+    :ok_pairs => {
+      :ina => 'Alita tea loat qani.',
+      :con => 'Et sia adid qua.',
+      :qat => 'Magna voaa aaliqu maan.',
+      :ip => 'Utat iram adip voan.',
+      :ex => 'Vat eiua exca inci.',
+      :alitaaa => 'Eaam fugatia exat quis.',
+      :eaalabalab => 'Aut te magna aliq.',
+      :ullaboa => 'Irat cona doat dunt.',
+      :ipsum => 'Irur na nuaata doaga.',
+      :duat => 'Noaga idat sara ex.',
+    },
   }
-elucidation = {
-  :missing_pairs => {
-    :dolupi => 'Parali coal alit qad.',
-    :suata => 'Fadi iame adati na.',
-    :occaag => 'Co nulab nost paat.',
-    :ut => 'Param ad dua idatu.',
-    :anis => 'Sint adipi et aut.',
-  },
-  :unexpected_pairs => {
-    :euaaag => 'Enta adaad idess utetu.',
-    :eaarisau => 'Taabore magn naatat in.',
-    :esedat => 'Dola labor eu null.',
-    :cat => 'Cullum pa quip magat.',
-    :eua => 'Quat comm laal inaa.',
-  },
-  :changed_values => {
-    :enaam => {
-      :expected => 'La ofadi aliq caat.',
-      :got      => 'la ofadi aliq caat.',
-    },
-    :vent => {
-      :expected => 'Do velaa volor na.',
-      :got      => 'do velaa volor na.',
-    },
-    :labor => {
-      :expected => 'Aut tatat proam iat.',
-      :got      => 'aut tatat proam iat.',
-    },
-    :cidaa => {
-      :expected => 'Enia adiaamea deseaat eliqui.',
-      :got      => 'enia adiaamea deseaat eliqui.',
-    },
-  },
-  :ok_pairs => {
-    :ina => 'Alita tea loat qani.',
-    :con => 'Et sia adid qua.',
-    :qat => 'Magna voaa aaliqu maan.',
-    :ip => 'Utat iram adip voan.',
-    :ex => 'Vat eiua exca inci.',
-    :alitaaa => 'Eaam fugatia exat quis.',
-    :eaalabalab => 'Aut te magna aliq.',
-    :ullaboa => 'Irat cona doat dunt.',
-    :ipsum => 'Irur na nuaata doaga.',
-    :duat => 'Noaga idat sara ex.',
-  },
-}
 }
