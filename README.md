@@ -175,7 +175,7 @@ Message using ```minitest_lucid```
 }
 ```
 
-### Hash
+### Set
 
 #### assert_equal
 
