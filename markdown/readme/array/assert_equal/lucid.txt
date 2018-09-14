@@ -1,117 +1,31 @@
-
-Expected class:  Array
-Actual class:  Array
-elucidation = [
-  {
-  :status => :missing,
-  :old_index_0 => "Si alit vagna nonse.",
-  },
-  {
-  :status => :missing,
-  :old_index_1 => "Serci nosa deaaboat iama.",
-  },
-  {
-  :status => :missing,
-  :old_index_2 => "Pa ipsab occata seqa.",
-  },
-  {
-  :status => :missing,
-  :old_index_3 => "Oaba dunt sicid eur.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_4 => "Esam est tat sumaan.",
-  :new_index_0 => "Esam est tat sumaan.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_5 => "Ad do ea labat.",
-  :new_index_1 => "Ad do ea labat.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_6 => "Cupis doluaan adat duat.",
-  :new_index_2 => "Cupis doluaan adat duat.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_7 => "Dolla aua am maab.",
-  :new_index_3 => "Dolla aua am maab.",
-  },
-  {
-  :status => :changed,
-  :old_index_8 => "In na idat nonsa.",
-  :new_index_4 => "Si alit vagna nonse.",
-  },
-  {
-  :status => :changed,
-  :old_index_9 => "Eniat noaeaa in venia.",
-  :new_index_5 => "Serci nosa deaaboat iama.",
-  },
-  {
-  :status => :changed,
-  :old_index_10 => "Non utat rad et.",
-  :new_index_6 => "Fugame cupis do iramaa.",
-  },
-  {
-  :status => :changed,
-  :old_index_11 => "Volu siamc moloab cupi.",
-  :new_index_7 => "Eiusmagat do labore utatur.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_12 => "Lababor rat vent essa.",
-  :new_index_8 => "Lababor rat vent essa.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_13 => "Modola cula ocaadia amea.",
-  :new_index_9 => "Modola cula ocaadia amea.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_14 => "Ania est exeaat sicid.",
-  :new_index_10 => "Ania est exeaat sicid.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_15 => "Adipsu miate eiuat naam.",
-  :new_index_11 => "Adipsu miate eiuat naam.",
-  },
-  {
-  :status => :unexpected,
-  :new_index_12 => "In na idat nonsa.",
-  },
-  {
-  :status => :unexpected,
-  :new_index_13 => "Eniat noaeaa in venia.",
-  },
-  {
-  :status => :unexpected,
-  :new_index_14 => "Non utat rad et.",
-  },
-  {
-  :status => :unexpected,
-  :new_index_15 => "Volu siamc moloab cupi.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_16 => "Dolor eaae doat volu.",
-  :new_index_16 => "Dolor eaae doat volu.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_17 => "Adiatur anaaa qui eius.",
-  :new_index_17 => "Adiatur anaaa qui eius.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_18 => "Ad laam utet seri.",
-  :new_index_18 => "Ad laam utet seri.",
-  },
-  {
-  :status => :unchanged,
-  :old_index_19 => "Prem do laan pa.",
-  :new_index_19 => "Prem do laan pa.",
-  },
-]
+--- expected
++++ actual
+@@ -1,19 +1,19 @@
+-["Si alit vagna nonse.",
+- "Serci nosa deaaboat iama.",
+- "Pa ipsab occata seqa.",
+- "Oaba dunt sicid eur.",
+- "Esam est tat sumaan.",
++["Esam est tat sumaan.",
+  "Ad do ea labat.",
+  "Cupis doluaan adat duat.",
+  "Dolla aua am maab.",
+- "In na idat nonsa.",
+- "Eniat noaeaa in venia.",
+- "Non utat rad et.",
+- "Volu siamc moloab cupi.",
++ "Si alit vagna nonse.",
++ "Serci nosa deaaboat iama.",
++ "Fugame cupis do iramaa.",
++ "Eiusmagat do labore utatur.",
+  "Lababor rat vent essa.",
+  "Modola cula ocaadia amea.",
+  "Ania est exeaat sicid.",
+  "Adipsu miate eiuat naam.",
++ "In na idat nonsa.",
++ "Eniat noaeaa in venia.",
++ "Non utat rad et.",
++ "Volu siamc moloab cupi.",
+  "Dolor eaae doat volu.",
+  "Adiatur anaaa qui eius.",
+  "Ad laam utet seri.",

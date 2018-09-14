@@ -1,6 +1,6 @@
 --- expected
 +++ actual
-@@ -1,18 +1,18 @@
+@@ -1,19 +1,19 @@
  {:ina=>"Alita tea loat qani.",
   :con=>"Et sia adid qua.",
 - :dolupi=>"Parali coal alit qad.",
@@ -12,7 +12,7 @@
 - :suata=>"Fadi iame adati na.",
 + :vent=>"do velaa volor na.",
 + :eaarisau=>"Taabore magn naatat in.",
-  :ip=>"Irur na nuaata doaga.",
+  :ip=>"Utat iram adip voan.",
   :ex=>"Vat eiua exca inci.",
 - :labor=>"Aut tatat proam iat.",
 - :occaag=>"Co nulab nost paat.",
@@ -25,6 +25,7 @@
 - :ut=>"Param ad dua idatu.",
 + :cat=>"Cullum pa quip magat.",
   :ullaboa=>"Irat cona doat dunt.",
+  :ipsum=>"Irur na nuaata doaga.",
   :duat=>"Noaga idat sara ex.",
 - :anis=>"Sint adipi et aut."}
 + :eua=>"Quat comm laal inaa."}

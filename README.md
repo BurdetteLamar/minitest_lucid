@@ -33,7 +33,7 @@ def expected
       :eaalabalab => 'Aut te magna aliq.',
       :ut => 'Param ad dua idatu.',
       :ullaboa => 'Irat cona doat dunt.',
-      :ip => 'Irur na nuaata doaga.',
+      :ipsum => 'Irur na nuaata doaga.',
       :duat => 'Noaga idat sara ex.',
       :anis => 'Sint adipi et aut.',
   }
@@ -56,7 +56,7 @@ def actual
       :eaalabalab => 'Aut te magna aliq.',
       :cat => 'Cullum pa quip magat.',
       :ullaboa => 'Irat cona doat dunt.',
-      :ip => 'Irur na nuaata doaga.',
+      :ipsum => 'Irur na nuaata doaga.',
       :duat => 'Noaga idat sara ex.',
       :eua => 'Quat comm laal inaa.',
   }
@@ -70,8 +70,8 @@ The default ```Minitest::Assertion``` message:
 --- expected
 +++ actual
 @@ -1 +1 @@
--{:ina=>"Alita tea loat qani.", :con=>"Et sia adid qua.", :dolupi=>"Parali coal alit qad.", :enaam=>"La ofadi aliq caat.", :qat=>"Magna voaa aaliqu maan.", :vent=>"Do velaa volor na.", :suata=>"Fadi iame adati na.", :ip=>"Irur na nuaata doaga.", :ex=>"Vat eiua exca inci.", :labor=>"Aut tatat proam iat.", :occaag=>"Co nulab nost paat.", :alitaaa=>"Eaam fugatia exat quis.", :cidaa=>"Enia adiaamea deseaat eliqui.", :eaalabalab=>"Aut te magna aliq.", :ut=>"Param ad dua idatu.", :ullaboa=>"Irat cona doat dunt.", :duat=>"Noaga idat sara ex.", :anis=>"Sint adipi et aut."}
-+{:ina=>"Alita tea loat qani.", :con=>"Et sia adid qua.", :euaaag=>"Enta adaad idess utetu.", :enaam=>"la ofadi aliq caat.", :qat=>"Magna voaa aaliqu maan.", :vent=>"do velaa volor na.", :eaarisau=>"Taabore magn naatat in.", :ip=>"Irur na nuaata doaga.", :ex=>"Vat eiua exca inci.", :labor=>"aut tatat proam iat.", :esedat=>"Dola labor eu null.", :alitaaa=>"Eaam fugatia exat quis.", :cidaa=>"enia adiaamea deseaat eliqui.", :eaalabalab=>"Aut te magna aliq.", :cat=>"Cullum pa quip magat.", :ullaboa=>"Irat cona doat dunt.", :duat=>"Noaga idat sara ex.", :eua=>"Quat comm laal inaa."}
+-{:ina=>"Alita tea loat qani.", :con=>"Et sia adid qua.", :dolupi=>"Parali coal alit qad.", :enaam=>"La ofadi aliq caat.", :qat=>"Magna voaa aaliqu maan.", :vent=>"Do velaa volor na.", :suata=>"Fadi iame adati na.", :ip=>"Utat iram adip voan.", :ex=>"Vat eiua exca inci.", :labor=>"Aut tatat proam iat.", :occaag=>"Co nulab nost paat.", :alitaaa=>"Eaam fugatia exat quis.", :cidaa=>"Enia adiaamea deseaat eliqui.", :eaalabalab=>"Aut te magna aliq.", :ut=>"Param ad dua idatu.", :ullaboa=>"Irat cona doat dunt.", :ipsum=>"Irur na nuaata doaga.", :duat=>"Noaga idat sara ex.", :anis=>"Sint adipi et aut."}
++{:ina=>"Alita tea loat qani.", :con=>"Et sia adid qua.", :euaaag=>"Enta adaad idess utetu.", :enaam=>"la ofadi aliq caat.", :qat=>"Magna voaa aaliqu maan.", :vent=>"do velaa volor na.", :eaarisau=>"Taabore magn naatat in.", :ip=>"Utat iram adip voan.", :ex=>"Vat eiua exca inci.", :labor=>"aut tatat proam iat.", :esedat=>"Dola labor eu null.", :alitaaa=>"Eaam fugatia exat quis.", :cidaa=>"enia adiaamea deseaat eliqui.", :eaalabalab=>"Aut te magna aliq.", :cat=>"Cullum pa quip magat.", :ullaboa=>"Irat cona doat dunt.", :ipsum=>"Irur na nuaata doaga.", :duat=>"Noaga idat sara ex.", :eua=>"Quat comm laal inaa."}
 ```
 
 Message using ```make_my_diffs_pretty!```:
@@ -80,7 +80,7 @@ Message using ```make_my_diffs_pretty!```:
 ```diff
 --- expected
 +++ actual
-@@ -1,18 +1,18 @@
+@@ -1,19 +1,19 @@
  {:ina=>"Alita tea loat qani.",
   :con=>"Et sia adid qua.",
 - :dolupi=>"Parali coal alit qad.",
@@ -92,7 +92,7 @@ Message using ```make_my_diffs_pretty!```:
 - :suata=>"Fadi iame adati na.",
 + :vent=>"do velaa volor na.",
 + :eaarisau=>"Taabore magn naatat in.",
-  :ip=>"Irur na nuaata doaga.",
+  :ip=>"Utat iram adip voan.",
   :ex=>"Vat eiua exca inci.",
 - :labor=>"Aut tatat proam iat.",
 - :occaag=>"Co nulab nost paat.",
@@ -105,6 +105,7 @@ Message using ```make_my_diffs_pretty!```:
 - :ut=>"Param ad dua idatu.",
 + :cat=>"Cullum pa quip magat.",
   :ullaboa=>"Irat cona doat dunt.",
+  :ipsum=>"Irur na nuaata doaga.",
   :duat=>"Noaga idat sara ex.",
 - :anis=>"Sint adipi et aut."}
 + :eua=>"Quat comm laal inaa."}
@@ -115,8 +116,15 @@ Message using ```minitest_lucid```
 ```lucid.txt```:
 ```ruby
 
-Expected class:  Hash
-Actual class:  Hash
+{
+  :expected => {
+    :class => Hash
+    :size => 19
+  }
+  :actual => {
+    :class => Hash
+    :size => 19
+  }
 elucidation = {
   :missing_pairs => {
     :dolupi => 'Parali coal alit qad.',
@@ -154,13 +162,15 @@ elucidation = {
     :ina => 'Alita tea loat qani.',
     :con => 'Et sia adid qua.',
     :qat => 'Magna voaa aaliqu maan.',
-    :ip => 'Irur na nuaata doaga.',
+    :ip => 'Utat iram adip voan.',
     :ex => 'Vat eiua exca inci.',
     :alitaaa => 'Eaam fugatia exat quis.',
     :eaalabalab => 'Aut te magna aliq.',
     :ullaboa => 'Irat cona doat dunt.',
+    :ipsum => 'Irur na nuaata doaga.',
     :duat => 'Noaga idat sara ex.',
   },
+}
 }
 ```
 

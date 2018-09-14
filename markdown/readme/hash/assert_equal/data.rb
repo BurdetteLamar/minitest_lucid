@@ -16,7 +16,7 @@ def expected
       :eaalabalab => 'Aut te magna aliq.',
       :ut => 'Param ad dua idatu.',
       :ullaboa => 'Irat cona doat dunt.',
-      :ip => 'Irur na nuaata doaga.',
+      :ipsum => 'Irur na nuaata doaga.',
       :duat => 'Noaga idat sara ex.',
       :anis => 'Sint adipi et aut.',
   }
@@ -39,7 +39,7 @@ def actual
       :eaalabalab => 'Aut te magna aliq.',
       :cat => 'Cullum pa quip magat.',
       :ullaboa => 'Irat cona doat dunt.',
-      :ip => 'Irur na nuaata doaga.',
+      :ipsum => 'Irur na nuaata doaga.',
       :duat => 'Noaga idat sara ex.',
       :eua => 'Quat comm laal inaa.',
   }

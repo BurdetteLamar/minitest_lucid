@@ -1,6 +1,13 @@
 
-Expected class:  Hash
-Actual class:  Hash
+{
+  :expected => {
+    :class => Hash
+    :size => 19
+  }
+  :actual => {
+    :class => Hash
+    :size => 19
+  }
 elucidation = {
   :missing_pairs => {
     :dolupi => 'Parali coal alit qad.',
@@ -38,11 +45,13 @@ elucidation = {
     :ina => 'Alita tea loat qani.',
     :con => 'Et sia adid qua.',
     :qat => 'Magna voaa aaliqu maan.',
-    :ip => 'Irur na nuaata doaga.',
+    :ip => 'Utat iram adip voan.',
     :ex => 'Vat eiua exca inci.',
     :alitaaa => 'Eaam fugatia exat quis.',
     :eaalabalab => 'Aut te magna aliq.',
     :ullaboa => 'Irat cona doat dunt.',
+    :ipsum => 'Irur na nuaata doaga.',
     :duat => 'Noaga idat sara ex.',
   },
+}
 }

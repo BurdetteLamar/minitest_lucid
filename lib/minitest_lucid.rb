@@ -52,10 +52,10 @@ module Minitest
           poll(expected, actual)
       if elucidation_method
         lines = ['']
-        lines.push("Message:  #{msg}") if msg
-        lines.push("Expected class:  #{expected.class}")
-        lines.push("Actual class:  #{actual.class}")
+        lines.push('{')
+        lines.push("  :message =>  #{msg}") if msg
         send(elucidation_method, exception, expected, actual, lines)
+        lines.push('}')
         lines.push('')
         message = lines.join("\n")
         new_exception = exception.exception(message)
@@ -132,6 +132,14 @@ module Minitest
             fail [expected_value, actual_value].inspect
         end
       end
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class}")
+      lines.push("    :size => #{expected.size}")
+      lines.push('  }')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class}")
+      lines.push("    :size => #{actual.size}")
+      lines.push('  }')
       lines.push('elucidation = {')
       h.each_pair do |category, items|
         lines.push("  #{pretty(category)} => {")
