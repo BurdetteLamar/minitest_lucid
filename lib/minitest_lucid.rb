@@ -2,8 +2,6 @@ require 'minitest'
 require 'diff/lcs'
 require 'set'
 
-require 'minitest_lucid/version'
-
 module Minitest
 
   module Assertions
@@ -19,10 +17,10 @@ module Minitest
     end
 
     METHOD_FOR_CLASS = {
-        Struct => :elucidate_struct,
         Hash => :elucidate_hash,
-        Array => :elucidate_array,
         Set => :elucidate_set,
+        Struct => :elucidate_struct,
+        # Array => :elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
 
@@ -42,7 +40,6 @@ module Minitest
         next unless expected.kind_of?(klass)
         next unless actual.kind_of?(klass)
         return method
-        break
       end
       nil
     end
@@ -54,10 +51,10 @@ module Minitest
           poll(expected, actual)
       if elucidation_method
         lines = ['']
-        lines.push("Message:  #{msg}") if msg
-        lines.push("Expected class:  #{expected.class}")
-        lines.push("Actual class:  #{actual.class}")
+        lines.push('{')
+        lines.push("  :message => '#{msg}',") if msg
         send(elucidation_method, exception, expected, actual, lines)
+        lines.push('}')
         lines.push('')
         message = lines.join("\n")
         new_exception = exception.exception(message)
@@ -134,23 +131,31 @@ module Minitest
             fail [expected_value, actual_value].inspect
         end
       end
-      lines.push('elucidation = {')
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
       h.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => {")
+        lines.push("    #{pretty(category)} => {")
         items.each_pair do |key, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("    #{pretty(key)} => {")
-            lines.push("      :expected => #{pretty(expected)},")
-            lines.push("      :got      => #{pretty(actual)},")
-            lines.push('    },')
+            lines.push("      #{pretty(key)} => {")
+            lines.push("        :expected => #{pretty(expected)},")
+            lines.push("        :got      => #{pretty(actual)},")
+            lines.push('      },')
           else
-            lines.push("    #{pretty(key)} => #{pretty(value)},")
+            lines.push("      #{pretty(key)} => #{pretty(value)},")
           end
         end
-        lines.push('  },')
+        lines.push('    },')
       end
-      lines.push('}')
+      lines.push('  }')
     end
 
     def elucidate_set(exception, expected, actual, lines)
@@ -159,15 +164,23 @@ module Minitest
           :unexpected => actual.difference(expected),
           :ok => expected.intersection(actual),
       }
-      lines.push('elucidation = {')
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
       result.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => {")
+        lines.push("    #{pretty(category)} => {")
         items.each do |member|
-          lines.push("    #{pretty(member)},")
+          lines.push("      #{pretty(member)},")
         end
-        lines.push('  },')
+        lines.push('    },')
       end
-      lines.push('}')
+      lines.push('  }')
     end
 
     def elucidate_struct(exception, expected, actual, lines)
@@ -187,23 +200,31 @@ module Minitest
           h[:changed_values].store(member, [expected_value, actual_value])
         end
       end
-      lines.push('elucidation = {')
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
       h.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => {")
+        lines.push("    #{pretty(category)} => {")
         items.each_pair do |member, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("    #{pretty(member)} => {")
-            lines.push("      :expected => #{pretty(expected)},")
-            lines.push("      :got      => #{pretty(actual)},")
-            lines.push('    },')
+            lines.push("      #{pretty(member)} => {")
+            lines.push("        :expected => #{pretty(expected)},")
+            lines.push("        :got      => #{pretty(actual)},")
+            lines.push('      },')
           else
-            lines.push("    #{pretty(member)} => #{pretty(value)},")
+            lines.push("      #{pretty(member)} => #{pretty(value)},")
           end
         end
-        lines.push('  },')
+        lines.push('    },')
       end
-      lines.push('}')
+      lines.push('  }')
     end
 
     def pretty(arg)
