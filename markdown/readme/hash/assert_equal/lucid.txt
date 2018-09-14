@@ -1,25 +1,48 @@
 
+Expected class:  Hash
+Actual class:  Hash
 elucidation = {
-    :missing_pairs => {
-      :offab => 'Ut dolore ua consal vaba caea.',
-      :moam => 'Sunt sed te coma teu alaaame.',
+  :missing_pairs => {
+    :dolupi => 'Parali coal alit qad.',
+    :suata => 'Fadi iame adati na.',
+    :occaag => 'Co nulab nost paat.',
+    :ut => 'Param ad dua idatu.',
+    :anis => 'Sint adipi et aut.',
+  },
+  :unexpected_pairs => {
+    :euaaag => 'Enta adaad idess utetu.',
+    :eaarisau => 'Taabore magn naatat in.',
+    :esedat => 'Dola labor eu null.',
+    :cat => 'Cullum pa quip magat.',
+    :eua => 'Quat comm laal inaa.',
+  },
+  :changed_values => {
+    :enaam => {
+      :expected => 'La ofadi aliq caat.',
+      :got      => 'la ofadi aliq caat.',
     },
-    :unexpected_pairs => {
-      :laboru => 'Laboab vaga dat maaua in venima.',
-      :amcae => 'Utatu cilaa cit siat commag seqa.',
+    :vent => {
+      :expected => 'Do velaa volor na.',
+      :got      => 'do velaa volor na.',
     },
-    :changed_values => {
-      :tauro => {
-        :expected => 'Cia ina do ip ocat doat.',
-        :got      => 'cia ina do ip ocat doat.',
-      },
-      :loquens => {
-        :expected => 'Dua sarat rad noad maat caea.',
-        :got      => 'dua sarat rad noad maat caea.',
-      },
+    :labor => {
+      :expected => 'Aut tatat proam iat.',
+      :got      => 'aut tatat proam iat.',
     },
-    :ok_pairs => {
-      :lor => 'Eser in dolo eaata labor ut.',
-      :dolo => 'Ipaat paal doat iruat ala magabor.',
+    :cidaa => {
+      :expected => 'Enia adiaamea deseaat eliqui.',
+      :got      => 'enia adiaamea deseaat eliqui.',
     },
+  },
+  :ok_pairs => {
+    :ina => 'Alita tea loat qani.',
+    :con => 'Et sia adid qua.',
+    :qat => 'Magna voaa aaliqu maan.',
+    :ip => 'Irur na nuaata doaga.',
+    :ex => 'Vat eiua exca inci.',
+    :alitaaa => 'Eaam fugatia exat quis.',
+    :eaalabalab => 'Aut te magna aliq.',
+    :ullaboa => 'Irat cona doat dunt.',
+    :duat => 'Noaga idat sara ex.',
+  },
 }

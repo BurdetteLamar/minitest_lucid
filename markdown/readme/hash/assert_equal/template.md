@@ -1,10 +1,10 @@
 #### assert_equal
 
-Here are the hashes, expected and actual, that we'll use for comparison:
+Here are the hashes, expected and actual, to be compared.
 
 @[ruby](data.rb)
 
-The default message:
+The default ```Minitest::Assertion``` message:
 
 @[diff](default.txt)
 

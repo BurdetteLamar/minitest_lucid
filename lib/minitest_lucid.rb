@@ -2,8 +2,6 @@ require 'minitest'
 require 'diff/lcs'
 require 'set'
 
-require 'minitest_lucid/version'
-
 module Minitest
 
   module Assertions
@@ -19,10 +17,10 @@ module Minitest
     end
 
     METHOD_FOR_CLASS = {
-        Struct => :elucidate_struct,
         Hash => :elucidate_hash,
-        Array => :elucidate_array,
         Set => :elucidate_set,
+        Struct => :elucidate_struct,
+        # Array => :elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
 

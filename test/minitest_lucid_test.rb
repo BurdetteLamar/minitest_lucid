@@ -1,5 +1,7 @@
 require 'test_helper'
 
+require 'minitest_lucid/version'
+
 class MinitestLucidTest < Minitest::Test
 
   # make_my_diffs_pretty!
