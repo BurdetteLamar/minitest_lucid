@@ -1,6 +1,10 @@
 # Minitest Lucid
 
-Use ```minitest_lucid``` to improve assertion messages from ```minitest```.
+When you use gem ```miiitest```, a failed assertion for a large or complex object can be difficult to understand.
+
+Using method ```make_my_diffs_pretty!``` (it's part of ```minitest```) can sometimes help, but sometimes not enough.
+
+Use gem ```minitest_lucid``` to improve assertion messages from ```minitest```.
 
 ## Usage
 
