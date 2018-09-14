@@ -1,6 +1,6 @@
 #### assert_equal
 
-Here are hashes, expected and actual, to be compared.
+Here are sets, expected and actual, to be compared.
 
 @[ruby](data.rb)
 

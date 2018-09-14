@@ -6,12 +6,13 @@ Use ```minitest_lucid``` to improve error messages from ```minitest```.
 ## Supported Classes
 
 - [Hash](#hash)
+- [Set](#set)
 
 ### Hash
 
 #### assert_equal
 
-Here are the hashes, expected and actual, to be compared.
+Here are hashes, expected and actual, to be compared.
 
 ```data.rb```:
 ```ruby
@@ -173,5 +174,160 @@ Message using ```minitest_lucid```
   }
 }
 ```
+
+### Hash
+
+#### assert_equal
+
+Here are sets, expected and actual, to be compared.
+
+```data.rb```:
+```ruby
+def expected
+  Set.new([
+              'Eia do elab same.',
+              'Uati nua iaam caea.',
+              'Nulla paal dolor maatat.',
+              'Exerad iame ulpa ipari.',
+              'Veaat ea conaaectat noat.',
+              'Euaab voat doloa caecat.',
+              'Idatia naat paaat inia.',
+              'Prem fatiaa fad ulpaat.',
+              'Ea re deni utat.',
+              'Irud ming fat int.',
+              'Utaag quis aut ing.',
+              'Siaa miaation vagna alaa.',
+              'Ut dolla laat nonse.',
+              'Enaat alam nonse magnaat.',
+              'Sequaa nulp duisic na.',
+              'Seqa quips sitataa exae.',
+              'Vate eu adip quata.',
+              'Tatua ididun offia doaut.',
+          ])
+end
+def actual
+  Set.new([
+              'Euaab voat doloa caecat.',
+              'Suntat fugiame sici exad.',
+              'Idatia naat paaat inia.',
+              'Ea re deni utat.',
+              'Eia do elab same.',
+              'Nulla paal dolor maatat.',
+              'Dolo mod eaamet ena.',
+              'Exerad iame ulpa ipari.',
+              'Ut dolla laat nonse.',
+              'Sequaa nulp duisic na.',
+              'Dat dolor laboat caalit.',
+              'Seqa quips sitataa exae.',
+              'Dolo esera id samcomaa.',
+              'Irud ming fat int.',
+              'Siaa miaation vagna alaa.',
+              'Cuate adid do nim.',
+              'Tatua ididun offia doaut.',
+              'Ocaada iaamaa fatioa anaat.',
+          ])
+end
+```
+
+The default ```Minitest::Assertion``` message:
+
+```default.txt```:
+```diff
+--- expected
++++ actual
+@@ -1 +1 @@
+-#<Set: {"Eia do elab same.", "Uati nua iaam caea.", "Nulla paal dolor maatat.", "Exerad iame ulpa ipari.", "Veaat ea conaaectat noat.", "Euaab voat doloa caecat.", "Idatia naat paaat inia.", "Prem fatiaa fad ulpaat.", "Ea re deni utat.", "Irud ming fat int.", "Utaag quis aut ing.", "Siaa miaation vagna alaa.", "Ut dolla laat nonse.", "Enaat alam nonse magnaat.", "Sequaa nulp duisic na.", "Seqa quips sitataa exae.", "Vate eu adip quata.", "Tatua ididun offia doaut."}>
++#<Set: {"Euaab voat doloa caecat.", "Suntat fugiame sici exad.", "Idatia naat paaat inia.", "Ea re deni utat.", "Eia do elab same.", "Nulla paal dolor maatat.", "Dolo mod eaamet ena.", "Exerad iame ulpa ipari.", "Ut dolla laat nonse.", "Sequaa nulp duisic na.", "Dat dolor laboat caalit.", "Seqa quips sitataa exae.", "Dolo esera id samcomaa.", "Irud ming fat int.", "Siaa miaation vagna alaa.", "Cuate adid do nim.", "Tatua ididun offia doaut.", "Ocaada iaamaa fatioa anaat."}>
+```
+
+Message using ```make_my_diffs_pretty!```:
+
+```better.txt```:
+```diff
+--- expected
++++ actual
+@@ -1,18 +1,18 @@
+-#<Set: {"Eia do elab same.",
+- "Uati nua iaam caea.",
+- "Nulla paal dolor maatat.",
+- "Exerad iame ulpa ipari.",
+- "Veaat ea conaaectat noat.",
+- "Euaab voat doloa caecat.",
++#<Set: {"Euaab voat doloa caecat.",
++ "Suntat fugiame sici exad.",
+  "Idatia naat paaat inia.",
+- "Prem fatiaa fad ulpaat.",
+  "Ea re deni utat.",
+- "Irud ming fat int.",
+- "Utaag quis aut ing.",
+- "Siaa miaation vagna alaa.",
++ "Eia do elab same.",
++ "Nulla paal dolor maatat.",
++ "Dolo mod eaamet ena.",
++ "Exerad iame ulpa ipari.",
+  "Ut dolla laat nonse.",
+- "Enaat alam nonse magnaat.",
+  "Sequaa nulp duisic na.",
++ "Dat dolor laboat caalit.",
+  "Seqa quips sitataa exae.",
+- "Vate eu adip quata.",
+- "Tatua ididun offia doaut."}>
++ "Dolo esera id samcomaa.",
++ "Irud ming fat int.",
++ "Siaa miaation vagna alaa.",
++ "Cuate adid do nim.",
++ "Tatua ididun offia doaut.",
++ "Ocaada iaamaa fatioa anaat."}>
+```
+
+Message using ```minitest_lucid```
+
+```lucid.txt```:
+```ruby
+
+{
+  :expected => {
+    :class => Set,
+    :size => 18,
+  },
+  :actual => {
+    :class => Set,
+    :size => 18,
+  },
+  :elucidation => {
+    :missing => {
+      'Uati nua iaam caea.',
+      'Veaat ea conaaectat noat.',
+      'Prem fatiaa fad ulpaat.',
+      'Utaag quis aut ing.',
+      'Enaat alam nonse magnaat.',
+      'Vate eu adip quata.',
+    },
+    :unexpected => {
+      'Suntat fugiame sici exad.',
+      'Dolo mod eaamet ena.',
+      'Dat dolor laboat caalit.',
+      'Dolo esera id samcomaa.',
+      'Cuate adid do nim.',
+      'Ocaada iaamaa fatioa anaat.',
+    },
+    :ok => {
+      'Euaab voat doloa caecat.',
+      'Idatia naat paaat inia.',
+      'Ea re deni utat.',
+      'Eia do elab same.',
+      'Nulla paal dolor maatat.',
+      'Exerad iame ulpa ipari.',
+      'Ut dolla laat nonse.',
+      'Sequaa nulp duisic na.',
+      'Seqa quips sitataa exae.',
+      'Irud ming fat int.',
+      'Siaa miaation vagna alaa.',
+      'Tatua ididun offia doaut.',
+    },
+  }
+}
+```
+
 
 
