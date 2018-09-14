@@ -19,7 +19,7 @@ module Minitest
     METHOD_FOR_CLASS = {
         Hash => :elucidate_hash,
         Set => :elucidate_set,
-        Struct => :elucidate_struct,
+        # Struct => :elucidate_struct,
         # Array => :elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
@@ -164,15 +164,23 @@ module Minitest
           :unexpected => actual.difference(expected),
           :ok => expected.intersection(actual),
       }
-      lines.push('elucidation = {')
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
       result.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => {")
+        lines.push("    #{pretty(category)} => {")
         items.each do |member|
-          lines.push("    #{pretty(member)},")
+          lines.push("      #{pretty(member)},")
         end
-        lines.push('  },')
+        lines.push('    },')
       end
-      lines.push('}')
+      lines.push('  }')
     end
 
     def elucidate_struct(exception, expected, actual, lines)

@@ -181,55 +181,90 @@ EOT
   end
 
   class MySet < Set; end
-  def zzz_test_set
+  def test_set
     expected = Set.new([
-        'Cia ina do ip ocat doat.',
-        'Dua sarat rad noad maat caea.',
-        'Eser in dolo eaata labor ut.',
-        'Ipaat paal doat iruat ala magabor.',
-        'Ut dolore ua consal vaba caea.',
-        'Sunt sed te coma teu alaaame.',
-        'Laboab vaga dat maaua in venima.',
-        'Eser in dolo eaata labor ut.',
-    ])
+                           'Eia do elab same.',
+                           'Uati nua iaam caea.',
+                           'Nulla paal dolor maatat.',
+                           'Exerad iame ulpa ipari.',
+                           'Veaat ea conaaectat noat.',
+                           'Euaab voat doloa caecat.',
+                           'Idatia naat paaat inia.',
+                           'Prem fatiaa fad ulpaat.',
+                           'Ea re deni utat.',
+                           'Irud ming fat int.',
+                           'Utaag quis aut ing.',
+                           'Siaa miaation vagna alaa.',
+                           'Ut dolla laat nonse.',
+                           'Enaat alam nonse magnaat.',
+                           'Sequaa nulp duisic na.',
+                           'Seqa quips sitataa exae.',
+                           'Vate eu adip quata.',
+                           'Tatua ididun offia doaut.',
+                       ])
     actual = Set.new([
-        'Cia ina do ip ocat doat.',
-        'Dua sarat rad noad maat caea.',
-        'eser in dolo eaata labor ut.',
-        'ipaat paal doat iruat ala magabor.',
-        'Ut dolore ua consal vaba caea.',
-        'Sunt sed te coma teu alaaame.',
-        'laboab vaga dat maaua in venima.',
-        'eser in dolo eaata labor ut.',
-    ])
+                         'Euaab voat doloa caecat.',
+                         'Suntat fugiame sici exad.',
+                         'Idatia naat paaat inia.',
+                         'Ea re deni utat.',
+                         'Eia do elab same.',
+                         'Nulla paal dolor maatat.',
+                         'Dolo mod eaamet ena.',
+                         'Exerad iame ulpa ipari.',
+                         'Ut dolla laat nonse.',
+                         'Sequaa nulp duisic na.',
+                         'Dat dolor laboat caalit.',
+                         'Seqa quips sitataa exae.',
+                         'Dolo esera id samcomaa.',
+                         'Irud ming fat int.',
+                         'Siaa miaation vagna alaa.',
+                         'Cuate adid do nim.',
+                         'Tatua ididun offia doaut.',
+                         'Ocaada iaamaa fatioa anaat.',
+                     ])
     msg = 'My message'
     lucid_format = <<EOT
+
 {
-  :message => 'MinitestLucidTest::MyHash and Hash',
+  :message => '%s and %s',
   :expected => {
-    :class => MinitestLucidTest::MyHash,
-    :size => 6,
+    :class => %s,
+    :size => 18,
   },
   :actual => {
-    :class => Hash,
-    :size => 6,
+    :class => %s,
+    :size => 18,
   },
   :elucidation => {
     :missing => {
-      'Eser in dolo eaata labor ut.',
-      'Ipaat paal doat iruat ala magabor.',
-      'Laboab vaga dat maaua in venima.',
+      'Uati nua iaam caea.',
+      'Veaat ea conaaectat noat.',
+      'Prem fatiaa fad ulpaat.',
+      'Utaag quis aut ing.',
+      'Enaat alam nonse magnaat.',
+      'Vate eu adip quata.',
     },
     :unexpected => {
-      'eser in dolo eaata labor ut.',
-      'ipaat paal doat iruat ala magabor.',
-      'laboab vaga dat maaua in venima.',
+      'Suntat fugiame sici exad.',
+      'Dolo mod eaamet ena.',
+      'Dat dolor laboat caalit.',
+      'Dolo esera id samcomaa.',
+      'Cuate adid do nim.',
+      'Ocaada iaamaa fatioa anaat.',
     },
     :ok => {
-      'Cia ina do ip ocat doat.',
-      'Dua sarat rad noad maat caea.',
-      'Ut dolore ua consal vaba caea.',
-      'Sunt sed te coma teu alaaame.',
+      'Euaab voat doloa caecat.',
+      'Idatia naat paaat inia.',
+      'Ea re deni utat.',
+      'Eia do elab same.',
+      'Nulla paal dolor maatat.',
+      'Exerad iame ulpa ipari.',
+      'Ut dolla laat nonse.',
+      'Sequaa nulp duisic na.',
+      'Seqa quips sitataa exae.',
+      'Irud ming fat int.',
+      'Siaa miaation vagna alaa.',
+      'Tatua ididun offia doaut.',
     },
   }
 }
@@ -247,10 +282,12 @@ EOT
       x = assert_raises (Minitest::Assertion) do
         assert_equal(exp, act, msg)
       end
-      lucid = format(lucid_format, msg, exp.class, act.class)
+      lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
       assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
     end
   end
+  
+
 
   def zzz_test_struct
     Struct.new('MyStruct',
