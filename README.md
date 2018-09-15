@@ -26,12 +26,10 @@ No other code change is required.
 
 For example, change this test
 
-```not_lucid.rb```:
 ```ruby
 require 'minitest/autorun'
 
 class MyTest < Minitest::Test
-
   def test_foo
     expected = {:a => 0, :b => 1}
     actual = {}
@@ -42,12 +40,10 @@ end
 
 to this
 
-```lucid.rb```:
 ```ruby
 require 'minitest_lucid'
 
 class MyTest < Minitest::Test
-
   def test_foo
     expected = {:a => 0, :b => 1}
     actual = {}

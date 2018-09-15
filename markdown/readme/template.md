@@ -26,11 +26,31 @@ No other code change is required.
 
 For example, change this test
 
-@[ruby](not_lucid.rb)
+```ruby
+require 'minitest/autorun'
+
+class MyTest < Minitest::Test
+  def test_foo
+    expected = {:a => 0, :b => 1}
+    actual = {}
+    assert_equal(expected, actual)
+  end
+end
+```
 
 to this
 
-@[ruby](lucid.rb)
+```ruby
+require 'minitest_lucid'
+
+class MyTest < Minitest::Test
+  def test_foo
+    expected = {:a => 0, :b => 1}
+    actual = {}
+    assert_equal(expected, actual)
+  end
+end
+```
 
 See example outputs below.
 
