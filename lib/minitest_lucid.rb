@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 require 'diff/lcs'
+require 'rexml/document'
 require 'set'
 
 module Minitest
@@ -159,11 +160,71 @@ module Minitest
     end
 
     def elucidate_set(exception, expected, actual, lines)
+      doc = REXML::Document.new
+      html_ele = doc.add_element('html')
+      body_ele = html_ele.add_element('body')
+      h1_ele = body_ele.add_element('h1')
+      h1_ele.text = 'Comparison'
+
+      h2_ele = body_ele.add_element('h2')
+      h2_ele.text = "Expected: Class=#{expected.class} Size=#{expected.size}"
+      table = table_ele(body_ele)
+      tr = tr_ele(table)
+      th_eles(tr, 'Index', 'Class', 'Inspection')
+      expected.each_with_index do |item, i|
+        tr = tr_ele(table)
+        td_eles(tr, i, item.class, item.inspect)
+      end
+
+      h2_ele = body_ele.add_element('h2')
+      h2_ele.text = "Actual: Class=#{actual.class} Size=#{actual.size}"
+      table = table_ele(body_ele)
+      tr = tr_ele(table)
+      th_eles(tr, 'Index', 'Class', 'Inspection')
+      actual.each_with_index do |item, i|
+        tr = tr_ele(table)
+        td_eles(tr, i, item.class, item.inspect)
+      end
+
+      h2_ele = body_ele.add_element('h2')
+      h2_ele.text = "Elucidation"
       result = {
           :missing => expected.difference(actual),
           :unexpected => actual.difference(expected),
           :ok => expected.intersection(actual),
       }
+      h3_ele = body_ele.add_element('h3')
+      h3_ele.text = "Missing: Size=#{result[:missing].size}"
+      table = table_ele(body_ele)
+      tr = tr_ele(table)
+      th_eles(tr, 'Index in Expected', 'Class', 'Inspection')
+      result[:missing].each do |item|
+        tr = tr_ele(table)
+        td_eles(tr, expected.to_a.index(item), item.class, item.inspect)
+      end
+      h3_ele = body_ele.add_element('h3')
+      h3_ele.text = "Unexpected: Size=#{result[:unexpected].size}"
+      table = table_ele(body_ele)
+      tr = tr_ele(table)
+      th_eles(tr, 'Index in Actual', 'Class', 'Inspection')
+      result[:unexpected].each do |item|
+        tr = tr_ele(table)
+        td_eles(tr, actual.to_a.index(item), item.class, item.inspect)
+      end
+      h3_ele = body_ele.add_element('h3')
+      h3_ele.text = "Ok: Size=#{result[:ok].size}"
+      table = table_ele(body_ele)
+      tr = tr_ele(table)
+      th_eles(tr, 'Index in Expected', 'Index in Actual', 'Class', 'Inspection')
+      result[:ok].each do |item|
+        tr = tr_ele(table)
+        td_eles(tr, expected.to_a.index(item), actual.to_a.index(item), item.class, item.inspect)
+      end
+
+      File.open('t.html', 'w') do |file|
+        doc.write(file, 2)
+      end
+
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
       lines.push("    :size => #{expected.size},")
@@ -237,6 +298,45 @@ module Minitest
           arg
         else
           arg.inspect
+      end
+    end
+
+    def table_ele(parent, attributes = {})
+      ele = REXML::Element.new('table', parent)
+      ele.attributes['border'] = 1
+      attributes.each_pair do |k, v|
+        ele.attributes[k.to_s] = v
+      end
+      ele
+    end
+
+    def tr_ele(parent)
+      parent << REXML::Element.new('tr')
+    end
+
+    def th_ele(parent, text)
+      ele = REXML::Element.new('th')
+      parent << ele
+      ele.text = text
+      ele
+    end
+
+    def th_eles(parent, *texts)
+      texts.each do |text|
+        th_ele(parent, text)
+      end
+    end
+
+    def td_ele(parent, text)
+      ele = REXML::Element.new('td')
+      parent << ele
+      ele.text = text
+      ele
+    end
+
+    def td_eles(parent, *texts)
+      texts.each do |text|
+        td_ele(parent, text)
       end
     end
 
