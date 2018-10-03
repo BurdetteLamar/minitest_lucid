@@ -181,9 +181,15 @@ EOT
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Comparison'
 
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.text = "Expected: Class=#{expected.class} Size=#{expected.size}"
-      table = table_ele(body_ele)
+
+      def status_table(body_ele, header_tag, label, items)
+        h_ele = body_ele.add_element(header_tag)
+        h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        table_ele(body_ele)
+
+      end
+
+      table = status_table(body_ele, 'h2', 'Expected', expected)
       tr = tr_ele(table)
       tr.attributes['class'] = 'neutral'
       th_eles(tr, 'Status', 'Class', 'Inspection')
@@ -194,9 +200,7 @@ EOT
         td_eles(tr, status, item.class, item.inspect)
       end
 
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.text = "Actual: Class=#{actual.class} Size=#{actual.size}"
-      table = table_ele(body_ele)
+      table = status_table(body_ele, 'h2', 'Actual', actual)
       tr = tr_ele(table)
       tr.attributes['class'] = 'neutral'
       th_eles(tr, 'Status', 'Class', 'Inspection')
@@ -209,9 +213,8 @@ EOT
 
       h2_ele = body_ele.add_element('h2')
       h2_ele.text = "Elucidation"
-      h3_ele = body_ele.add_element('h3')
-      h3_ele.text = "Missing: Size=#{result[:missing].size}"
-      table = table_ele(body_ele)
+
+      table = status_table(body_ele, 'h3', 'Missing', result[:missing])
       tr = tr_ele(table)
       tr.attributes['class'] = 'neutral'
       th_eles(tr, 'Class', 'Inspection')
@@ -220,9 +223,7 @@ EOT
         tr.attributes['class'] = 'bad'
         td_eles(tr, item.class, item.inspect)
       end
-      h3_ele = body_ele.add_element('h3')
-      h3_ele.text = "Unexpected: Size=#{result[:unexpected].size}"
-      table = table_ele(body_ele)
+      table = status_table(body_ele, 'h3', 'Unexpected', result[:unexpected])
       tr = tr_ele(table)
       tr.attributes['class'] = 'neutral'
       th_eles(tr, 'Class', 'Inspection')
@@ -231,9 +232,7 @@ EOT
         tr.attributes['class'] = 'bad'
         td_eles(tr, item.class, item.inspect)
       end
-      h3_ele = body_ele.add_element('h3')
-      h3_ele.text = "Ok: Size=#{result[:ok].size}"
-      table = table_ele(body_ele)
+      table = status_table(body_ele, 'h3', 'Ok', result[:ok])
       tr = tr_ele(table)
       tr.attributes['class'] = 'neutral'
       th_eles(tr,  'Class', 'Inspection')
