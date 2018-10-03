@@ -192,20 +192,27 @@ EOT
         table
       end
 
+      def status_tds(tr, status, item)
+        tds = td_eles(tr, status, item.class, item.inspect)
+        tds[0].attributes['class'] = 'status'
+        tds[1].attributes['class'] = 'data'
+        tds[2].attributes['class'] = 'data'
+      end
+
       table = status_table(body_ele, 'h2', 'Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = tr_ele(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        td_eles(tr, status, item.class, item.inspect)
+        status_tds(tr, status, item)
       end
 
       table = status_table(body_ele, 'h2', 'Actual', actual)
-      actual.each do |item, i|
+      actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = tr_ele(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        td_eles(tr, status, item.class, item.inspect)
+        status_tds(tr, status, item)
       end
 
       h2_ele = body_ele.add_element('h2')
@@ -215,21 +222,21 @@ EOT
       result[:missing].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
-        td_eles(tr, 'Missing', item.class, item.inspect)
+        status_tds(tr, 'Missing', item)
       end
 
       table = status_table(body_ele, 'h3', 'Unexpected', result[:unexpected])
       result[:unexpected].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
-        td_eles(tr, 'Unexpected', item.class, item.inspect)
+        status_tds(tr, 'Unexpected', item)
       end
 
       table = status_table(body_ele, 'h3', 'Ok', result[:ok])
       result[:ok].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'good'
-        td_eles(tr, 'Ok', item.class, item.inspect)
+        status_tds(tr, 'Ok', item)
       end
 
       File.open('t.html', 'w') do |file|
@@ -350,9 +357,11 @@ EOT
     end
 
     def td_eles(parent, *texts)
+      eles = []
       texts.each do |text|
-        td_ele(parent, text)
+        eles << td_ele(parent, text)
       end
+      eles
     end
 
   end
