@@ -185,14 +185,14 @@ EOT
       def status_table(body_ele, header_tag, label, items)
         h_ele = body_ele.add_element(header_tag)
         h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        table_ele(body_ele)
-
+        table = table_ele(body_ele)
+        tr = tr_ele(table)
+        tr.attributes['class'] = 'neutral'
+        th_eles(tr, 'Status', 'Class', 'Inspection')
+        table
       end
 
       table = status_table(body_ele, 'h2', 'Expected', expected)
-      tr = tr_ele(table)
-      tr.attributes['class'] = 'neutral'
-      th_eles(tr, 'Status', 'Class', 'Inspection')
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = tr_ele(table)
@@ -201,9 +201,6 @@ EOT
       end
 
       table = status_table(body_ele, 'h2', 'Actual', actual)
-      tr = tr_ele(table)
-      tr.attributes['class'] = 'neutral'
-      th_eles(tr, 'Status', 'Class', 'Inspection')
       actual.each do |item, i|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = tr_ele(table)
@@ -215,31 +212,24 @@ EOT
       h2_ele.text = "Elucidation"
 
       table = status_table(body_ele, 'h3', 'Missing', result[:missing])
-      tr = tr_ele(table)
-      tr.attributes['class'] = 'neutral'
-      th_eles(tr, 'Class', 'Inspection')
       result[:missing].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
-        td_eles(tr, item.class, item.inspect)
+        td_eles(tr, 'Missing', item.class, item.inspect)
       end
+
       table = status_table(body_ele, 'h3', 'Unexpected', result[:unexpected])
-      tr = tr_ele(table)
-      tr.attributes['class'] = 'neutral'
-      th_eles(tr, 'Class', 'Inspection')
       result[:unexpected].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
-        td_eles(tr, item.class, item.inspect)
+        td_eles(tr, 'Unexpected', item.class, item.inspect)
       end
+
       table = status_table(body_ele, 'h3', 'Ok', result[:ok])
-      tr = tr_ele(table)
-      tr.attributes['class'] = 'neutral'
-      th_eles(tr,  'Class', 'Inspection')
       result[:ok].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'good'
-        td_eles(tr, item.class, item.inspect)
+        td_eles(tr, 'Ok', item.class, item.inspect)
       end
 
       File.open('t.html', 'w') do |file|
