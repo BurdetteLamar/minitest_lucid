@@ -182,8 +182,8 @@ EOT
       h1_ele.text = 'Comparison'
 
 
-      def status_table(body_ele, header_tag, label, items)
-        h_ele = body_ele.add_element(header_tag)
+      def status_table(body_ele, label, items)
+        h_ele = body_ele.add_element('h2')
         h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
         table = table_ele(body_ele)
         tr = tr_ele(table)
@@ -199,7 +199,7 @@ EOT
         tds[2].attributes['class'] = 'data'
       end
 
-      table = status_table(body_ele, 'h2', 'Expected', expected)
+      table = status_table(body_ele, 'Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = tr_ele(table)
@@ -207,7 +207,7 @@ EOT
         status_tds(tr, status, item)
       end
 
-      table = status_table(body_ele, 'h2', 'Actual', actual)
+      table = status_table(body_ele, 'Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = tr_ele(table)
@@ -215,24 +215,21 @@ EOT
         status_tds(tr, status, item)
       end
 
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.text = "Elucidation"
-
-      table = status_table(body_ele, 'h3', 'Missing', result[:missing])
+      table = status_table(body_ele, 'Missing', result[:missing])
       result[:missing].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Missing', item)
       end
 
-      table = status_table(body_ele, 'h3', 'Unexpected', result[:unexpected])
+      table = status_table(body_ele, 'Unexpected', result[:unexpected])
       result[:unexpected].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Unexpected', item)
       end
 
-      table = status_table(body_ele, 'h3', 'Ok', result[:ok])
+      table = status_table(body_ele, 'Ok', result[:ok])
       result[:ok].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'good'
