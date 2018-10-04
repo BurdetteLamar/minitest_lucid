@@ -180,11 +180,18 @@ EOT
       body_ele = html_ele.add_element('body')
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Comparison'
+      link_list_ele = body_ele.add_element('ul')
 
 
-      def status_table(body_ele, label, items)
+      def status_table(body_ele, link_list_ele, label, items)
         h_ele = body_ele.add_element('h2')
         h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        id = "##{label}"
+        h_ele.attributes['id'] = label
+        li_ele = link_list_ele.add_element('li')
+        a_ele = li_ele.add_element('a')
+        a_ele.attributes['href'] = id
+        a_ele.text = h_ele.text
         table = table_ele(body_ele)
         tr = tr_ele(table)
         tr.attributes['class'] = 'neutral'
@@ -199,7 +206,7 @@ EOT
         tds[2].attributes['class'] = 'data'
       end
 
-      table = status_table(body_ele, 'Expected', expected)
+      table = status_table(body_ele, link_list_ele, 'Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = tr_ele(table)
@@ -207,7 +214,7 @@ EOT
         status_tds(tr, status, item)
       end
 
-      table = status_table(body_ele, 'Actual', actual)
+      table = status_table(body_ele, link_list_ele, 'Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = tr_ele(table)
@@ -215,21 +222,21 @@ EOT
         status_tds(tr, status, item)
       end
 
-      table = status_table(body_ele, 'Missing', result[:missing])
+      table = status_table(body_ele, link_list_ele, 'Missing', result[:missing])
       result[:missing].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Missing', item)
       end
 
-      table = status_table(body_ele, 'Unexpected', result[:unexpected])
+      table = status_table(body_ele, link_list_ele, 'Unexpected', result[:unexpected])
       result[:unexpected].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Unexpected', item)
       end
 
-      table = status_table(body_ele, 'Ok', result[:ok])
+      table = status_table(body_ele, link_list_ele, 'Ok', result[:ok])
       result[:ok].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'good'
