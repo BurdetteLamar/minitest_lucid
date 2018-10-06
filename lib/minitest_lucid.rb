@@ -161,9 +161,9 @@ module Minitest
 
     def elucidate_set(exception, expected, actual, lines)
       result = {
-          :missing => expected.difference(actual),
-          :unexpected => actual.difference(expected),
-          :ok => expected.intersection(actual),
+          :missing => expected - actual,
+          :unexpected => actual - expected,
+          :ok => expected & actual,
       }
 
       doc = REXML::Document.new
@@ -222,21 +222,21 @@ EOT
         status_tds(tr, status, item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Missing', result[:missing])
+      table = status_table(body_ele, link_list_ele, 'Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Missing', item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Unexpected', result[:unexpected])
+      table = status_table(body_ele, link_list_ele, 'Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Unexpected', item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Ok', result[:ok])
+      table = status_table(body_ele, link_list_ele, 'Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'good'
