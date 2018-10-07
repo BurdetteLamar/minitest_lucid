@@ -66,6 +66,15 @@ module Minitest
       end
     end
 
+
+    # Element-by-element comparison.
+    #     Diff-LCS comparison.
+    #     Missing elements: expected - actual.
+    #         Unexpected elements: actual - expected.
+    #     Common elements: actual & expected.
+    #     All elements: actual | expected.
+
+
     def elucidate_array(exception, expected, actual, lines)
       sdiff = Diff::LCS.sdiff(expected, actual)
       changes = {}
@@ -255,15 +264,13 @@ EOT
       lines.push("    :class => #{actual.class},")
       lines.push("    :size => #{actual.size},")
       lines.push('  },')
-      lines.push('  :elucidation => {')
       result.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("  #{pretty(category)} => [")
         items.each do |member|
-          lines.push("      #{pretty(member)},")
+          lines.push("    #{pretty(member)},")
         end
-        lines.push('    },')
+        lines.push('  ],')
       end
-      lines.push('  }')
     end
 
     def elucidate_struct(exception, expected, actual, lines)
