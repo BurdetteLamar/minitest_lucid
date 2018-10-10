@@ -66,6 +66,15 @@ module Minitest
       end
     end
 
+
+    # Element-by-element comparison.
+    #     Diff-LCS comparison.
+    #     Missing elements: expected - actual.
+    #         Unexpected elements: actual - expected.
+    #     Common elements: actual & expected.
+    #     All elements: actual | expected.
+
+
     def elucidate_array(exception, expected, actual, lines)
       sdiff = Diff::LCS.sdiff(expected, actual)
       changes = {}
@@ -160,65 +169,87 @@ module Minitest
     end
 
     def elucidate_set(exception, expected, actual, lines)
+      result = {
+          :missing => expected - actual,
+          :unexpected => actual - expected,
+          :ok => expected & actual,
+      }
+
       doc = REXML::Document.new
       html_ele = doc.add_element('html')
+      head_ele = html_ele.add_element('head')
+      style_ele = head_ele.add_element('style')
+      style_ele.text = <<EOT
+.good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
+.neutral { color: rgb(0,0,0) ; background-color: rgb(200,200,200) }
+.bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
+.data { font-family: Courier, Courier, serif }
+.status { text-align: center; }
+EOT
       body_ele = html_ele.add_element('body')
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Comparison'
+      link_list_ele = body_ele.add_element('ul')
 
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.text = "Expected: Class=#{expected.class} Size=#{expected.size}"
-      table = table_ele(body_ele)
-      tr = tr_ele(table)
-      th_eles(tr, 'Index', 'Class', 'Inspection')
-      expected.each_with_index do |item, i|
+
+      def status_table(body_ele, link_list_ele, label, items)
+        h_ele = body_ele.add_element('h2')
+        h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        id = "##{label}"
+        h_ele.attributes['id'] = label
+        li_ele = link_list_ele.add_element('li')
+        a_ele = li_ele.add_element('a')
+        a_ele.attributes['href'] = id
+        a_ele.text = h_ele.text
+        table = table_ele(body_ele)
         tr = tr_ele(table)
-        td_eles(tr, i, item.class, item.inspect)
+        tr.attributes['class'] = 'neutral'
+        th_eles(tr, 'Status', 'Class', 'Inspection')
+        table
       end
 
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.text = "Actual: Class=#{actual.class} Size=#{actual.size}"
-      table = table_ele(body_ele)
-      tr = tr_ele(table)
-      th_eles(tr, 'Index', 'Class', 'Inspection')
-      actual.each_with_index do |item, i|
-        tr = tr_ele(table)
-        td_eles(tr, i, item.class, item.inspect)
+      def status_tds(tr, status, item)
+        tds = td_eles(tr, status, item.class, item.inspect)
+        tds[0].attributes['class'] = 'status'
+        tds[1].attributes['class'] = 'data'
+        tds[2].attributes['class'] = 'data'
       end
 
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.text = "Elucidation"
-      result = {
-          :missing => expected.difference(actual),
-          :unexpected => actual.difference(expected),
-          :ok => expected.intersection(actual),
-      }
-      h3_ele = body_ele.add_element('h3')
-      h3_ele.text = "Missing: Size=#{result[:missing].size}"
-      table = table_ele(body_ele)
-      tr = tr_ele(table)
-      th_eles(tr, 'Index in Expected', 'Class', 'Inspection')
+      table = status_table(body_ele, link_list_ele, 'Expected', expected)
+      expected.each do |item, i|
+        status = result[:missing].include?(item) ? 'Missing' : 'Ok'
+        tr = tr_ele(table)
+        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+        status_tds(tr, status, item)
+      end
+
+      table = status_table(body_ele, link_list_ele, 'Actual', actual)
+      actual.each do |item|
+        status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
+        tr = tr_ele(table)
+        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+        status_tds(tr, status, item)
+      end
+
+      table = status_table(body_ele, link_list_ele, 'Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         tr = tr_ele(table)
-        td_eles(tr, expected.to_a.index(item), item.class, item.inspect)
+        tr.attributes['class'] = 'bad'
+        status_tds(tr, 'Missing', item)
       end
-      h3_ele = body_ele.add_element('h3')
-      h3_ele.text = "Unexpected: Size=#{result[:unexpected].size}"
-      table = table_ele(body_ele)
-      tr = tr_ele(table)
-      th_eles(tr, 'Index in Actual', 'Class', 'Inspection')
+
+      table = status_table(body_ele, link_list_ele, 'Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         tr = tr_ele(table)
-        td_eles(tr, actual.to_a.index(item), item.class, item.inspect)
+        tr.attributes['class'] = 'bad'
+        status_tds(tr, 'Unexpected', item)
       end
-      h3_ele = body_ele.add_element('h3')
-      h3_ele.text = "Ok: Size=#{result[:ok].size}"
-      table = table_ele(body_ele)
-      tr = tr_ele(table)
-      th_eles(tr, 'Index in Expected', 'Index in Actual', 'Class', 'Inspection')
+
+      table = status_table(body_ele, link_list_ele, 'Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         tr = tr_ele(table)
-        td_eles(tr, expected.to_a.index(item), actual.to_a.index(item), item.class, item.inspect)
+        tr.attributes['class'] = 'good'
+        status_tds(tr, 'Ok', item)
       end
 
       File.open('t.html', 'w') do |file|
@@ -233,15 +264,13 @@ module Minitest
       lines.push("    :class => #{actual.class},")
       lines.push("    :size => #{actual.size},")
       lines.push('  },')
-      lines.push('  :elucidation => {')
       result.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("  #{pretty(category)} => [")
         items.each do |member|
-          lines.push("      #{pretty(member)},")
+          lines.push("    #{pretty(member)},")
         end
-        lines.push('    },')
+        lines.push('  ],')
       end
-      lines.push('  }')
     end
 
     def elucidate_struct(exception, expected, actual, lines)
@@ -301,9 +330,13 @@ module Minitest
       end
     end
 
+    def h2_ele(parent)
+      h2_ele = parent.add_element('h2')
+    end
+
     def table_ele(parent, attributes = {})
       ele = REXML::Element.new('table', parent)
-      ele.attributes['border'] = 1
+      ele.attributes['border'] = 0
       attributes.each_pair do |k, v|
         ele.attributes[k.to_s] = v
       end
@@ -335,9 +368,11 @@ module Minitest
     end
 
     def td_eles(parent, *texts)
+      eles = []
       texts.each do |text|
-        td_ele(parent, text)
+        eles << td_ele(parent, text)
       end
+      eles
     end
 
   end
