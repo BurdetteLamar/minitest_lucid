@@ -66,14 +66,13 @@ module Minitest
       end
     end
 
-
+    # Notes for future elucidation of arrays.
     # Element-by-element comparison.
-    #     Diff-LCS comparison.
-    #     Missing elements: expected - actual.
-    #         Unexpected elements: actual - expected.
-    #     Common elements: actual & expected.
-    #     All elements: actual | expected.
-
+    # Diff-LCS comparison.
+    # Missing elements: expected - actual.
+    # Unexpected elements: actual - expected.
+    # Common elements: actual & expected.
+    # All elements: actual | expected.
 
     def elucidate_array(exception, expected, actual, lines)
       sdiff = Diff::LCS.sdiff(expected, actual)
