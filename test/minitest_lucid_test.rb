@@ -100,7 +100,7 @@ EOT
         assert_equal(exp, act, msg)
       end
       lucid = format(lucid_format, msg, exp.class, act.class)
-      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+      assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
     end
   end
 
@@ -175,7 +175,7 @@ EOT
         assert_equal(exp, act, msg)
       end
       lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
-      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+      assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
     end
 
   end
@@ -235,38 +235,36 @@ EOT
     :class => %s,
     :size => 18,
   },
-  :elucidation => {
-    :missing => {
-      'Uati nua iaam caea.',
-      'Veaat ea conaaectat noat.',
-      'Prem fatiaa fad ulpaat.',
-      'Utaag quis aut ing.',
-      'Enaat alam nonse magnaat.',
-      'Vate eu adip quata.',
-    },
-    :unexpected => {
-      'Suntat fugiame sici exad.',
-      'Dolo mod eaamet ena.',
-      'Dat dolor laboat caalit.',
-      'Dolo esera id samcomaa.',
-      'Cuate adid do nim.',
-      'Ocaada iaamaa fatioa anaat.',
-    },
-    :ok => {
-      'Euaab voat doloa caecat.',
-      'Idatia naat paaat inia.',
-      'Ea re deni utat.',
-      'Eia do elab same.',
-      'Nulla paal dolor maatat.',
-      'Exerad iame ulpa ipari.',
-      'Ut dolla laat nonse.',
-      'Sequaa nulp duisic na.',
-      'Seqa quips sitataa exae.',
-      'Irud ming fat int.',
-      'Siaa miaation vagna alaa.',
-      'Tatua ididun offia doaut.',
-    },
-  }
+  :missing => [
+    'Uati nua iaam caea.',
+    'Veaat ea conaaectat noat.',
+    'Prem fatiaa fad ulpaat.',
+    'Utaag quis aut ing.',
+    'Enaat alam nonse magnaat.',
+    'Vate eu adip quata.',
+  ],
+  :unexpected => [
+    'Suntat fugiame sici exad.',
+    'Dolo mod eaamet ena.',
+    'Dat dolor laboat caalit.',
+    'Dolo esera id samcomaa.',
+    'Cuate adid do nim.',
+    'Ocaada iaamaa fatioa anaat.',
+  ],
+  :ok => [
+    'Euaab voat doloa caecat.',
+    'Idatia naat paaat inia.',
+    'Ea re deni utat.',
+    'Eia do elab same.',
+    'Nulla paal dolor maatat.',
+    'Exerad iame ulpa ipari.',
+    'Ut dolla laat nonse.',
+    'Sequaa nulp duisic na.',
+    'Seqa quips sitataa exae.',
+    'Irud ming fat int.',
+    'Siaa miaation vagna alaa.',
+    'Tatua ididun offia doaut.',
+  ],
 }
 EOT
     my_expected = MySet.new.merge(expected)
@@ -283,11 +281,9 @@ EOT
         assert_equal(exp, act, msg)
       end
       lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
-      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+      assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
     end
   end
-  
-
 
   def test_struct
     Struct.new('MyStruct',
@@ -459,7 +455,7 @@ EOT
       assert_equal(expected, actual, msg)
     end
     lucid = format(lucid_format, expected.class, actual.class)
-    assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+    assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
   end
 
 end
