@@ -170,10 +170,10 @@ module Minitest
 
     class Html
 
-      attr_accessor :doc, :head, :body
+      attr_accessor :doc, :head, :body, :toc_list
 
-      def initialize
-        doc = REXML::Document.new
+      def initialize(title)
+        self.doc = REXML::Document.new
         html = doc.add_element('html')
         head = html.add_element('head')
         style = head.add_element('style')
@@ -184,18 +184,18 @@ module Minitest
 .data { font-family: Courier, Courier, serif }
 .status { text-align: center; }
 EOT
-        body = html.add_element('body')
-        self.doc = doc
+        self.body = html.add_element('body')
+        body.add_element('h1').text = title
+        self.toc_list = body.add_element('ul')
         self.head = head
-        self.body = body
       end
 
-      def status_table(body, link_list, label, items)
+      def status_table(label, items)
         h = body.add_element('h2')
         h.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
         id = "##{label}"
         h.attributes['id'] = label
-        li = link_list.add_element('li')
+        li = toc_list.add_element('li')
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
@@ -214,7 +214,7 @@ EOT
       end
 
       def h2(parent)
-        h2 = parent.add_element('h2')
+        parent.add_element('h2')
       end
 
       def table(parent, attributes = {})
@@ -268,13 +268,10 @@ EOT
           :ok => expected & actual,
       }
 
-      html = Html.new
+      html = Html.new('Comparison')
       doc, head, body = html.doc, html.head, html.body
-      h1 = html.body.add_element('h1')
-      h1.text = 'Comparison'
-      link_list = body.add_element('ul')
-      
-      table = html.status_table(body, link_list, 'Expected', expected)
+
+      table = html.status_table('Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = html.tr(table)
@@ -282,7 +279,7 @@ EOT
         html.status_tds(tr, status, item)
       end
 
-      table = html.status_table(body, link_list, 'Actual', actual)
+      table = html.status_table('Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = html.tr(table)
@@ -290,21 +287,21 @@ EOT
         html.status_tds(tr, status, item)
       end
 
-      table = html.status_table(body, link_list, 'Missing (Expected - Actual)', result[:missing])
+      table = html.status_table('Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         tr = html.tr(table)
         tr.attributes['class'] = 'bad'
         html.status_tds(tr, 'Missing', item)
       end
 
-      table = html.status_table(body, link_list, 'Unexpected (Actual - Expected)', result[:unexpected])
+      table = html.status_table('Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         tr = html.tr(table)
         tr.attributes['class'] = 'bad'
         html.status_tds(tr, 'Unexpected', item)
       end
 
-      table = html.status_table(body, link_list, 'Ok (Expected & Actual)', result[:ok])
+      table = html.status_table('Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         tr = html.tr(table)
         tr.attributes['class'] = 'good'
