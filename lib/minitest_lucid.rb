@@ -308,9 +308,10 @@ EOT
         html.status_tds(tr, 'Ok', item)
       end
 
-      File.open('t.html', 'w') do |file|
-        html.doc.write(file, 2)
-      end
+      # For debugging.
+      # File.open('t.html', 'w') do |file|
+      #   html.doc.write(file, 2)
+      # end
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
