@@ -168,32 +168,46 @@ module Minitest
       lines.push('  }')
     end
 
-    def elucidate_set(exception, expected, actual, lines)
-      result = {
-          :missing => expected - actual,
-          :unexpected => actual - expected,
-          :ok => expected & actual,
-      }
+    class Html
 
-      doc = REXML::Document.new
-      html_ele = doc.add_element('html')
-      head_ele = html_ele.add_element('head')
-      style_ele = head_ele.add_element('style')
-      style_ele.text = <<EOT
+      attr_accessor :doc, :head, :body
+
+      def initialize
+        doc = REXML::Document.new
+        html = doc.add_element('html')
+        head = html.add_element('head')
+        style = head.add_element('style')
+        style.text = <<EOT
 .good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
 .neutral { color: rgb(0,0,0) ; background-color: rgb(200,200,200) }
 .bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
 .data { font-family: Courier, Courier, serif }
 .status { text-align: center; }
 EOT
-      body_ele = html_ele.add_element('body')
-      h1_ele = body_ele.add_element('h1')
-      h1_ele.text = 'Comparison'
-      link_list_ele = body_ele.add_element('ul')
+        body = html.add_element('body')
+        self.doc = doc
+        self.head = head
+        self.body = body
+      end
+    end
+
+    def elucidate_set(exception, expected, actual, lines)
+
+      result = {
+          :missing => expected - actual,
+          :unexpected => actual - expected,
+          :ok => expected & actual,
+      }
+
+      html = Html.new
+      doc, head, body = html.doc, html.head, html.body
+      h1 = html.body.add_element('h1')
+      h1.text = 'Comparison'
+      link_list_ele = body.add_element('ul')
 
 
-      def status_table(body_ele, link_list_ele, label, items)
-        h_ele = body_ele.add_element('h2')
+      def status_table(body, link_list_ele, label, items)
+        h_ele = body.add_element('h2')
         h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
         id = "##{label}"
         h_ele.attributes['id'] = label
@@ -201,7 +215,7 @@ EOT
         a_ele = li_ele.add_element('a')
         a_ele.attributes['href'] = id
         a_ele.text = h_ele.text
-        table = table_ele(body_ele)
+        table = table_ele(body)
         tr = tr_ele(table)
         tr.attributes['class'] = 'neutral'
         th_eles(tr, 'Status', 'Class', 'Inspection')
@@ -215,7 +229,7 @@ EOT
         tds[2].attributes['class'] = 'data'
       end
 
-      table = status_table(body_ele, link_list_ele, 'Expected', expected)
+      table = status_table(body, link_list_ele, 'Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = tr_ele(table)
@@ -223,7 +237,7 @@ EOT
         status_tds(tr, status, item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Actual', actual)
+      table = status_table(body, link_list_ele, 'Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = tr_ele(table)
@@ -231,21 +245,21 @@ EOT
         status_tds(tr, status, item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Missing (Expected - Actual)', result[:missing])
+      table = status_table(body, link_list_ele, 'Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Missing', item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Unexpected (Actual - Expected)', result[:unexpected])
+      table = status_table(body, link_list_ele, 'Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'bad'
         status_tds(tr, 'Unexpected', item)
       end
 
-      table = status_table(body_ele, link_list_ele, 'Ok (Expected & Actual)', result[:ok])
+      table = status_table(body, link_list_ele, 'Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         tr = tr_ele(table)
         tr.attributes['class'] = 'good'
