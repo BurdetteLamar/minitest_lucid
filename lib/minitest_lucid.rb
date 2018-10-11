@@ -269,7 +269,6 @@ EOT
       }
 
       html = Html.new('Comparison')
-      doc, head, body = html.doc, html.head, html.body
 
       table = html.status_table('Expected', expected)
       expected.each do |item, i|
@@ -309,7 +308,7 @@ EOT
       end
 
       File.open('t.html', 'w') do |file|
-        doc.write(file, 2)
+        html.doc.write(file, 2)
       end
 
       lines.push('  :expected => {')
