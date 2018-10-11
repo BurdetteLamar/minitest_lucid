@@ -191,8 +191,9 @@ EOT
       end
 
       def status_table(label, items)
-        h = body.add_element('h2')
-        h.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        # h = body.add_element('h2')
+        # h.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
         id = "##{label}"
         h.attributes['id'] = label
         li = toc_list.add_element('li')
@@ -213,8 +214,10 @@ EOT
         tds[2].attributes['class'] = 'data'
       end
 
-      def h2(parent)
-        parent.add_element('h2')
+      def h2(text)
+        ele = body.add_element('h2')
+        ele.text = text
+        ele
       end
 
       def table(parent, attributes = {})
