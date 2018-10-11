@@ -191,8 +191,6 @@ EOT
       end
 
       def status_table(label, items)
-        # h = body.add_element('h2')
-        # h.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
         id = "##{label}"
         h.attributes['id'] = label
@@ -200,11 +198,11 @@ EOT
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
-        table = table(body)
-        tr = tr(table)
+        ele = table(body)
+        tr = tr(ele)
         tr.attributes['class'] = 'neutral'
         ths(tr, 'Status', 'Class', 'Inspection')
-        table
+        ele
       end
 
       def status_tds(tr, status, item)
