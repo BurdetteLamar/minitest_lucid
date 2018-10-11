@@ -189,6 +189,75 @@ EOT
         self.head = head
         self.body = body
       end
+
+      def status_table(body, link_list, label, items)
+        h = body.add_element('h2')
+        h.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        id = "##{label}"
+        h.attributes['id'] = label
+        li = link_list.add_element('li')
+        a = li.add_element('a')
+        a.attributes['href'] = id
+        a.text = h.text
+        table = table(body)
+        tr = tr(table)
+        tr.attributes['class'] = 'neutral'
+        ths(tr, 'Status', 'Class', 'Inspection')
+        table
+      end
+
+      def status_tds(tr, status, item)
+        tds = tds(tr, status, item.class, item.inspect)
+        tds[0].attributes['class'] = 'status'
+        tds[1].attributes['class'] = 'data'
+        tds[2].attributes['class'] = 'data'
+      end
+
+      def h2(parent)
+        h2 = parent.add_element('h2')
+      end
+
+      def table(parent, attributes = {})
+        ele = REXML::Element.new('table', parent)
+        ele.attributes['border'] = 0
+        attributes.each_pair do |k, v|
+          ele.attributes[k.to_s] = v
+        end
+        ele
+      end
+
+      def tr(parent)
+        parent << REXML::Element.new('tr')
+      end
+
+      def th(parent, text)
+        ele = REXML::Element.new('th')
+        parent << ele
+        ele.text = text
+        ele
+      end
+
+      def ths(parent, *texts)
+        texts.each do |text|
+          th(parent, text)
+        end
+      end
+
+      def td(parent, text)
+        ele = REXML::Element.new('td')
+        parent << ele
+        ele.text = text
+        ele
+      end
+
+      def tds(parent, *texts)
+        eles = []
+        texts.each do |text|
+          eles << td(parent, text)
+        end
+        eles
+      end
+
     end
 
     def elucidate_set(exception, expected, actual, lines)
@@ -203,67 +272,43 @@ EOT
       doc, head, body = html.doc, html.head, html.body
       h1 = html.body.add_element('h1')
       h1.text = 'Comparison'
-      link_list_ele = body.add_element('ul')
-
-
-      def status_table(body, link_list_ele, label, items)
-        h_ele = body.add_element('h2')
-        h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        id = "##{label}"
-        h_ele.attributes['id'] = label
-        li_ele = link_list_ele.add_element('li')
-        a_ele = li_ele.add_element('a')
-        a_ele.attributes['href'] = id
-        a_ele.text = h_ele.text
-        table = table_ele(body)
-        tr = tr_ele(table)
-        tr.attributes['class'] = 'neutral'
-        th_eles(tr, 'Status', 'Class', 'Inspection')
-        table
-      end
-
-      def status_tds(tr, status, item)
-        tds = td_eles(tr, status, item.class, item.inspect)
-        tds[0].attributes['class'] = 'status'
-        tds[1].attributes['class'] = 'data'
-        tds[2].attributes['class'] = 'data'
-      end
-
-      table = status_table(body, link_list_ele, 'Expected', expected)
+      link_list = body.add_element('ul')
+      
+      table = html.status_table(body, link_list, 'Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-        tr = tr_ele(table)
+        tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        status_tds(tr, status, item)
+        html.status_tds(tr, status, item)
       end
 
-      table = status_table(body, link_list_ele, 'Actual', actual)
+      table = html.status_table(body, link_list, 'Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-        tr = tr_ele(table)
+        tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        status_tds(tr, status, item)
+        html.status_tds(tr, status, item)
       end
 
-      table = status_table(body, link_list_ele, 'Missing (Expected - Actual)', result[:missing])
+      table = html.status_table(body, link_list, 'Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
-        tr = tr_ele(table)
+        tr = html.tr(table)
         tr.attributes['class'] = 'bad'
-        status_tds(tr, 'Missing', item)
+        html.status_tds(tr, 'Missing', item)
       end
 
-      table = status_table(body, link_list_ele, 'Unexpected (Actual - Expected)', result[:unexpected])
+      table = html.status_table(body, link_list, 'Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
-        tr = tr_ele(table)
+        tr = html.tr(table)
         tr.attributes['class'] = 'bad'
-        status_tds(tr, 'Unexpected', item)
+        html.status_tds(tr, 'Unexpected', item)
       end
 
-      table = status_table(body, link_list_ele, 'Ok (Expected & Actual)', result[:ok])
+      table = html.status_table(body, link_list, 'Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
-        tr = tr_ele(table)
+        tr = html.tr(table)
         tr.attributes['class'] = 'good'
-        status_tds(tr, 'Ok', item)
+        html.status_tds(tr, 'Ok', item)
       end
 
       File.open('t.html', 'w') do |file|
@@ -342,51 +387,6 @@ EOT
         else
           arg.inspect
       end
-    end
-
-    def h2_ele(parent)
-      h2_ele = parent.add_element('h2')
-    end
-
-    def table_ele(parent, attributes = {})
-      ele = REXML::Element.new('table', parent)
-      ele.attributes['border'] = 0
-      attributes.each_pair do |k, v|
-        ele.attributes[k.to_s] = v
-      end
-      ele
-    end
-
-    def tr_ele(parent)
-      parent << REXML::Element.new('tr')
-    end
-
-    def th_ele(parent, text)
-      ele = REXML::Element.new('th')
-      parent << ele
-      ele.text = text
-      ele
-    end
-
-    def th_eles(parent, *texts)
-      texts.each do |text|
-        th_ele(parent, text)
-      end
-    end
-
-    def td_ele(parent, text)
-      ele = REXML::Element.new('td')
-      parent << ele
-      ele.text = text
-      ele
-    end
-
-    def td_eles(parent, *texts)
-      eles = []
-      texts.each do |text|
-        eles << td_ele(parent, text)
-      end
-      eles
     end
 
   end
