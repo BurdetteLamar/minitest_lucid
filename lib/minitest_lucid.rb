@@ -330,10 +330,9 @@ EOT
         html.scalar_status_tds(tr, 'Ok', item)
       end
 
-      # For debugging.
-      # File.open('t.html', 'w') do |file|
-      #   html.doc.write(file, 2)
-      # end
+      File.open('t.html', 'w') do |file|
+        html.doc.write(file, 2)
+      end
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
@@ -372,6 +371,14 @@ EOT
 
       table = html.pair_status_table('Expected', expected)
       expected.each_pair do |member, value|
+        status = values[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
+        tr = html.tr(table)
+        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+        html.pair_status_tds(tr, status, member, value)
+      end
+
+      table = html.pair_status_table('Actual', expected)
+      actual.each_pair do |member, value|
         status = values[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
         tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
