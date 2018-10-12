@@ -222,16 +222,46 @@ EOT
         ele = table(body)
         tr = tr(ele)
         tr.attributes['class'] = 'neutral'
-        ths(tr, 'Status', 'Name', 'Class', 'Inspection')
+        ths(tr, 'Status', 'Name', 'Values')
         ele
       end
 
-      def pair_status_tds(tr, status, name, value)
-        tds = tds(tr, status, name, value.class, value.inspect)
-        tds[0].attributes['class'] = 'status'
-        tds[1].attributes['class'] = 'data'
-        tds[2].attributes['class'] = 'data'
-        tds[3].attributes['class'] = 'data'
+      def pair_values_table(parent, values)
+        ele = table(parent)
+        tr = tr(ele)
+        tr.attributes['class'] = 'neutral'
+        ths(tr, '', 'Class', 'Inspection')
+        value = values[:expected]
+        tr = tr(ele)
+        th(tr, 'Expected')
+        td(tr, value.class)
+        td(tr, value.inspect)
+        value = values[:actual]
+        tr = tr(ele)
+        th(tr, 'Actual')
+        td(tr, value.inspect)
+      end
+
+      def pair_status_tds(tr, status, name, values)
+        p values.class
+        ds = tds(tr, status, name, nil)
+        ds[0].attributes['class'] = 'status'
+        ds[1].attributes['class'] = 'data'
+        t = table(ds[2])
+        r = tr(t)
+        h = th(r, '')
+        h = th(r, 'Class')
+        h = th(r, 'Value')
+        value = values[:expected_value]
+        r = tr(t)
+        h = th(r, 'Expected')
+        d = td(r, value.class)
+        d = td(r, value.inspect)
+        value = values[:actual_value]
+        r = tr(t)
+        h = th(r, 'Actual')
+        d = td(r, value.class)
+        d = td(r, value.inspect)
       end
 
       def h2(text)
@@ -261,9 +291,11 @@ EOT
       end
 
       def ths(parent, *texts)
+        eles = []
         texts.each do |text|
-          th(parent, text)
+          eles.push(th(parent, text))
         end
+        eles
       end
 
       def td(parent, text)
@@ -353,37 +385,48 @@ EOT
 
     def elucidate_struct(exception, expected, actual, lines)
       members = Set.new(expected.members + actual.members)
-      values = {
+      categories = {
           :changed_values => {},
           :ok_values => {},
       }
       members.each do |member|
         expected_value = expected[member]
         actual_value = actual[member]
+        values  = {
+            :expected => expected_value,
+            :actual => actual_value,
+        }
         if expected_value == actual_value
-          values[:ok_values].store(member, expected_value)
+          categories[:ok_values].store(member, values)
         else
-          values[:changed_values].store(member, [expected_value, actual_value])
+          categories[:changed_values].store(member, values)
         end
       end
 
       html = Html.new
 
       table = html.pair_status_table('Expected', expected)
-      expected.each_pair do |member, value|
-        status = values[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
+      expected.each_pair do |member, values|
+        status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
         tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.pair_status_tds(tr, status, member, value)
+        html.pair_status_tds(tr, status, member, values)
       end
 
-      table = html.pair_status_table('Actual', expected)
-      actual.each_pair do |member, value|
-        status = values[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
-        tr = html.tr(table)
-        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.pair_status_tds(tr, status, member, value)
-      end
+      # table = html.pair_status_table('Actual', expected)
+      # actual.each_pair do |member, values|
+      #   status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
+      #   tr = html.tr(table)
+      #   tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+      #   html.pair_status_tds(tr, status, member, values)
+      # end
+
+      # table = html.pair_status_table('Changed', categories[:changed_values])
+      # categories[:changed_values].each do |pair|
+      #   tr = html.tr(table)
+      #   tr.attributes['class'] = 'bad'
+      #   html.scalar_status_tds(tr, 'Changed', pair)
+      # end
 
       # For debugging.
       File.open('t.html', 'w') do |file|
@@ -399,7 +442,7 @@ EOT
       lines.push("    :size => #{actual.size},")
       lines.push('  },')
       lines.push('  :elucidation => {')
-      values.each_pair do |category, items|
+      categories.each_pair do |category, items|
         lines.push("    #{pretty(category)} => {")
         items.each_pair do |member, value|
           if value.instance_of?(Array)
