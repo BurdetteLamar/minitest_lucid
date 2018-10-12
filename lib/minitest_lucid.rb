@@ -171,7 +171,7 @@ module Minitest
 
       attr_accessor :doc, :head, :body, :toc_list
 
-      def initialize(title)
+      def initialize
         self.doc = REXML::Document.new
         html = doc.add_element('html')
         head = html.add_element('head')
@@ -184,12 +184,12 @@ module Minitest
 .status { text-align: center; }
 EOT
         self.body = html.add_element('body')
-        body.add_element('h1').text = title
+        body.add_element('h1').text = 'Comparison'
         self.toc_list = body.add_element('ul')
         self.head = head
       end
 
-      def status_table(label, items)
+      def scalar_status_table(label, items)
         h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
         id = "##{label}"
         h.attributes['id'] = label
@@ -204,11 +204,34 @@ EOT
         ele
       end
 
-      def status_tds(tr, status, item)
+      def scalar_status_tds(tr, status, item)
         tds = tds(tr, status, item.class, item.inspect)
         tds[0].attributes['class'] = 'status'
         tds[1].attributes['class'] = 'data'
         tds[2].attributes['class'] = 'data'
+      end
+
+      def pair_status_table(label, items)
+        h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
+        id = "##{label}"
+        h.attributes['id'] = label
+        li = toc_list.add_element('li')
+        a = li.add_element('a')
+        a.attributes['href'] = id
+        a.text = h.text
+        ele = table(body)
+        tr = tr(ele)
+        tr.attributes['class'] = 'neutral'
+        ths(tr, 'Status', 'Name', 'Class', 'Inspection')
+        ele
+      end
+
+      def pair_status_tds(tr, status, name, value)
+        tds = tds(tr, status, name, value.class, value.inspect)
+        tds[0].attributes['class'] = 'status'
+        tds[1].attributes['class'] = 'data'
+        tds[2].attributes['class'] = 'data'
+        tds[3].attributes['class'] = 'data'
       end
 
       def h2(text)
@@ -268,43 +291,43 @@ EOT
           :ok => expected & actual,
       }
 
-      html = Html.new('Comparison')
+      html = Html.new
 
-      table = html.status_table('Expected', expected)
+      table = html.scalar_status_table('Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.status_tds(tr, status, item)
+        html.scalar_status_tds(tr, status, item)
       end
 
-      table = html.status_table('Actual', actual)
+      table = html.scalar_status_table('Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.status_tds(tr, status, item)
+        html.scalar_status_tds(tr, status, item)
       end
 
-      table = html.status_table('Missing (Expected - Actual)', result[:missing])
+      table = html.scalar_status_table('Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         tr = html.tr(table)
         tr.attributes['class'] = 'bad'
-        html.status_tds(tr, 'Missing', item)
+        html.scalar_status_tds(tr, 'Missing', item)
       end
 
-      table = html.status_table('Unexpected (Actual - Expected)', result[:unexpected])
+      table = html.scalar_status_table('Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         tr = html.tr(table)
         tr.attributes['class'] = 'bad'
-        html.status_tds(tr, 'Unexpected', item)
+        html.scalar_status_tds(tr, 'Unexpected', item)
       end
 
-      table = html.status_table('Ok (Expected & Actual)', result[:ok])
+      table = html.scalar_status_table('Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         tr = html.tr(table)
         tr.attributes['class'] = 'good'
-        html.status_tds(tr, 'Ok', item)
+        html.scalar_status_tds(tr, 'Ok', item)
       end
 
       # For debugging.
@@ -330,10 +353,8 @@ EOT
     end
 
     def elucidate_struct(exception, expected, actual, lines)
-      expected_members = expected.members
-      actual_members = actual.members
-      members = Set.new(expected_members + actual_members)
-      h = {
+      members = Set.new(expected.members + actual.members)
+      values = {
           :changed_values => {},
           :ok_values => {},
       }
@@ -341,11 +362,27 @@ EOT
         expected_value = expected[member]
         actual_value = actual[member]
         if expected_value == actual_value
-          h[:ok_values].store(member, expected_value)
+          values[:ok_values].store(member, expected_value)
         else
-          h[:changed_values].store(member, [expected_value, actual_value])
+          values[:changed_values].store(member, [expected_value, actual_value])
         end
       end
+
+      html = Html.new
+
+      table = html.pair_status_table('Expected', expected)
+      expected.each_pair do |member, value|
+        status = values[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
+        tr = html.tr(table)
+        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+        html.pair_status_tds(tr, status, member, value)
+      end
+
+      # For debugging.
+      File.open('t.html', 'w') do |file|
+        html.doc.write(file, 2)
+      end
+
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
       lines.push("    :size => #{expected.size},")
@@ -355,7 +392,7 @@ EOT
       lines.push("    :size => #{actual.size},")
       lines.push('  },')
       lines.push('  :elucidation => {')
-      h.each_pair do |category, items|
+      values.each_pair do |category, items|
         lines.push("    #{pretty(category)} => {")
         items.each_pair do |member, value|
           if value.instance_of?(Array)
