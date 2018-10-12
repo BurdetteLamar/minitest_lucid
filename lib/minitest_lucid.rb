@@ -27,9 +27,9 @@ module Minitest
 
     # Lookup objects in hash.
     def lookup(one_object, other_object)
-      if ELUCIDATABLE_CLASSES.include?(one_object.class)
-        if other_object.kind_of?(one_object.class)
-          return METHOD_FOR_CLASS.fetch(one_object.class)
+      ELUCIDATABLE_CLASSES.each do |elucidatable_class|
+        if one_object.kind_of?(elucidatable_class) && other_object.kind_of?(elucidatable_class)
+          return METHOD_FOR_CLASS.fetch(elucidatable_class)
         end
       end
       nil
