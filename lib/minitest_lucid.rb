@@ -243,11 +243,12 @@ EOT
       end
 
       def struct_status_tds(tr, status, name, values)
-        p values
         addl_class = status == 'Ok' ? 'good' : 'bad'
+        data_class = "data #{addl_class}"
+        status_class = "status #{addl_class}"
         ds = tds(tr, status, name, nil)
-        ds[0].attributes['class'] = "status #{addl_class}"
-        ds[1].attributes['class'] = "data #{addl_class}"
+        ds[0].attributes['class'] = status_class
+        ds[1].attributes['class'] = data_class
         t = table(ds[2])
         t.attributes['width'] = '100%'
         r = tr(t)
@@ -260,17 +261,17 @@ EOT
         h = th(r, 'Expected')
         h.attributes['class'] = 'neutral'
         d = td(r, value.class)
-        d.attributes['class'] = "data #{addl_class}"
+        d.attributes['class'] = data_class
         d = td(r, value.inspect)
-        d.attributes['class'] = "data #{addl_class}"
+        d.attributes['class'] = data_class
         value = values[:actual]
         r = tr(t)
         h = th(r, 'Actual')
         h.attributes['class'] = 'neutral'
         d = td(r, value.class)
-        d.attributes['class'] = "data #{addl_class}"
+        d.attributes['class'] = data_class
         d = td(r, value.inspect)
-        d.attributes['class'] = "data #{addl_class}"
+        d.attributes['class'] = data_class
       end
 
       def h2(text)
@@ -396,13 +397,12 @@ EOT
     end
 
     def elucidate_struct(exception, expected, actual, lines)
-      members = Set.new(expected.members + actual.members)
       categories = {
           :all_values => {},
           :changed_values => {},
           :ok_values => {},
       }
-      members.each do |member|
+      expected.members.each do |member|
         expected_value = expected[member]
         actual_value = actual[member]
         values  = {
@@ -440,21 +440,6 @@ EOT
         tr = html.tr(table)
         html.struct_status_tds(tr, status, member, values)
       end
-
-      # table = html.struct_status_table('Actual', expected)
-      # actual.each_pair do |member, values|
-      #   status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
-      #   tr = html.tr(table)
-      #   tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-      #   html.struct_status_tds(tr, status, member, values)
-      # end
-
-      # table = html.struct_status_table('Changed', categories[:changed_values])
-      # categories[:changed_values].each do |pair|
-      #   tr = html.tr(table)
-      #   tr.attributes['class'] = 'bad'
-      #   html.set_status_tds(tr, 'Changed', pair)
-      # end
 
       # For debugging.
       File.open('t.html', 'w') do |file|
