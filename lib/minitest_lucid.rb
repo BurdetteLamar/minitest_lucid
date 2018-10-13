@@ -176,6 +176,7 @@ module Minitest
       BAD_STYLE = 'bad'
       DATA_STYLE = 'data'
       STATUS_STYLE = 'status'
+      CLASS_STYLE = 'class'
 
       def initialize
         self.doc = REXML::Document.new
@@ -188,6 +189,7 @@ module Minitest
 .#{BAD_STYLE} { color: rgb(156,0,6); background-color: rgb(255,199,206) }
 .#{DATA_STYLE} { font-family: Courier, Courier, serif }
 .#{STATUS_STYLE} { text-align: center; }
+.#{CLASS_STYLE} { text-align: center; font-family: Courier, Courier, serif }
 EOT
         self.body = html.add_element('body')
         body.add_element('h1').text = 'Comparison'
@@ -208,7 +210,7 @@ EOT
 
       def set_status_tds(tr, status, item)
         new_td(tr, status, {:class => Html::STATUS_STYLE})
-        new_td(tr, item.class, {:class => Html::DATA_STYLE})
+        new_td(tr, item.class, {:class => Html::CLASS_STYLE})
         new_td(tr, item.inspect, {:class => Html::DATA_STYLE})
       end
 
@@ -226,6 +228,7 @@ EOT
       def struct_status_tds(tr, status, name, values)
         addl_class = status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE
         data_class = "data #{addl_class}"
+        class_class = "class #{addl_class}"
         status_class = "status #{addl_class}"
         new_td(tr, status, {:class => status_class})
         new_td(tr, name, {:class => data_class})
@@ -238,13 +241,13 @@ EOT
         value = values[:expected]
         r = new_tr(t)
         new_th(r, 'Expected', {:class => Html::NEUTRAL_STYLE})
-        new_td(r, value.class, {:class => data_class})
+        new_td(r, value.class, {:class => class_class})
         new_td(r, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
         r = new_tr(t)
         new_th(r, 'Actual', {:class => Html::NEUTRAL_STYLE})
-        new_td(r, value.class, {:class => data_class})
+        new_td(r, value.class, {:class => class_class})
         new_td(r, value.inspect, {:class => data_class})
       end
 
