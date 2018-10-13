@@ -255,27 +255,21 @@ EOT
         # Header row.
         r = tr(t)
         r.attributes['class'] = 'neutral'
-        h = th(r, '')
-        h = th(r, 'Class')
-        h = th(r, 'Value')
+        th(r, '')
+        th(r, 'Class')
+        th(r, 'Value')
         # Expected value.
         value = values[:expected]
         r = tr(t)
-        h = th(r, 'Expected')
-        h.attributes['class'] = 'neutral'
-        d = td(r, value.class)
-        d.attributes['class'] = data_class
-        d = td(r, value.inspect)
-        d.attributes['class'] = data_class
+        th(r, 'Expected').attributes['class'] = 'neutral'
+        td(r, value.class).attributes['class'] = data_class
+        td(r, value.inspect).attributes['class'] = data_class
         # Actual value.
         value = values[:actual]
         r = tr(t)
-        h = th(r, 'Actual')
-        h.attributes['class'] = 'neutral'
-        d = td(r, value.class)
-        d.attributes['class'] = data_class
-        d = td(r, value.inspect)
-        d.attributes['class'] = data_class
+        th(r, 'Actual').attributes['class'] = 'neutral'
+        td(r, value.class).attributes['class'] = data_class
+        td(r, value.inspect).attributes['class'] = data_class
       end
 
       def h2(text)
