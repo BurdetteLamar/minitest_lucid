@@ -255,9 +255,7 @@ EOT
         # Header row.
         r = tr(t)
         r.attributes['class'] = 'neutral'
-        th(r, '')
-        th(r, 'Class')
-        th(r, 'Value')
+        ths(r, '', 'Class', 'Value')
         # Expected value.
         value = values[:expected]
         r = tr(t)
