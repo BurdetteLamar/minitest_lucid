@@ -224,8 +224,7 @@ EOT
         new_td(tr, status, {:class => status_class})
         new_td(tr, name, {:class => data_class})
         # Values table, expected and actual
-        t = new_table(new_td(tr, nil))
-        t.attributes['width'] = '100%'
+        t = new_table(new_td(tr, nil), {:width => '100%'})
         # Header row.
         r = new_tr(t, {:class => 'neutral'})
         new_ths(r, '', 'Class', 'Value')
@@ -238,7 +237,7 @@ EOT
         # Actual value.
         value = values[:actual]
         r = new_tr(t)
-        new_th(r, 'Actual').attributes['class'] = 'neutral'
+        new_th(r, 'Actual', {:class => 'neutral'})
         new_td(r, value.class, {:class => data_class})
         new_td(r, value.inspect, {:class => data_class})
       end
