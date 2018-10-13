@@ -272,11 +272,8 @@ EOT
       end
 
       def new_th(parent, text, attributes = {})
-        ele = REXML::Element.new('th', parent)
+        ele = new_element('th', parent, attributes)
         ele.text = text
-        attributes.each_pair do |name, value|
-          ele.attributes[name.to_s] = value
-        end
         ele
       end
 
