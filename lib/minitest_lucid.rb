@@ -205,9 +205,9 @@ EOT
       end
 
       def set_status_tds(tr, status, item)
-        td(tr, status).attributes['class'] = 'status'
-        td(tr, item.class).attributes['class'] = 'data'
-        td(tr, item.inspect).attributes['class'] = 'data'
+        td(tr, status, {:class => 'status'})
+        td(tr, item.class, {:class => 'data'})
+        td(tr, item.inspect, {:class => 'data'})
       end
 
       def struct_status_table(label, items)
@@ -225,28 +225,12 @@ EOT
         ele
       end
 
-      def struct_values_table(parent, values)
-        ele = table(parent)
-        tr = tr(ele)
-        tr.attributes['class'] = 'neutral'
-        ths(tr, '', 'Class', 'Inspection')
-        value = values[:expected]
-        tr = tr(ele)
-        th(tr, 'Expected')
-        td(tr, value.class)
-        td(tr, value.inspect)
-        value = values[:actual]
-        tr = tr(ele)
-        th(tr, 'Actual')
-        td(tr, value.inspect)
-      end
-
       def struct_status_tds(tr, status, name, values)
         addl_class = status == 'Ok' ? 'good' : 'bad'
         data_class = "data #{addl_class}"
         status_class = "status #{addl_class}"
-        td(tr, status).attributes['class'] = status_class
-        td(tr, name).attributes['class'] = data_class
+        td(tr, status, {:class => status_class})
+        td(tr, name, {:class => data_class})
         # Values table, expected and actual
         t = table(td(tr, nil))
         t.attributes['width'] = '100%'
@@ -258,14 +242,14 @@ EOT
         value = values[:expected]
         r = tr(t)
         th(r, 'Expected').attributes['class'] = 'neutral'
-        td(r, value.class).attributes['class'] = data_class
-        td(r, value.inspect).attributes['class'] = data_class
+        td(r, value.class, {:class => data_class})
+        td(r, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
         r = tr(t)
         th(r, 'Actual').attributes['class'] = 'neutral'
-        td(r, value.class).attributes['class'] = data_class
-        td(r, value.inspect).attributes['class'] = data_class
+        td(r, value.class, {:class => data_class})
+        td(r, value.inspect, {:class => data_class})
       end
 
       def h2(text)
@@ -302,10 +286,13 @@ EOT
         eles
       end
 
-      def td(parent, text)
+      def td(parent, text, attributes = {})
         ele = REXML::Element.new('td')
         parent << ele
         ele.text = text
+        attributes.each_pair do |name, value|
+          ele.attributes[name.to_s] = value
+        end
         ele
       end
 
