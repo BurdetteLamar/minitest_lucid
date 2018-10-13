@@ -238,13 +238,13 @@ EOT
         # Expected value.
         value = values[:expected]
         r = new_tr(t)
-        th(r, 'Expected', {:class => 'neutral'})
+        new_th(r, 'Expected', {:class => 'neutral'})
         td(r, value.class, {:class => data_class})
         td(r, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
         r = new_tr(t)
-        th(r, 'Actual').attributes['class'] = 'neutral'
+        new_th(r, 'Actual').attributes['class'] = 'neutral'
         td(r, value.class, {:class => data_class})
         td(r, value.inspect, {:class => data_class})
       end
@@ -274,7 +274,7 @@ EOT
         ele
       end
 
-      def th(parent, text, attributes = {})
+      def new_th(parent, text, attributes = {})
         ele = REXML::Element.new('th')
         parent << ele
         ele.text = text
@@ -287,7 +287,7 @@ EOT
       def ths(parent, *texts)
         eles = []
         texts.each do |text|
-          eles.push(th(parent, text))
+          eles.push(new_th(parent, text))
         end
         eles
       end
