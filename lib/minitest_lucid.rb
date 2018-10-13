@@ -190,16 +190,15 @@ EOT
       end
 
       def set_status_table(label, items)
-        h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
+        title = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        h = h2(title, {:id => label})
         id = "##{label}"
-        h.attributes['id'] = label
         li = toc_list.add_element('li')
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
         ele = table(body)
-        tr = tr(ele)
-        tr.attributes['class'] = 'neutral'
+        tr = tr(ele, {:class => 'neutral'})
         ths(tr, 'Status', 'Class', 'Inspection')
         ele
       end
@@ -211,16 +210,15 @@ EOT
       end
 
       def struct_status_table(label, items)
-        h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
+        title = "#{label}: Class=#{items.class}, Size=#{items.size}"
+        h = h2(title, {:id => label})
         id = "##{label}"
-        h.attributes['id'] = label
         li = toc_list.add_element('li')
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
         ele = table(body)
-        tr = tr(ele)
-        tr.attributes['class'] = 'neutral'
+        tr = tr(ele, {:class => 'neutral'})
         ths(tr, 'Status', 'Name', 'Values')
         ele
       end
@@ -235,13 +233,12 @@ EOT
         t = table(td(tr, nil))
         t.attributes['width'] = '100%'
         # Header row.
-        r = tr(t)
-        r.attributes['class'] = 'neutral'
+        r = tr(t, {:class => 'neutral'})
         ths(r, '', 'Class', 'Value')
         # Expected value.
         value = values[:expected]
         r = tr(t)
-        th(r, 'Expected').attributes['class'] = 'neutral'
+        th(r, 'Expected', {:class => 'neutral'})
         td(r, value.class, {:class => data_class})
         td(r, value.inspect, {:class => data_class})
         # Actual value.
@@ -252,15 +249,17 @@ EOT
         td(r, value.inspect, {:class => data_class})
       end
 
-      def h2(text)
+      def h2(text, attributes = {})
         ele = body.add_element('h2')
+        attributes.each_pair do |k, v|
+          ele.attributes[k.to_s] = v
+        end
         ele.text = text
         ele
       end
 
       def table(parent, attributes = {})
         ele = REXML::Element.new('table', parent)
-        ele.attributes['border'] = 0
         attributes.each_pair do |k, v|
           ele.attributes[k.to_s] = v
         end
@@ -269,17 +268,19 @@ EOT
 
       def tr(parent, attributes = {})
         ele = REXML::Element.new('tr', parent)
-        ele.attributes['border'] = 0
         attributes.each_pair do |k, v|
           ele.attributes[k.to_s] = v
         end
         ele
       end
 
-      def th(parent, text)
+      def th(parent, text, attributes = {})
         ele = REXML::Element.new('th')
         parent << ele
         ele.text = text
+        attributes.each_pair do |name, value|
+          ele.attributes[name.to_s] = value
+        end
         ele
       end
 
