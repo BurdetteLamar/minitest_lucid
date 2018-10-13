@@ -193,7 +193,7 @@ EOT
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = new_h2(body, title, {:id => label})
         li = new_li(toc_list)
-        s = new_a(li, h.text, {:href => "##{label}"})
+        new_a(li, h.text, {:href => "##{label}"})
         ele = new_table(body)
         tr = new_tr(ele, {:class => 'neutral'})
         new_ths(tr, 'Status', 'Class', 'Inspection')
@@ -209,11 +209,8 @@ EOT
       def struct_status_new_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = new_h2(body, title, {:id => label})
-        id = "##{label}"
-        li = toc_list.add_element('li')
-        a = li.add_element('a')
-        a.attributes['href'] = id
-        a.text = h.text
+        li = new_li(toc_list)
+        new_a(li, h.text, {:href => "##{label}"})
         ele = new_table(body)
         tr = new_tr(ele, {:class => 'neutral'})
         new_ths(tr, 'Status', 'Name', 'Values')
