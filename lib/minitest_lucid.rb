@@ -267,8 +267,13 @@ EOT
         ele
       end
 
-      def tr(parent)
-        parent << REXML::Element.new('tr')
+      def tr(parent, attributes = {})
+        ele = REXML::Element.new('tr', parent)
+        ele.attributes['border'] = 0
+        attributes.each_pair do |k, v|
+          ele.attributes[k.to_s] = v
+        end
+        ele
       end
 
       def th(parent, text)
@@ -311,40 +316,35 @@ EOT
       table = html.set_status_table('Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-        tr = html.tr(table)
-        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+        tr = html.tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_table('Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-        tr = html.tr(table)
-        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
+        tr = html.tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_table('Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         status = 'Missing'
-        tr = html.tr(table)
-        tr.attributes['class'] = 'bad'
+        tr = html.tr(table, {:class => 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_table('Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         status = 'Unexpected'
-        tr = html.tr(table)
-        tr.attributes['class'] = 'bad'
+        tr = html.tr(table, {:class => 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_table('Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         status = 'Ok'
-        tr = html.tr(table)
-        tr.attributes['class'] = 'good'
+        tr = html.tr(table, {:class => 'good'})
         html.set_status_tds(tr, status, item)
       end
 
