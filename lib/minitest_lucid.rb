@@ -191,7 +191,7 @@ EOT
 
       def set_status_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        h = h2(title, {:id => label})
+        h = new_h2(title, {:id => label})
         id = "##{label}"
         li = toc_list.add_element('li')
         a = li.add_element('a')
@@ -211,7 +211,7 @@ EOT
 
       def struct_status_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        h = h2(title, {:id => label})
+        h = new_h2(title, {:id => label})
         id = "##{label}"
         li = toc_list.add_element('li')
         a = li.add_element('a')
@@ -248,8 +248,8 @@ EOT
         td(r, value.class, {:class => data_class})
         td(r, value.inspect, {:class => data_class})
       end
-
-      def h2(text, attributes = {})
+      
+      def new_h2(text, attributes = {})
         ele = body.add_element('h2')
         attributes.each_pair do |k, v|
           ele.attributes[k.to_s] = v
