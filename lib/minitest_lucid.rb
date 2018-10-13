@@ -189,7 +189,7 @@ EOT
         self.head = head
       end
 
-      def scalar_status_table(label, items)
+      def set_status_table(label, items)
         h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
         id = "##{label}"
         h.attributes['id'] = label
@@ -204,14 +204,14 @@ EOT
         ele
       end
 
-      def scalar_status_tds(tr, status, item)
+      def set_status_tds(tr, status, item)
         tds = tds(tr, status, item.class, item.inspect)
         tds[0].attributes['class'] = 'status'
         tds[1].attributes['class'] = 'data'
         tds[2].attributes['class'] = 'data'
       end
 
-      def pair_status_table(label, items)
+      def struct_status_table(label, items)
         h = h2("#{label}: Class=#{items.class}, Size=#{items.size}")
         id = "##{label}"
         h.attributes['id'] = label
@@ -226,7 +226,7 @@ EOT
         ele
       end
 
-      def pair_values_table(parent, values)
+      def struct_values_table(parent, values)
         ele = table(parent)
         tr = tr(ele)
         tr.attributes['class'] = 'neutral'
@@ -242,26 +242,35 @@ EOT
         td(tr, value.inspect)
       end
 
-      def pair_status_tds(tr, status, name, values)
-        p values.class
+      def struct_status_tds(tr, status, name, values)
+        p values
+        addl_class = status == 'Ok' ? 'good' : 'bad'
         ds = tds(tr, status, name, nil)
-        ds[0].attributes['class'] = 'status'
-        ds[1].attributes['class'] = 'data'
+        ds[0].attributes['class'] = "status #{addl_class}"
+        ds[1].attributes['class'] = "data #{addl_class}"
         t = table(ds[2])
+        t.attributes['width'] = '100%'
         r = tr(t)
+        r.attributes['class'] = 'neutral'
         h = th(r, '')
         h = th(r, 'Class')
         h = th(r, 'Value')
-        value = values[:expected_value]
+        value = values[:expected]
         r = tr(t)
         h = th(r, 'Expected')
+        h.attributes['class'] = 'neutral'
         d = td(r, value.class)
+        d.attributes['class'] = "data #{addl_class}"
         d = td(r, value.inspect)
-        value = values[:actual_value]
+        d.attributes['class'] = "data #{addl_class}"
+        value = values[:actual]
         r = tr(t)
         h = th(r, 'Actual')
+        h.attributes['class'] = 'neutral'
         d = td(r, value.class)
+        d.attributes['class'] = "data #{addl_class}"
         d = td(r, value.inspect)
+        d.attributes['class'] = "data #{addl_class}"
       end
 
       def h2(text)
@@ -325,41 +334,44 @@ EOT
 
       html = Html.new
 
-      table = html.scalar_status_table('Expected', expected)
+      table = html.set_status_table('Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
         tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.scalar_status_tds(tr, status, item)
+        html.set_status_tds(tr, status, item)
       end
 
-      table = html.scalar_status_table('Actual', actual)
+      table = html.set_status_table('Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
         tr = html.tr(table)
         tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.scalar_status_tds(tr, status, item)
+        html.set_status_tds(tr, status, item)
       end
 
-      table = html.scalar_status_table('Missing (Expected - Actual)', result[:missing])
+      table = html.set_status_table('Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
+        status = 'Missing'
         tr = html.tr(table)
         tr.attributes['class'] = 'bad'
-        html.scalar_status_tds(tr, 'Missing', item)
+        html.set_status_tds(tr, status, item)
       end
 
-      table = html.scalar_status_table('Unexpected (Actual - Expected)', result[:unexpected])
+      table = html.set_status_table('Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
+        status = 'Unexpected'
         tr = html.tr(table)
         tr.attributes['class'] = 'bad'
-        html.scalar_status_tds(tr, 'Unexpected', item)
+        html.set_status_tds(tr, status, item)
       end
 
-      table = html.scalar_status_table('Ok (Expected & Actual)', result[:ok])
+      table = html.set_status_table('Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
+        status = 'Ok'
         tr = html.tr(table)
         tr.attributes['class'] = 'good'
-        html.scalar_status_tds(tr, 'Ok', item)
+        html.set_status_tds(tr, status, item)
       end
 
       File.open('t.html', 'w') do |file|
@@ -386,6 +398,7 @@ EOT
     def elucidate_struct(exception, expected, actual, lines)
       members = Set.new(expected.members + actual.members)
       categories = {
+          :all_values => {},
           :changed_values => {},
           :ok_values => {},
       }
@@ -396,6 +409,7 @@ EOT
             :expected => expected_value,
             :actual => actual_value,
         }
+        categories[:all_values].store(member, values)
         if expected_value == actual_value
           categories[:ok_values].store(member, values)
         else
@@ -405,27 +419,41 @@ EOT
 
       html = Html.new
 
-      table = html.pair_status_table('Expected', expected)
-      expected.each_pair do |member, values|
+      table = html.struct_status_table('All', expected)
+      expected.members.each do |member|
+        values = categories[:all_values][member]
         status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
         tr = html.tr(table)
-        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        html.pair_status_tds(tr, status, member, values)
+        html.struct_status_tds(tr, status, member, values)
       end
 
-      # table = html.pair_status_table('Actual', expected)
+      table = html.struct_status_table('Changed', categories[:changed_values])
+      categories[:changed_values].each_pair do |member, values|
+        status = 'Changed'
+        tr = html.tr(table)
+        html.struct_status_tds(tr, status, member, values)
+      end
+
+      table = html.struct_status_table('Ok', categories[:ok_values])
+      categories[:ok_values].each_pair do |member, values|
+        status = 'Ok'
+        tr = html.tr(table)
+        html.struct_status_tds(tr, status, member, values)
+      end
+
+      # table = html.struct_status_table('Actual', expected)
       # actual.each_pair do |member, values|
       #   status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
       #   tr = html.tr(table)
       #   tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-      #   html.pair_status_tds(tr, status, member, values)
+      #   html.struct_status_tds(tr, status, member, values)
       # end
 
-      # table = html.pair_status_table('Changed', categories[:changed_values])
+      # table = html.struct_status_table('Changed', categories[:changed_values])
       # categories[:changed_values].each do |pair|
       #   tr = html.tr(table)
       #   tr.attributes['class'] = 'bad'
-      #   html.scalar_status_tds(tr, 'Changed', pair)
+      #   html.set_status_tds(tr, 'Changed', pair)
       # end
 
       # For debugging.
