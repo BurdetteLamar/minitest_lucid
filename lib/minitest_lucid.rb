@@ -199,14 +199,14 @@ EOT
         a.text = h.text
         ele = new_table(body)
         tr = new_tr(ele, {:class => 'neutral'})
-        ths(tr, 'Status', 'Class', 'Inspection')
+        new_ths(tr, 'Status', 'Class', 'Inspection')
         ele
       end
 
       def set_status_tds(tr, status, item)
-        td(tr, status, {:class => 'status'})
-        td(tr, item.class, {:class => 'data'})
-        td(tr, item.inspect, {:class => 'data'})
+        new_td(tr, status, {:class => 'status'})
+        new_td(tr, item.class, {:class => 'data'})
+        new_td(tr, item.inspect, {:class => 'data'})
       end
 
       def struct_status_new_table(label, items)
@@ -219,7 +219,7 @@ EOT
         a.text = h.text
         ele = new_table(body)
         tr = new_tr(ele, {:class => 'neutral'})
-        ths(tr, 'Status', 'Name', 'Values')
+        new_ths(tr, 'Status', 'Name', 'Values')
         ele
       end
 
@@ -227,26 +227,26 @@ EOT
         addl_class = status == 'Ok' ? 'good' : 'bad'
         data_class = "data #{addl_class}"
         status_class = "status #{addl_class}"
-        td(tr, status, {:class => status_class})
-        td(tr, name, {:class => data_class})
+        new_td(tr, status, {:class => status_class})
+        new_td(tr, name, {:class => data_class})
         # Values table, expected and actual
-        t = new_table(td(tr, nil))
+        t = new_table(new_td(tr, nil))
         t.attributes['width'] = '100%'
         # Header row.
         r = new_tr(t, {:class => 'neutral'})
-        ths(r, '', 'Class', 'Value')
+        new_ths(r, '', 'Class', 'Value')
         # Expected value.
         value = values[:expected]
         r = new_tr(t)
         new_th(r, 'Expected', {:class => 'neutral'})
-        td(r, value.class, {:class => data_class})
-        td(r, value.inspect, {:class => data_class})
+        new_td(r, value.class, {:class => data_class})
+        new_td(r, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
         r = new_tr(t)
         new_th(r, 'Actual').attributes['class'] = 'neutral'
-        td(r, value.class, {:class => data_class})
-        td(r, value.inspect, {:class => data_class})
+        new_td(r, value.class, {:class => data_class})
+        new_td(r, value.inspect, {:class => data_class})
       end
       
       def new_h2(text, attributes = {})
@@ -284,7 +284,7 @@ EOT
         ele
       end
 
-      def ths(parent, *texts)
+      def new_ths(parent, *texts)
         eles = []
         texts.each do |text|
           eles.push(new_th(parent, text))
@@ -292,7 +292,7 @@ EOT
         eles
       end
 
-      def td(parent, text, attributes = {})
+      def new_td(parent, text, attributes = {})
         ele = REXML::Element.new('td')
         parent << ele
         ele.text = text
