@@ -191,7 +191,7 @@ EOT
 
       def set_status_new_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        h = new_h2(title, {:id => label})
+        h = new_h2(body, title, {:id => label})
         id = "##{label}"
         li = toc_list.add_element('li')
         a = li.add_element('a')
@@ -211,7 +211,7 @@ EOT
 
       def struct_status_new_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        h = new_h2(title, {:id => label})
+        h = new_h2(body, title, {:id => label})
         id = "##{label}"
         li = toc_list.add_element('li')
         a = li.add_element('a')
@@ -248,35 +248,31 @@ EOT
         new_td(r, value.class, {:class => data_class})
         new_td(r, value.inspect, {:class => data_class})
       end
-      
-      def new_h2(text, attributes = {})
-        ele = body.add_element('h2')
+
+      def new_element(name, parent, attributes = {})
+        ele = REXML::Element.new(name, parent)
         attributes.each_pair do |k, v|
           ele.attributes[k.to_s] = v
         end
+        ele
+      end
+
+      def new_h2(parent, text, attributes = {})
+        ele = new_element('h2', parent, attributes)
         ele.text = text
         ele
       end
 
       def new_table(parent, attributes = {})
-        ele = REXML::Element.new('table', parent)
-        attributes.each_pair do |k, v|
-          ele.attributes[k.to_s] = v
-        end
-        ele
+        new_element('table', parent, attributes)
       end
 
       def new_tr(parent, attributes = {})
-        ele = REXML::Element.new('tr', parent)
-        attributes.each_pair do |k, v|
-          ele.attributes[k.to_s] = v
-        end
-        ele
+        new_element('tr', parent, attributes)
       end
 
       def new_th(parent, text, attributes = {})
-        ele = REXML::Element.new('th')
-        parent << ele
+        ele = REXML::Element.new('th', parent)
         ele.text = text
         attributes.each_pair do |name, value|
           ele.attributes[name.to_s] = value
