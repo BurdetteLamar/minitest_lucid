@@ -177,6 +177,7 @@ module Minitest
       DATA_STYLE = 'data'
       STATUS_STYLE = 'status'
       CLASS_STYLE = 'class'
+      NAME_STYLE = 'name'
 
       def initialize
         self.doc = REXML::Document.new
@@ -190,6 +191,7 @@ module Minitest
 .#{DATA_STYLE} { font-family: Courier, Courier, serif }
 .#{STATUS_STYLE} { text-align: center; }
 .#{CLASS_STYLE} { text-align: center; font-family: Courier, Courier, serif }
+.#{NAME_STYLE} { text-align: center; font-family: Courier, Courier, serif }
 EOT
         self.body = html.add_element('body')
         body.add_element('h1').text = 'Comparison'
@@ -228,10 +230,11 @@ EOT
       def struct_status_tds(tr, status, name, values)
         addl_class = status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE
         data_class = "data #{addl_class}"
+        name_class = "name #{addl_class}"
         class_class = "class #{addl_class}"
         status_class = "status #{addl_class}"
         new_td(tr, status, {:class => status_class})
-        new_td(tr, name, {:class => data_class})
+        new_td(tr, name, {:class => name_class})
         # Values table, expected and actual
         t = new_table(new_td(tr, nil), {:width => '100%'})
         # Header row.
