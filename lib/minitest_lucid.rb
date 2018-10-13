@@ -189,7 +189,7 @@ EOT
         self.head = head
       end
 
-      def set_status_table(label, items)
+      def set_status_new_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = new_h2(title, {:id => label})
         id = "##{label}"
@@ -197,8 +197,8 @@ EOT
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
-        ele = table(body)
-        tr = tr(ele, {:class => 'neutral'})
+        ele = new_table(body)
+        tr = new_tr(ele, {:class => 'neutral'})
         ths(tr, 'Status', 'Class', 'Inspection')
         ele
       end
@@ -209,7 +209,7 @@ EOT
         td(tr, item.inspect, {:class => 'data'})
       end
 
-      def struct_status_table(label, items)
+      def struct_status_new_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = new_h2(title, {:id => label})
         id = "##{label}"
@@ -217,8 +217,8 @@ EOT
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
-        ele = table(body)
-        tr = tr(ele, {:class => 'neutral'})
+        ele = new_table(body)
+        tr = new_tr(ele, {:class => 'neutral'})
         ths(tr, 'Status', 'Name', 'Values')
         ele
       end
@@ -230,20 +230,20 @@ EOT
         td(tr, status, {:class => status_class})
         td(tr, name, {:class => data_class})
         # Values table, expected and actual
-        t = table(td(tr, nil))
+        t = new_table(td(tr, nil))
         t.attributes['width'] = '100%'
         # Header row.
-        r = tr(t, {:class => 'neutral'})
+        r = new_tr(t, {:class => 'neutral'})
         ths(r, '', 'Class', 'Value')
         # Expected value.
         value = values[:expected]
-        r = tr(t)
+        r = new_tr(t)
         th(r, 'Expected', {:class => 'neutral'})
         td(r, value.class, {:class => data_class})
         td(r, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
-        r = tr(t)
+        r = new_tr(t)
         th(r, 'Actual').attributes['class'] = 'neutral'
         td(r, value.class, {:class => data_class})
         td(r, value.inspect, {:class => data_class})
@@ -258,7 +258,7 @@ EOT
         ele
       end
 
-      def table(parent, attributes = {})
+      def new_table(parent, attributes = {})
         ele = REXML::Element.new('table', parent)
         attributes.each_pair do |k, v|
           ele.attributes[k.to_s] = v
@@ -266,7 +266,7 @@ EOT
         ele
       end
 
-      def tr(parent, attributes = {})
+      def new_tr(parent, attributes = {})
         ele = REXML::Element.new('tr', parent)
         attributes.each_pair do |k, v|
           ele.attributes[k.to_s] = v
@@ -314,38 +314,38 @@ EOT
 
       html = Html.new
 
-      table = html.set_status_table('Expected', expected)
+      table = html.set_status_new_table('Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-        tr = html.tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
+        tr = html.new_tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
-      table = html.set_status_table('Actual', actual)
+      table = html.set_status_new_table('Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-        tr = html.tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
+        tr = html.new_tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
-      table = html.set_status_table('Missing (Expected - Actual)', result[:missing])
+      table = html.set_status_new_table('Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         status = 'Missing'
-        tr = html.tr(table, {:class => 'bad'})
+        tr = html.new_tr(table, {:class => 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
-      table = html.set_status_table('Unexpected (Actual - Expected)', result[:unexpected])
+      table = html.set_status_new_table('Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         status = 'Unexpected'
-        tr = html.tr(table, {:class => 'bad'})
+        tr = html.new_tr(table, {:class => 'bad'})
         html.set_status_tds(tr, status, item)
       end
 
-      table = html.set_status_table('Ok (Expected & Actual)', result[:ok])
+      table = html.set_status_new_table('Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         status = 'Ok'
-        tr = html.tr(table, {:class => 'good'})
+        tr = html.new_tr(table, {:class => 'good'})
         html.set_status_tds(tr, status, item)
       end
 
@@ -393,25 +393,25 @@ EOT
 
       html = Html.new
 
-      table = html.struct_status_table('All', expected)
+      table = html.struct_status_new_table('All', expected)
       expected.members.each do |member|
         values = categories[:all_values][member]
         status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
-        tr = html.tr(table)
+        tr = html.new_tr(table)
         html.struct_status_tds(tr, status, member, values)
       end
 
-      table = html.struct_status_table('Changed', categories[:changed_values])
+      table = html.struct_status_new_table('Changed', categories[:changed_values])
       categories[:changed_values].each_pair do |member, values|
         status = 'Changed'
-        tr = html.tr(table)
+        tr = html.new_tr(table)
         html.struct_status_tds(tr, status, member, values)
       end
 
-      table = html.struct_status_table('Ok', categories[:ok_values])
+      table = html.struct_status_new_table('Ok', categories[:ok_values])
       categories[:ok_values].each_pair do |member, values|
         status = 'Ok'
-        tr = html.tr(table)
+        tr = html.new_tr(table)
         html.struct_status_tds(tr, status, member, values)
       end
 
