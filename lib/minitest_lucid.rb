@@ -204,10 +204,10 @@ EOT
         h = new_h2(body, title, {:id => label})
         li = new_li(toc_list)
         new_a(li, h.text, {:href => "##{label}"})
-        ele = new_table(body)
-        tr = new_tr(ele, {:class => Html::NEUTRAL_STYLE})
+        table = new_table(body)
+        tr = new_tr(table, {:class => Html::NEUTRAL_STYLE})
         new_ths(tr, Html::STATUS_STYLE, 'Class', 'Inspection')
-        ele
+        table
       end
 
       def set_status_tds(tr, status, item)
@@ -221,10 +221,10 @@ EOT
         h = new_h2(body, title, {:id => label})
         li = new_li(toc_list)
         new_a(li, h.text, {:href => "##{label}"})
-        ele = new_table(body)
-        tr = new_tr(ele, {:class => Html::NEUTRAL_STYLE})
+        table = new_table(body)
+        tr = new_tr(table, {:class => Html::NEUTRAL_STYLE})
         new_ths(tr, Html::STATUS_STYLE, 'Name', 'Values')
-        ele
+        table
       end
 
       def struct_status_tds(tr, status, name, values)
@@ -236,22 +236,22 @@ EOT
         new_td(tr, status, {:class => status_class})
         new_td(tr, name, {:class => name_class})
         # Values table, expected and actual
-        t = new_table(new_td(tr, nil), {:width => '100%'})
+        table = new_table(new_td(tr, nil), {:width => '100%'})
         # Header row.
-        r = new_tr(t, {:class => Html::NEUTRAL_STYLE})
-        new_ths(r, '', 'Class', 'Value')
+        tr = new_tr(table, {:class => Html::NEUTRAL_STYLE})
+        new_ths(tr, '', 'Class', 'Value')
         # Expected value.
         value = values[:expected]
-        r = new_tr(t)
-        new_th(r, 'Expected', {:class => Html::NEUTRAL_STYLE})
-        new_td(r, value.class, {:class => class_class})
-        new_td(r, value.inspect, {:class => data_class})
+        tr = new_tr(table)
+        new_th(tr, 'Expected', {:class => Html::NEUTRAL_STYLE})
+        new_td(tr, value.class, {:class => class_class})
+        new_td(tr, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
-        r = new_tr(t)
-        new_th(r, 'Actual', {:class => Html::NEUTRAL_STYLE})
-        new_td(r, value.class, {:class => class_class})
-        new_td(r, value.inspect, {:class => data_class})
+        tr = new_tr(table)
+        new_th(tr, 'Actual', {:class => Html::NEUTRAL_STYLE})
+        new_td(tr, value.class, {:class => class_class})
+        new_td(tr, value.inspect, {:class => data_class})
       end
 
       def new_element(name, parent, attributes = {})
