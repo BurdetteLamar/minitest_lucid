@@ -286,12 +286,8 @@ EOT
       end
 
       def new_td(parent, text, attributes = {})
-        ele = REXML::Element.new('td')
-        parent << ele
+        ele = new_element('td', parent, attributes)
         ele.text = text
-        attributes.each_pair do |name, value|
-          ele.attributes[name.to_s] = value
-        end
         ele
       end
 
