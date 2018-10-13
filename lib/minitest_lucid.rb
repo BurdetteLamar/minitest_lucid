@@ -171,17 +171,23 @@ module Minitest
 
       attr_accessor :doc, :head, :body, :toc_list
 
+      GOOD_STYLE = 'good'
+      NEUTRAL_STYLE = 'neutral'
+      BAD_STYLE = 'bad'
+      DATA_STYLE = 'data'
+      STATUS_STYLE = 'status'
+
       def initialize
         self.doc = REXML::Document.new
         html = doc.add_element('html')
         head = html.add_element('head')
         style = head.add_element('style')
         style.text = <<EOT
-.good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
-.neutral { color: rgb(0,0,0) ; background-color: rgb(200,200,200) }
-.bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
-.data { font-family: Courier, Courier, serif }
-.status { text-align: center; }
+.#{GOOD_STYLE} {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
+.#{NEUTRAL_STYLE} { color: rgb(0,0,0) ; background-color: rgb(200,200,200) }
+.#{BAD_STYLE} { color: rgb(156,0,6); background-color: rgb(255,199,206) }
+.#{DATA_STYLE} { font-family: Courier, Courier, serif }
+.#{STATUS_STYLE} { text-align: center; }
 EOT
         self.body = html.add_element('body')
         body.add_element('h1').text = 'Comparison'
@@ -195,15 +201,15 @@ EOT
         li = new_li(toc_list)
         new_a(li, h.text, {:href => "##{label}"})
         ele = new_table(body)
-        tr = new_tr(ele, {:class => 'neutral'})
-        new_ths(tr, 'Status', 'Class', 'Inspection')
+        tr = new_tr(ele, {:class => Html::NEUTRAL_STYLE})
+        new_ths(tr, Html::STATUS_STYLE, 'Class', 'Inspection')
         ele
       end
 
       def set_status_tds(tr, status, item)
-        new_td(tr, status, {:class => 'status'})
-        new_td(tr, item.class, {:class => 'data'})
-        new_td(tr, item.inspect, {:class => 'data'})
+        new_td(tr, status, {:class => Html::STATUS_STYLE})
+        new_td(tr, item.class, {:class => Html::DATA_STYLE})
+        new_td(tr, item.inspect, {:class => Html::DATA_STYLE})
       end
 
       def struct_status_new_table(label, items)
@@ -212,13 +218,13 @@ EOT
         li = new_li(toc_list)
         new_a(li, h.text, {:href => "##{label}"})
         ele = new_table(body)
-        tr = new_tr(ele, {:class => 'neutral'})
-        new_ths(tr, 'Status', 'Name', 'Values')
+        tr = new_tr(ele, {:class => Html::NEUTRAL_STYLE})
+        new_ths(tr, Html::STATUS_STYLE, 'Name', 'Values')
         ele
       end
 
       def struct_status_tds(tr, status, name, values)
-        addl_class = status == 'Ok' ? 'good' : 'bad'
+        addl_class = status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE
         data_class = "data #{addl_class}"
         status_class = "status #{addl_class}"
         new_td(tr, status, {:class => status_class})
@@ -226,18 +232,18 @@ EOT
         # Values table, expected and actual
         t = new_table(new_td(tr, nil), {:width => '100%'})
         # Header row.
-        r = new_tr(t, {:class => 'neutral'})
+        r = new_tr(t, {:class => Html::NEUTRAL_STYLE})
         new_ths(r, '', 'Class', 'Value')
         # Expected value.
         value = values[:expected]
         r = new_tr(t)
-        new_th(r, 'Expected', {:class => 'neutral'})
+        new_th(r, 'Expected', {:class => Html::NEUTRAL_STYLE})
         new_td(r, value.class, {:class => data_class})
         new_td(r, value.inspect, {:class => data_class})
         # Actual value.
         value = values[:actual]
         r = new_tr(t)
-        new_th(r, 'Actual', {:class => 'neutral'})
+        new_th(r, 'Actual', {:class => Html::NEUTRAL_STYLE})
         new_td(r, value.class, {:class => data_class})
         new_td(r, value.inspect, {:class => data_class})
       end
@@ -309,35 +315,35 @@ EOT
       table = html.set_status_new_table('Expected', expected)
       expected.each do |item, i|
         status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-        tr = html.new_tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
+        tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_new_table('Actual', actual)
       actual.each do |item|
         status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-        tr = html.new_tr(table, {:class => status == 'Ok' ? 'good' : 'bad'})
+        tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_new_table('Missing (Expected - Actual)', result[:missing])
       result[:missing].each do |item|
         status = 'Missing'
-        tr = html.new_tr(table, {:class => 'bad'})
+        tr = html.new_tr(table, {:class => Html::BAD_STYLE})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_new_table('Unexpected (Actual - Expected)', result[:unexpected])
       result[:unexpected].each do |item|
         status = 'Unexpected'
-        tr = html.new_tr(table, {:class => 'bad'})
+        tr = html.new_tr(table, {:class => Html::BAD_STYLE})
         html.set_status_tds(tr, status, item)
       end
 
       table = html.set_status_new_table('Ok (Expected & Actual)', result[:ok])
       result[:ok].each do |item|
         status = 'Ok'
-        tr = html.new_tr(table, {:class => 'good'})
+        tr = html.new_tr(table, {:class => Html::GOOD_STYLE})
         html.set_status_tds(tr, status, item)
       end
 
