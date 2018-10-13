@@ -249,13 +249,16 @@ EOT
         ds = tds(tr, status, name, nil)
         ds[0].attributes['class'] = status_class
         ds[1].attributes['class'] = data_class
+        # Values table, expected and actual
         t = table(ds[2])
         t.attributes['width'] = '100%'
+        # Header row.
         r = tr(t)
         r.attributes['class'] = 'neutral'
         h = th(r, '')
         h = th(r, 'Class')
         h = th(r, 'Value')
+        # Expected value.
         value = values[:expected]
         r = tr(t)
         h = th(r, 'Expected')
@@ -264,6 +267,7 @@ EOT
         d.attributes['class'] = data_class
         d = td(r, value.inspect)
         d.attributes['class'] = data_class
+        # Actual value.
         value = values[:actual]
         r = tr(t)
         h = th(r, 'Actual')
