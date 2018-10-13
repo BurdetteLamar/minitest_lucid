@@ -193,7 +193,7 @@ EOT
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = new_h2(body, title, {:id => label})
         id = "##{label}"
-        li = toc_list.add_element('li')
+        li = new_li(toc_list)
         a = li.add_element('a')
         a.attributes['href'] = id
         a.text = h.text
@@ -261,6 +261,10 @@ EOT
         ele = new_element('h2', parent, attributes)
         ele.text = text
         ele
+      end
+
+      def new_li(parent, attributes = {})
+        new_element('li', parent, attributes)
       end
 
       def new_table(parent, attributes = {})
