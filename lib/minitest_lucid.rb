@@ -205,10 +205,9 @@ EOT
       end
 
       def set_status_tds(tr, status, item)
-        tds = tds(tr, status, item.class, item.inspect)
-        tds[0].attributes['class'] = 'status'
-        tds[1].attributes['class'] = 'data'
-        tds[2].attributes['class'] = 'data'
+        td(tr, status).attributes['class'] = 'status'
+        td(tr, item.class).attributes['class'] = 'data'
+        td(tr, item.inspect).attributes['class'] = 'data'
       end
 
       def struct_status_table(label, items)
@@ -246,11 +245,10 @@ EOT
         addl_class = status == 'Ok' ? 'good' : 'bad'
         data_class = "data #{addl_class}"
         status_class = "status #{addl_class}"
-        ds = tds(tr, status, name, nil)
-        ds[0].attributes['class'] = status_class
-        ds[1].attributes['class'] = data_class
+        td(tr, status).attributes['class'] = status_class
+        td(tr, name).attributes['class'] = data_class
         # Values table, expected and actual
-        t = table(ds[2])
+        t = table(td(tr, nil))
         t.attributes['width'] = '100%'
         # Header row.
         r = tr(t)
@@ -309,14 +307,6 @@ EOT
         parent << ele
         ele.text = text
         ele
-      end
-
-      def tds(parent, *texts)
-        eles = []
-        texts.each do |text|
-          eles << td(parent, text)
-        end
-        eles
       end
 
     end
