@@ -2,7 +2,7 @@
 
 [![Gem](https://img.shields.io/gem/v/minitest_lucid.svg?style=flat)](http://rubygems.org/gems/minitest_lucid "View this project in Rubygems")
 
-When you use gem ```miiitest```, a failed assertion for a large or complex object can be difficult to understand.
+When you use gem ```minitest```, a failed assertion for a large or complex object can be difficult to understand.
 
 Using method ```make_my_diffs_pretty!``` (it's part of ```minitest```) can sometimes help, but sometimes not enough.
 
