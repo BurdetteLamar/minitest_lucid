@@ -32,7 +32,7 @@ class MinitestLucidTest < Minitest::Test
         'laboab vaga dat maaua in venima.',
         'Eser in dolo eaata labor ut.',
     ]
-    lucid_format = <<EOT
+    lucid_yaml_format = <<EOT
 Message:  %s
 Expected class:  %s
 Actual class:  %s
@@ -99,7 +99,7 @@ EOT
       x = assert_raises (Minitest::Assertion) do
         assert_equal(exp, act, msg)
       end
-      lucid = format(lucid_format, msg, exp.class, act.class)
+      lucid = format(lucid_yaml_format, msg, exp.class, act.class)
       assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
     end
   end
@@ -122,7 +122,7 @@ EOT
         :tauro => 'cia ina do ip ocat doat.',
         :amcae => 'Utatu cilaa cit siat commag seqa.',
     }
-    lucid_format = <<EOT
+    lucid_yaml_format = <<EOT
 
 {
   :message => '%s and %s',
@@ -174,7 +174,7 @@ EOT
       x = assert_raises (Minitest::Assertion) do
         assert_equal(exp, act, msg)
       end
-      lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
+      lucid = format(lucid_yaml_format, exp.class, act.class, exp.class, act.class)
       assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
     end
 
@@ -223,7 +223,7 @@ EOT
                          'Ocaada iaamaa fatioa anaat.',
                      ])
     msg = 'My message'
-    lucid_format = <<EOT
+    lucid_yaml_format = <<EOT
 
 {
   :message => '%s and %s',
@@ -280,7 +280,7 @@ EOT
       x = assert_raises (Minitest::Assertion) do
         assert_equal(exp, act, msg)
       end
-      lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
+      lucid = format(lucid_yaml_format, exp.class, act.class, exp.class, act.class)
       assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
     end
   end
@@ -368,16 +368,16 @@ EOT
         'si voaabor alit occaaa.',
     )
     msg = 'My message'
-    lucid_format = <<EOT
+    lucid_yaml_format = <<EOT
 
 {
   :message => 'My message',
   :expected => {
-    :class => Struct::MyStruct,
+    :class => %s,
     :size => 25,
   },
   :actual => {
-    :class => Struct::MyStruct,
+    :class => %s,
     :size => 25,
   },
   :elucidation => {
@@ -443,7 +443,7 @@ EOT
     x = assert_raises (Minitest::Assertion) do
       assert_equal(expected, actual, msg)
     end
-    lucid = format(lucid_format, expected.class, actual.class)
+    lucid = format(lucid_yaml_format, expected.class, actual.class)
     assert_match(Regexp.new(Regexp.escape(lucid), Regexp::MULTILINE), x.message)
   end
 

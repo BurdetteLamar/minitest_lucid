@@ -2,6 +2,7 @@ require 'minitest/autorun'
 require 'diff/lcs'
 require 'rexml/document'
 require 'set'
+require 'tmpdir'
 
 module Minitest
 
@@ -199,6 +200,20 @@ EOT
         self.head = head
       end
 
+      def write(test)
+        temp_dir_path = Dir.tmpdir
+        file_path = File.join(
+            temp_dir_path,
+            'minitest_lucid_set.html'
+        )
+        p test.name
+        File.open(file_path, 'w') do |file|
+          doc.write(file, 2)
+        end
+        system("start #{file_path}")
+
+      end
+
       def set_status_new_table(label, items)
         title = "#{label}: Class=#{items.class}, Size=#{items.size}"
         h = new_h2(body, title, {:id => label})
@@ -353,9 +368,7 @@ EOT
         html.set_status_tds(tr, status, item)
       end
 
-      File.open('t.html', 'w') do |file|
-        html.doc.write(file, 2)
-      end
+      html.write(self)
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
@@ -419,10 +432,7 @@ EOT
         html.struct_status_tds(tr, status, member, values)
       end
 
-      # For debugging.
-      File.open('t.html', 'w') do |file|
-        html.doc.write(file, 2)
-      end
+      html.write(self)
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
