@@ -14,20 +14,22 @@ module Minitest
       begin
         old_assert_equal(expected, actual, msg)
       rescue Minitest::Assertion => x
-        elucidate(x, expected, actual, msg)
+        minitest_lucid_elucidate(x, expected, actual, msg)
       end
     end
 
+    private
+
     METHOD_FOR_CLASS = {
-        Hash => :elucidate_hash,
-        Set => :elucidate_set,
-        Struct => :elucidate_struct,
-        # Array => :elucidate_array,
+        Hash => :minitest_lucid_elucidate_hash,
+        Set => :minitest_lucid_elucidate_set,
+        Struct => :minitest_lucid_elucidate_struct,
+        # Array => :minitest_lucid_elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
 
     # Lookup objects in hash.
-    def lookup(one_object, other_object)
+    def minitest_lucid_lookup(one_object, other_object)
       if ELUCIDATABLE_CLASSES.include?(one_object.class)
         if other_object.kind_of?(one_object.class)
           return METHOD_FOR_CLASS.fetch(one_object.class)
@@ -37,7 +39,7 @@ module Minitest
     end
 
     # Poll with kind_of?.
-    def poll(expected, actual)
+    def minitest_lucid_poll(expected, actual)
       METHOD_FOR_CLASS.each_pair do |klass, method|
         next unless expected.kind_of?(klass)
         next unless actual.kind_of?(klass)
@@ -46,11 +48,11 @@ module Minitest
       nil
     end
 
-    def elucidate(exception, expected, actual, msg)
+    def minitest_lucid_elucidate(exception, expected, actual, msg)
       elucidation_method  =
-          lookup(expected, actual) ||
-          lookup(actual, expected) ||
-          poll(expected, actual)
+          minitest_lucid_lookup(expected, actual) ||
+              minitest_lucid_lookup(actual, expected) ||
+              minitest_lucid_poll(expected, actual)
       if elucidation_method
         lines = ['']
         lines.push('{')
@@ -75,7 +77,7 @@ module Minitest
     # Common elements: actual & expected.
     # All elements: actual | expected.
 
-    def elucidate_array(exception, expected, actual, lines)
+    def minitest_lucid_elucidate_array(exception, expected, actual, lines)
       sdiff = Diff::LCS.sdiff(expected, actual)
       changes = {}
       statuses = {
@@ -113,7 +115,7 @@ module Minitest
       lines.push(']')
     end
 
-    def elucidate_hash(exception, expected, actual, lines)
+    def minitest_lucid_elucidate_hash(exception, expected, actual, lines)
       expected_keys = expected.keys
       actual_keys = actual.keys
       keys = Set.new(expected_keys + actual_keys)
@@ -151,16 +153,16 @@ module Minitest
       lines.push('  },')
       lines.push('  :elucidation => {')
       h.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("    #{minitest_lucid_pretty(category)} => {")
         items.each_pair do |key, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("      #{pretty(key)} => {")
-            lines.push("        :expected => #{pretty(expected)},")
-            lines.push("        :got      => #{pretty(actual)},")
+            lines.push("      #{minitest_lucid_pretty(key)} => {")
+            lines.push("        :expected => #{minitest_lucid_pretty(expected)},")
+            lines.push("        :got      => #{minitest_lucid_pretty(actual)},")
             lines.push('      },')
           else
-            lines.push("      #{pretty(key)} => #{pretty(value)},")
+            lines.push("      #{minitest_lucid_pretty(key)} => #{minitest_lucid_pretty(value)},")
           end
         end
         lines.push('    },')
@@ -323,7 +325,7 @@ EOT
 
     end
 
-    def elucidate_set(exception, expected, actual, lines)
+    def minitest_lucid_elucidate_set(exception, expected, actual, lines)
 
       result = {
           :missing => expected - actual,
@@ -379,15 +381,15 @@ EOT
       lines.push("    :size => #{actual.size},")
       lines.push('  },')
       result.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => [")
+        lines.push("  #{minitest_lucid_pretty(category)} => [")
         items.each do |member|
-          lines.push("    #{pretty(member)},")
+          lines.push("    #{minitest_lucid_pretty(member)},")
         end
         lines.push('  ],')
       end
     end
 
-    def elucidate_struct(exception, expected, actual, lines)
+    def minitest_lucid_elucidate_struct(exception, expected, actual, lines)
       categories = {
           :all_values => {},
           :changed_values => {},
@@ -444,16 +446,16 @@ EOT
       lines.push('  },')
       lines.push('  :elucidation => {')
       categories.each_pair do |category, items|
-        lines.push("    #{pretty(category)} => {")
+        lines.push("    #{minitest_lucid_pretty(category)} => {")
         items.each_pair do |member, value|
           if value.instance_of?(Array)
             expected, actual = *value
-            lines.push("      #{pretty(member)} => {")
-            lines.push("        :expected => #{pretty(expected)},")
-            lines.push("        :got      => #{pretty(actual)},")
+            lines.push("      #{minitest_lucid_pretty(member)} => {")
+            lines.push("        :expected => #{minitest_lucid_pretty(expected)},")
+            lines.push("        :got      => #{minitest_lucid_pretty(actual)},")
             lines.push('      },')
           else
-            lines.push("      #{pretty(member)} => #{pretty(value)},")
+            lines.push("      #{minitest_lucid_pretty(member)} => #{minitest_lucid_pretty(value)},")
           end
         end
         lines.push('    },')
@@ -461,7 +463,7 @@ EOT
       lines.push('  }')
     end
 
-    def pretty(arg)
+    def minitest_lucid_pretty(arg)
       case
         when arg.kind_of?(Symbol)
           ":#{arg}"
