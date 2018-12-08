@@ -20,19 +20,24 @@ module Minitest
 
     private
 
-    METHOD_FOR_CLASS = {
-        Hash => :minitest_lucid_elucidate_hash,
-        Set => :minitest_lucid_elucidate_set,
-        Struct => :minitest_lucid_elucidate_struct,
-        # Array => :minitest_lucid_elucidate_array,
-    }
-    ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
+    def minitest_lucid_method_for_class
+      {
+          Hash => :minitest_lucid_elucidate_hash,
+          Set => :minitest_lucid_elucidate_set,
+          Struct => :minitest_lucid_elucidate_struct,
+          # Array => :minitest_lucid_elucidate_array,
+      }
+    end
+
+    def minitest_lucid_elucidatable_classes
+      minitest_lucid_method_for_class.keys
+    end
 
     # Lookup objects in hash.
     def minitest_lucid_lookup(one_object, other_object)
-      if ELUCIDATABLE_CLASSES.include?(one_object.class)
+      if minitest_lucid_elucidatable_classes.include?(one_object.class)
         if other_object.kind_of?(one_object.class)
-          return METHOD_FOR_CLASS.fetch(one_object.class)
+          return minitest_lucid_method_for_class.fetch(one_object.class)
         end
       end
       nil
@@ -40,7 +45,7 @@ module Minitest
 
     # Poll with kind_of?.
     def minitest_lucid_poll(expected, actual)
-      METHOD_FOR_CLASS.each_pair do |klass, method|
+      minitest_lucid_method_for_class.each_pair do |klass, method|
         next unless expected.kind_of?(klass)
         next unless actual.kind_of?(klass)
         return method
@@ -208,7 +213,6 @@ EOT
             temp_dir_path,
             'minitest_lucid_set.html'
         )
-        p test.name
         File.open(file_path, 'w') do |file|
           doc.write(file, 2)
         end
