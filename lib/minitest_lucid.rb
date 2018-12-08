@@ -235,7 +235,7 @@ EOT
         temp_dir_path = Dir.tmpdir
         file_path = File.join(
             temp_dir_path,
-            'minitest_lucid_set.html'
+            "#{test.name}.html"
         )
         File.open(file_path, 'w') do |file|
           doc.write(file, 2)
@@ -243,6 +243,8 @@ EOT
 
         if display
           system("start #{file_path}")
+        else
+          puts "Your HTML elucidation is in file #{file_path}"
         end
 
       end
