@@ -187,6 +187,161 @@ module Minitest
       lines.push('  }')
     end
 
+    def minitest_lucid_elucidate_set(exception, expected, actual, lines)
+
+      result = {
+          :missing => expected - actual,
+          :unexpected => actual - expected,
+          :ok => expected & actual,
+      }
+
+      if minitest_lucid_format == 'html'
+        html = Html.new
+
+        table = html.set_status_new_table('Expected', expected)
+        expected.each do |item, i|
+          status = result[:missing].include?(item) ? 'Missing' : 'Ok'
+          tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Actual', actual)
+        actual.each do |item|
+          status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
+          tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Missing (Expected - Actual)', result[:missing])
+        result[:missing].each do |item|
+          status = 'Missing'
+          tr = html.new_tr(table, {:class => Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Unexpected (Actual - Expected)', result[:unexpected])
+        result[:unexpected].each do |item|
+          status = 'Unexpected'
+          tr = html.new_tr(table, {:class => Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Ok (Expected & Actual)', result[:ok])
+        result[:ok].each do |item|
+          status = 'Ok'
+          tr = html.new_tr(table, {:class => Html::GOOD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        html.write(self)
+      end
+
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      result.each_pair do |category, items|
+        lines.push("  #{minitest_lucid_pretty(category)} => [")
+        items.each do |member|
+          lines.push("    #{minitest_lucid_pretty(member)},")
+        end
+        lines.push('  ],')
+      end
+    end
+
+    def minitest_lucid_elucidate_struct(exception, expected, actual, lines)
+      categories = {
+          :all_values => {},
+          :changed_values => {},
+          :ok_values => {},
+      }
+      expected.members.each do |member|
+        expected_value = expected[member]
+        actual_value = actual[member]
+        values  = {
+            :expected => expected_value,
+            :actual => actual_value,
+        }
+        categories[:all_values].store(member, values)
+        if expected_value == actual_value
+          categories[:ok_values].store(member, values)
+        else
+          categories[:changed_values].store(member, values)
+        end
+      end
+
+      if minitest_lucid_format == 'html'
+        html = Html.new
+
+        table = html.struct_status_new_table('All', expected)
+        expected.members.each do |member|
+          values = categories[:all_values][member]
+          status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
+          tr = html.new_tr(table)
+          html.struct_status_tds(tr, status, member, values)
+        end
+
+        table = html.struct_status_new_table('Changed', categories[:changed_values])
+        categories[:changed_values].each_pair do |member, values|
+          status = 'Changed'
+          tr = html.new_tr(table)
+          html.struct_status_tds(tr, status, member, values)
+        end
+
+        table = html.struct_status_new_table('Ok', categories[:ok_values])
+        categories[:ok_values].each_pair do |member, values|
+          status = 'Ok'
+          tr = html.new_tr(table)
+          html.struct_status_tds(tr, status, member, values)
+        end
+
+        html.write(self)
+      end
+
+      lines.push('  :expected => {')
+      lines.push("    :class => #{expected.class},")
+      lines.push("    :size => #{expected.size},")
+      lines.push('  },')
+      lines.push('  :actual => {')
+      lines.push("    :class => #{actual.class},")
+      lines.push("    :size => #{actual.size},")
+      lines.push('  },')
+      lines.push('  :elucidation => {')
+      categories.each_pair do |category, items|
+        lines.push("    #{minitest_lucid_pretty(category)} => {")
+        items.each_pair do |member, value|
+          if value.instance_of?(Array)
+            expected, actual = *value
+            lines.push("      #{minitest_lucid_pretty(member)} => {")
+            lines.push("        :expected => #{minitest_lucid_pretty(expected)},")
+            lines.push("        :got      => #{minitest_lucid_pretty(actual)},")
+            lines.push('      },')
+          else
+            lines.push("      #{minitest_lucid_pretty(member)} => #{minitest_lucid_pretty(value)},")
+          end
+        end
+        lines.push('    },')
+      end
+      lines.push('  }')
+    end
+
+    def minitest_lucid_pretty(arg)
+      case
+        when arg.kind_of?(Symbol)
+          ":#{arg}"
+        when arg.kind_of?(String)
+          "'#{arg}'"
+        when arg.kind_of?(Numeric)
+          arg
+        else
+          arg.inspect
+      end
+    end
+
     class Html
 
       attr_accessor :doc, :head, :body, :toc_list
@@ -356,161 +511,6 @@ EOT
         ele
       end
 
-    end
-
-    def minitest_lucid_elucidate_set(exception, expected, actual, lines)
-
-      result = {
-          :missing => expected - actual,
-          :unexpected => actual - expected,
-          :ok => expected & actual,
-      }
-
-      if minitest_lucid_format == 'html'
-        html = Html.new
-
-        table = html.set_status_new_table('Expected', expected)
-        expected.each do |item, i|
-          status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-          tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
-          html.set_status_tds(tr, status, item)
-        end
-
-        table = html.set_status_new_table('Actual', actual)
-        actual.each do |item|
-          status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-          tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
-          html.set_status_tds(tr, status, item)
-        end
-
-        table = html.set_status_new_table('Missing (Expected - Actual)', result[:missing])
-        result[:missing].each do |item|
-          status = 'Missing'
-          tr = html.new_tr(table, {:class => Html::BAD_STYLE})
-          html.set_status_tds(tr, status, item)
-        end
-
-        table = html.set_status_new_table('Unexpected (Actual - Expected)', result[:unexpected])
-        result[:unexpected].each do |item|
-          status = 'Unexpected'
-          tr = html.new_tr(table, {:class => Html::BAD_STYLE})
-          html.set_status_tds(tr, status, item)
-        end
-
-        table = html.set_status_new_table('Ok (Expected & Actual)', result[:ok])
-        result[:ok].each do |item|
-          status = 'Ok'
-          tr = html.new_tr(table, {:class => Html::GOOD_STYLE})
-          html.set_status_tds(tr, status, item)
-        end
-
-        html.write(self)
-      end
-
-      lines.push('  :expected => {')
-      lines.push("    :class => #{expected.class},")
-      lines.push("    :size => #{expected.size},")
-      lines.push('  },')
-      lines.push('  :actual => {')
-      lines.push("    :class => #{actual.class},")
-      lines.push("    :size => #{actual.size},")
-      lines.push('  },')
-      result.each_pair do |category, items|
-        lines.push("  #{minitest_lucid_pretty(category)} => [")
-        items.each do |member|
-          lines.push("    #{minitest_lucid_pretty(member)},")
-        end
-        lines.push('  ],')
-      end
-    end
-
-    def minitest_lucid_elucidate_struct(exception, expected, actual, lines)
-      categories = {
-          :all_values => {},
-          :changed_values => {},
-          :ok_values => {},
-      }
-      expected.members.each do |member|
-        expected_value = expected[member]
-        actual_value = actual[member]
-        values  = {
-            :expected => expected_value,
-            :actual => actual_value,
-        }
-        categories[:all_values].store(member, values)
-        if expected_value == actual_value
-          categories[:ok_values].store(member, values)
-        else
-          categories[:changed_values].store(member, values)
-        end
-      end
-
-      if minitest_lucid_format == 'html'
-        html = Html.new
-
-        table = html.struct_status_new_table('All', expected)
-        expected.members.each do |member|
-          values = categories[:all_values][member]
-          status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
-          tr = html.new_tr(table)
-          html.struct_status_tds(tr, status, member, values)
-        end
-
-        table = html.struct_status_new_table('Changed', categories[:changed_values])
-        categories[:changed_values].each_pair do |member, values|
-          status = 'Changed'
-          tr = html.new_tr(table)
-          html.struct_status_tds(tr, status, member, values)
-        end
-
-        table = html.struct_status_new_table('Ok', categories[:ok_values])
-        categories[:ok_values].each_pair do |member, values|
-          status = 'Ok'
-          tr = html.new_tr(table)
-          html.struct_status_tds(tr, status, member, values)
-        end
-
-        html.write(self)
-      end
-
-      lines.push('  :expected => {')
-      lines.push("    :class => #{expected.class},")
-      lines.push("    :size => #{expected.size},")
-      lines.push('  },')
-      lines.push('  :actual => {')
-      lines.push("    :class => #{actual.class},")
-      lines.push("    :size => #{actual.size},")
-      lines.push('  },')
-      lines.push('  :elucidation => {')
-      categories.each_pair do |category, items|
-        lines.push("    #{minitest_lucid_pretty(category)} => {")
-        items.each_pair do |member, value|
-          if value.instance_of?(Array)
-            expected, actual = *value
-            lines.push("      #{minitest_lucid_pretty(member)} => {")
-            lines.push("        :expected => #{minitest_lucid_pretty(expected)},")
-            lines.push("        :got      => #{minitest_lucid_pretty(actual)},")
-            lines.push('      },')
-          else
-            lines.push("      #{minitest_lucid_pretty(member)} => #{minitest_lucid_pretty(value)},")
-          end
-        end
-        lines.push('    },')
-      end
-      lines.push('  }')
-    end
-
-    def minitest_lucid_pretty(arg)
-      case
-        when arg.kind_of?(Symbol)
-          ":#{arg}"
-        when arg.kind_of?(String)
-          "'#{arg}'"
-        when arg.kind_of?(Numeric)
-          arg
-        else
-          arg.inspect
-      end
     end
 
   end
