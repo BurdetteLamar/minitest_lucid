@@ -33,6 +33,18 @@ module Minitest
       minitest_lucid_method_for_class.keys
     end
 
+    def minitest_lucid_format
+      env_var_name = 'MINITEST_LUCID_FORMAT'
+      formats = %w/html yaml/
+      format = ENV[env_var_name]
+      return 'html' if format.nil?
+      unless formats.include?(format)
+        message = "Environment variable #{env_var_name} must be one of #{formats}, not #{format}"
+        raise ArgumentError.new(message)
+      end
+      format
+    end
+
     # Lookup objects in hash.
     def minitest_lucid_lookup(one_object, other_object)
       if minitest_lucid_elucidatable_classes.include?(one_object.class)
@@ -207,6 +219,18 @@ EOT
         self.head = head
       end
 
+      def display
+        env_var_name = 'MINITEST_LUCID_DISPLAY'
+        values = %w/true false/
+        value = ENV[env_var_name]
+        return 'true' if value.nil?
+        unless values.include?(value)
+          message = "Environment variable #{env_var_name} must be one of #{values}, not #{value}"
+          raise ArgumentError.new(message)
+        end
+        value == 'true' ? true : false
+      end
+
       def write(test)
         temp_dir_path = Dir.tmpdir
         file_path = File.join(
@@ -216,7 +240,10 @@ EOT
         File.open(file_path, 'w') do |file|
           doc.write(file, 2)
         end
-        system("start #{file_path}")
+
+        if display
+          system("start #{file_path}")
+        end
 
       end
 
@@ -337,44 +364,46 @@ EOT
           :ok => expected & actual,
       }
 
-      html = Html.new
+      if minitest_lucid_format == 'html'
+        html = Html.new
 
-      table = html.set_status_new_table('Expected', expected)
-      expected.each do |item, i|
-        status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-        tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
-        html.set_status_tds(tr, status, item)
+        table = html.set_status_new_table('Expected', expected)
+        expected.each do |item, i|
+          status = result[:missing].include?(item) ? 'Missing' : 'Ok'
+          tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Actual', actual)
+        actual.each do |item|
+          status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
+          tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Missing (Expected - Actual)', result[:missing])
+        result[:missing].each do |item|
+          status = 'Missing'
+          tr = html.new_tr(table, {:class => Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Unexpected (Actual - Expected)', result[:unexpected])
+        result[:unexpected].each do |item|
+          status = 'Unexpected'
+          tr = html.new_tr(table, {:class => Html::BAD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        table = html.set_status_new_table('Ok (Expected & Actual)', result[:ok])
+        result[:ok].each do |item|
+          status = 'Ok'
+          tr = html.new_tr(table, {:class => Html::GOOD_STYLE})
+          html.set_status_tds(tr, status, item)
+        end
+
+        html.write(self)
       end
-
-      table = html.set_status_new_table('Actual', actual)
-      actual.each do |item|
-        status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-        tr = html.new_tr(table, {:class => status == 'Ok' ? Html::GOOD_STYLE : Html::BAD_STYLE})
-        html.set_status_tds(tr, status, item)
-      end
-
-      table = html.set_status_new_table('Missing (Expected - Actual)', result[:missing])
-      result[:missing].each do |item|
-        status = 'Missing'
-        tr = html.new_tr(table, {:class => Html::BAD_STYLE})
-        html.set_status_tds(tr, status, item)
-      end
-
-      table = html.set_status_new_table('Unexpected (Actual - Expected)', result[:unexpected])
-      result[:unexpected].each do |item|
-        status = 'Unexpected'
-        tr = html.new_tr(table, {:class => Html::BAD_STYLE})
-        html.set_status_tds(tr, status, item)
-      end
-
-      table = html.set_status_new_table('Ok (Expected & Actual)', result[:ok])
-      result[:ok].each do |item|
-        status = 'Ok'
-        tr = html.new_tr(table, {:class => Html::GOOD_STYLE})
-        html.set_status_tds(tr, status, item)
-      end
-
-      html.write(self)
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
@@ -414,31 +443,33 @@ EOT
         end
       end
 
-      html = Html.new
+      if minitest_lucid_format == 'html'
+        html = Html.new
 
-      table = html.struct_status_new_table('All', expected)
-      expected.members.each do |member|
-        values = categories[:all_values][member]
-        status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
-        tr = html.new_tr(table)
-        html.struct_status_tds(tr, status, member, values)
+        table = html.struct_status_new_table('All', expected)
+        expected.members.each do |member|
+          values = categories[:all_values][member]
+          status = categories[:ok_values].keys.include?(member) ? 'Ok' : 'Changed'
+          tr = html.new_tr(table)
+          html.struct_status_tds(tr, status, member, values)
+        end
+
+        table = html.struct_status_new_table('Changed', categories[:changed_values])
+        categories[:changed_values].each_pair do |member, values|
+          status = 'Changed'
+          tr = html.new_tr(table)
+          html.struct_status_tds(tr, status, member, values)
+        end
+
+        table = html.struct_status_new_table('Ok', categories[:ok_values])
+        categories[:ok_values].each_pair do |member, values|
+          status = 'Ok'
+          tr = html.new_tr(table)
+          html.struct_status_tds(tr, status, member, values)
+        end
+
+        html.write(self)
       end
-
-      table = html.struct_status_new_table('Changed', categories[:changed_values])
-      categories[:changed_values].each_pair do |member, values|
-        status = 'Changed'
-        tr = html.new_tr(table)
-        html.struct_status_tds(tr, status, member, values)
-      end
-
-      table = html.struct_status_new_table('Ok', categories[:ok_values])
-      categories[:ok_values].each_pair do |member, values|
-        status = 'Ok'
-        tr = html.new_tr(table)
-        html.struct_status_tds(tr, status, member, values)
-      end
-
-      html.write(self)
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
