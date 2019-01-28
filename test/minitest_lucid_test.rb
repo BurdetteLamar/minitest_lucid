@@ -1,3 +1,4 @@
+require 'diff-lcs'
 require 'test_helper'
 
 require 'minitest_lucid/version'
@@ -122,66 +123,36 @@ EOT
         :tauro => 'cia ina do ip ocat doat.',
         :amcae => 'Utatu cilaa cit siat commag seqa.',
     }
-    lucid_format = <<EOT
-
-{
-  :message => '%s and %s',
-  :expected => {
-    :class => %s,
-    :size => 6,
-  },
-  :actual => {
-    :class => %s,
-    :size => 6,
-  },
-  :elucidation => {
-    :missing_pairs => {
-      :offab => 'Ut dolore ua consal vaba caea.',
-      :moam => 'Sunt sed te coma teu alaaame.',
-    },
-    :unexpected_pairs => {
-      :laboru => 'Laboab vaga dat maaua in venima.',
-      :amcae => 'Utatu cilaa cit siat commag seqa.',
-    },
-    :changed_values => {
-      :tauro => {
-        :expected => 'Cia ina do ip ocat doat.',
-        :got      => 'cia ina do ip ocat doat.',
-      },
-      :loquens => {
-        :expected => 'Dua sarat rad noad maat caea.',
-        :got      => 'dua sarat rad noad maat caea.',
-      },
-    },
-    :ok_pairs => {
-      :lor => 'Eser in dolo eaata labor ut.',
-      :dolo => 'Ipaat paal doat iruat ala magabor.',
-    },
-  }
-}
-EOT
-
     my_expected = MyHash.new.merge(expected)
     my_actual = MyHash.new.merge(actual)
-    [
-        [expected, actual],
-        [my_expected, actual],
-        [expected, my_actual],
-        [my_expected, my_actual]
-    ].each do |pair|
-      exp, act = *pair
-      msg = "#{exp.class} and #{act.class}"
-      x = assert_raises (Minitest::Assertion) do
-        assert_equal(exp, act, msg)
+    hash_dir_path = File.join(File.dirname(__FILE__), 'hash')
+    Dir.chdir(hash_dir_path) do
+      [
+          [expected, actual],
+          [my_expected, actual],
+          [expected, my_actual],
+          [my_expected, my_actual]
+      ].each do |pair|
+        exp, act = *pair
+        msg = "#{exp.class} and #{act.class}"
+        x = assert_raises (Minitest::Assertion) do
+          assert_equal(exp, act, msg)
+        end
+        exp_name = exp.class == Hash ? 'hash' : 'myhash'
+        act_name = act.class == Hash ? 'hash' : 'myhash'
+        exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
+        act_file_path = "actual/#{exp_name}.#{act_name}.txt"
+        File.write(act_file_path, x.message)
+        exp_lines = File.readlines(exp_file_path)
+        act_lines = File.readlines(act_file_path)
+        diffs = Diff::LCS.diff(exp_lines, act_lines)
+        assert_empty(diffs)
       end
-      lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
-      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
     end
-
   end
 
   class MySet < Set; end
-  def test_set
+  def zzz_test_set
     expected = Set.new([
                            'Eia do elab same.',
                            'Uati nua iaam caea.',
@@ -289,7 +260,7 @@ EOT
   
 
 
-  def test_struct
+  def zzz_test_struct
     Struct.new('MyStruct',
                :cat,
                :etur,

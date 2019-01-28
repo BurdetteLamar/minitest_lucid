@@ -50,7 +50,7 @@ module Minitest
           lookup(actual, expected) ||
           poll(expected, actual)
       if elucidation_method
-        lines = ['']
+        lines = []
         lines.push('{')
         lines.push("  :message => '#{msg}',") if msg
         send(elucidation_method, exception, expected, actual, lines)
