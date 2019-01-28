@@ -1,6 +1,5 @@
 require 'minitest/autorun'
 require 'diff/lcs'
-require 'rexml/document'
 require 'set'
 
 module Minitest
@@ -174,87 +173,6 @@ module Minitest
           :unexpected => actual - expected,
           :ok => expected & actual,
       }
-
-      doc = REXML::Document.new
-      html_ele = doc.add_element('html')
-      head_ele = html_ele.add_element('head')
-      style_ele = head_ele.add_element('style')
-      style_ele.text = <<EOT
-.good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
-.neutral { color: rgb(0,0,0) ; background-color: rgb(200,200,200) }
-.bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
-.data { font-family: Courier, Courier, serif }
-.status { text-align: center; }
-EOT
-      body_ele = html_ele.add_element('body')
-      h1_ele = body_ele.add_element('h1')
-      h1_ele.text = 'Comparison'
-      link_list_ele = body_ele.add_element('ul')
-
-
-      def status_table(body_ele, link_list_ele, label, items)
-        h_ele = body_ele.add_element('h2')
-        h_ele.text = "#{label}: Class=#{items.class}, Size=#{items.size}"
-        id = "##{label}"
-        h_ele.attributes['id'] = label
-        li_ele = link_list_ele.add_element('li')
-        a_ele = li_ele.add_element('a')
-        a_ele.attributes['href'] = id
-        a_ele.text = h_ele.text
-        table = table_ele(body_ele)
-        tr = tr_ele(table)
-        tr.attributes['class'] = 'neutral'
-        th_eles(tr, 'Status', 'Class', 'Inspection')
-        table
-      end
-
-      def status_tds(tr, status, item)
-        tds = td_eles(tr, status, item.class, item.inspect)
-        tds[0].attributes['class'] = 'status'
-        tds[1].attributes['class'] = 'data'
-        tds[2].attributes['class'] = 'data'
-      end
-
-      table = status_table(body_ele, link_list_ele, 'Expected', expected)
-      expected.each do |item, i|
-        status = result[:missing].include?(item) ? 'Missing' : 'Ok'
-        tr = tr_ele(table)
-        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        status_tds(tr, status, item)
-      end
-
-      table = status_table(body_ele, link_list_ele, 'Actual', actual)
-      actual.each do |item|
-        status = result[:unexpected].include?(item) ? 'Unexpected' : 'Ok'
-        tr = tr_ele(table)
-        tr.attributes['class'] = status == 'Ok' ? 'good' : 'bad'
-        status_tds(tr, status, item)
-      end
-
-      table = status_table(body_ele, link_list_ele, 'Missing (Expected - Actual)', result[:missing])
-      result[:missing].each do |item|
-        tr = tr_ele(table)
-        tr.attributes['class'] = 'bad'
-        status_tds(tr, 'Missing', item)
-      end
-
-      table = status_table(body_ele, link_list_ele, 'Unexpected (Actual - Expected)', result[:unexpected])
-      result[:unexpected].each do |item|
-        tr = tr_ele(table)
-        tr.attributes['class'] = 'bad'
-        status_tds(tr, 'Unexpected', item)
-      end
-
-      table = status_table(body_ele, link_list_ele, 'Ok (Expected & Actual)', result[:ok])
-      result[:ok].each do |item|
-        tr = tr_ele(table)
-        tr.attributes['class'] = 'good'
-        status_tds(tr, 'Ok', item)
-      end
-
-      File.open('t.html', 'w') do |file|
-        doc.write(file, 2)
-      end
 
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
