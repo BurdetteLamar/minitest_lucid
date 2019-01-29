@@ -270,6 +270,8 @@ EOT
              :ex,
              )
 
+  class SubStruct < Struct::MyStruct; end
+
   def test_struct
     expected = Struct::MyStruct.new(
         'Venia con maga qaboadaa.',
@@ -325,12 +327,17 @@ EOT
         'Ad irab ut cupar.',
         'Si voaabor alit occaaa.',
     )
+    sub_expected = SubStruct.new(*expected.to_h.values)
+    sub_actual = SubStruct.new(*actual.to_h.values)
     struct_dir_path = File.join(File.dirname(__FILE__), 'struct')
     Dir.chdir(struct_dir_path) do
       [
           [expected, actual],
+          [sub_expected, actual],
+          [expected, sub_actual],
+          [sub_expected, sub_actual],
       ].each do |pair|
-        do_test(Struct::MyStruct, expected, actual)
+        do_test(Struct::MyStruct, *pair)
       end
     end
   end

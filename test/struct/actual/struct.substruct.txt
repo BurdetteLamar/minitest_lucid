@@ -1,0 +1,78 @@
+{
+  :message => 'Struct::MyStruct and MinitestLucidTest::SubStruct',
+  :expected => {
+    :class => Struct::MyStruct,
+    :size => 25,
+  },
+  :actual => {
+    :class => MinitestLucidTest::SubStruct,
+    :size => 25,
+  },
+  :elucidation => {
+    :changed_values => {
+      :cat => {
+        :expected => 'Venia con maga qaboadaa.',
+        :got      => 'venia con maga qaboadaa.',
+      },
+      :etur => {
+        :expected => 'Esea alit ut ofabo.',
+        :got      => 'esea alit ut ofabo.',
+      },
+      :est => {
+        :expected => 'Etuata ing mina famcom.',
+        :got      => 'etuata ing mina famcom.',
+      },
+      :iam => {
+        :expected => 'Irur ciat nullum nis.',
+        :got      => 'irur ciat nullum nis.',
+      },
+      :quipa => {
+        :expected => 'Oat adaa eser qatat.',
+        :got      => 'oat adaa eser qatat.',
+      },
+      :estat => {
+        :expected => 'Paar seaali ocaabor prabo.',
+        :got      => 'paar seaali ocaabor prabo.',
+      },
+      :deseqama => {
+        :expected => 'Cona catat exat dolo.',
+        :got      => 'cona catat exat dolo.',
+      },
+      :dolor => {
+        :expected => 'Miat dat adid labo.',
+        :got      => 'miat dat adid labo.',
+      },
+      :sicingaeaada => {
+        :expected => 'In ex con ent.',
+        :got      => 'in ex con ent.',
+      },
+      :labam => {
+        :expected => 'Oatiat in amcons adaature.',
+        :got      => 'oatiat in amcons adaature.',
+      },
+      :eaaua => {
+        :expected => 'Exatate labo ulla re.',
+        :got      => 'exatate labo ulla re.',
+      },
+      :suaa => {
+        :expected => 'Auta te esta para.',
+        :got      => 'auta te esta para.',
+      },
+    },
+    :ok_values => {
+      :ent => 'Sin maga eaaec aate.',
+      :et => 'Idua amag la ip.',
+      :aabor => 'Dolo cida maal exceaad.',
+      :quaa => 'Exce exea autat alabaa.',
+      :occat => 'Coam ea naat caatati.',
+      :enim => 'Idaat cat do in.',
+      :sing => 'Ut quatat adaat excae.',
+      :ea => 'Adip iatatet auaa vea.',
+      :amea => 'Ipia sea commol magna.',
+      :magat => 'Endenia eur in aliamaga.',
+      :lam => 'Noabor modo autaa aata.',
+      :re => 'Ad irab ut cupar.',
+      :ex => 'Si voaabor alit occaaa.',
+    },
+  }
+}
