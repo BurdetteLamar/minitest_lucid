@@ -241,37 +241,36 @@ EOT
       assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
     end
   end
-  
 
+  Struct.new('MyStruct',
+             :cat,
+             :etur,
+             :est,
+             :iam,
+             :ent,
+             :et,
+             :aabor,
+             :quaa,
+             :quipa,
+             :estat,
+             :deseqama,
+             :dolor,
+             :occat,
+             :enim,
+             :sing,
+             :ea,
+             :sicingaeaada,
+             :labam,
+             :eaaua,
+             :suaa,
+             :amea,
+             :magat,
+             :lam,
+             :re,
+             :ex,
+             )
 
   def test_struct
-    Struct.new('MyStruct',
-               :cat,
-               :etur,
-               :est,
-               :iam,
-               :ent,
-               :et,
-               :aabor,
-               :quaa,
-               :quipa,
-               :estat,
-               :deseqama,
-               :dolor,
-               :occat,
-               :enim,
-               :sing,
-               :ea,
-               :sicingaeaada,
-               :labam,
-               :eaaua,
-               :suaa,
-               :amea,
-               :magat,
-               :lam,
-               :re,
-               :ex,
-    )
     expected = Struct::MyStruct.new(
         'Venia con maga qaboadaa.',
         'Esea alit ut ofabo.',
@@ -331,33 +330,23 @@ EOT
       [
           [expected, actual],
       ].each do |pair|
-        exp, act = *pair
-        msg = "#{exp.class} and #{act.class}"
-        x = assert_raises (Minitest::Assertion) do
-          assert_equal(exp, act, msg)
-        end
-        exp_name = exp.class == Struct::MyStruct ? 'struct' : 'substuct'
-        act_name = act.class == Struct::MyStruct ? 'struct' : 'substuct'
-        exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
-        act_file_path = "actual/#{exp_name}.#{act_name}.txt"
-        File.write(act_file_path, x.message)
-        exp_lines = File.readlines(exp_file_path)
-        act_lines = File.readlines(act_file_path)
-        diffs = Diff::LCS.diff(exp_lines, act_lines)
-        assert_empty(diffs)
+        do_test(Struct::MyStruct, expected, actual)
       end
     end
   end
 
   def do_test(klass, expected, actual)
-    hash_dir_path = File.join(File.dirname(__FILE__), klass.name)
-    Dir.chdir(hash_dir_path) do
+    names = names_for_class(klass)
+    dir_path = File.join(File.dirname(__FILE__), names[:dir_name])
+    Dir.chdir(dir_path) do
       msg = "#{expected.class} and #{actual.class}"
       x = assert_raises (Minitest::Assertion) do
         assert_equal(expected, actual, msg)
       end
-      exp_name = expected.class == Hash ? klass.name : "sub#{klass.name}"
-      act_name = actual.class == Hash ? klass.name : "sub#{klass.name}"
+      name = klass.name.downcase
+      subname = 'sub' + name
+      exp_name = expected.class == klass ? names[:name] : names[:subname]
+      act_name = actual.class == klass ? names[:name] : names[:subname]
       exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
       act_file_path = "actual/#{exp_name}.#{act_name}.txt"
       File.write(act_file_path, x.message)
@@ -366,6 +355,21 @@ EOT
       diffs = Diff::LCS.diff(exp_lines, act_lines)
       assert_empty(diffs)
     end
+  end
+
+  def names_for_class(klass)
+    {
+        Hash => {
+            :dir_name => 'hash',
+            :name => 'hash',
+            :subname => 'subhash',
+        },
+        Struct::MyStruct => {
+            :dir_name => 'struct',
+            :name => 'struct',
+            :subname => 'substruct',
+        },
+    }[klass]
   end
 
 end
