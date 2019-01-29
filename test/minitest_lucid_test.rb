@@ -260,7 +260,7 @@ EOT
   
 
 
-  def zzz_test_struct
+  def test_struct
     Struct.new('MyStruct',
                :cat,
                :etur,
@@ -340,7 +340,34 @@ EOT
         'Endenia eur in aliamaga.',
         'Noabor modo autaa aata.',
         'Ad irab ut cupar.',
+        'Si voaabor alit occaaa.',
     )
+    struct_dir_path = File.join(File.dirname(__FILE__), 'struct')
+    Dir.chdir(struct_dir_path) do
+      [
+          [expected, actual],
+      ].each do |pair|
+        exp, act = *pair
+        msg = "#{exp.class} and #{act.class}"
+        x = assert_raises (Minitest::Assertion) do
+          assert_equal(exp, act, msg)
+        end
+        exp_name = exp.class == Struct::MyStruct ? 'struct' : 'substuct'
+        act_name = act.class == Struct::MyStruct ? 'struct' : 'substuct'
+        exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
+        act_file_path = "actual/#{exp_name}.#{act_name}.txt"
+        File.write(act_file_path, x.message)
+        exp_lines = File.readlines(exp_file_path)
+        act_lines = File.readlines(act_file_path)
+        diffs = Diff::LCS.diff(exp_lines, act_lines)
+        assert_empty(diffs)
+      end
+    end
+
+    return
+
+
+
     msg = 'My message'
     lucid_format = <<EOT
 
