@@ -1,0 +1,51 @@
+{
+  :message => 'MinitestLucidTest::SubArray and MinitestLucidTest::SubArray',
+elucidation = [
+  {
+    :status => :unchanged,
+    :old_index_0 => "Cia ina do ip ocat doat.",
+    :new_index_0 => "Cia ina do ip ocat doat.",
+  },
+  {
+    :status => :changed,
+    :old_index_1 => "Dua sarat rad noad maat caea.",
+    :new_index_1 => "dua sarat rad noad maat caea.",
+  },
+  {
+    :status => :missing,
+    :old_index_2 => "Eser in dolo eaata labor ut.",
+  },
+  {
+    :status => :missing,
+    :old_index_3 => "Ipaat paal doat iruat ala magabor.",
+  },
+  {
+    :status => :unchanged,
+    :old_index_4 => "Ut dolore ua consal vaba caea.",
+    :new_index_2 => "Ut dolore ua consal vaba caea.",
+  },
+  {
+    :status => :unchanged,
+    :old_index_5 => "Sunt sed te coma teu alaaame.",
+    :new_index_3 => "Sunt sed te coma teu alaaame.",
+  },
+  {
+    :status => :changed,
+    :old_index_6 => "Laboab vaga dat maaua in venima.",
+    :new_index_4 => "Eser in dolo eaata labor ut.",
+  },
+  {
+    :status => :unexpected,
+    :new_index_5 => "Ipaat paal doat iruat ala magabor.",
+  },
+  {
+    :status => :unexpected,
+    :new_index_6 => "laboab vaga dat maaua in venima.",
+  },
+  {
+    :status => :unchanged,
+    :old_index_7 => "Eser in dolo eaata labor ut.",
+    :new_index_7 => "Eser in dolo eaata labor ut.",
+  },
+]
+}

@@ -20,7 +20,7 @@ module Minitest
         Hash => :elucidate_hash,
         Set => :elucidate_set,
         Struct => :elucidate_struct,
-        # Array => :elucidate_array,
+        Array => :elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
 
@@ -103,9 +103,9 @@ module Minitest
           change_data.delete_if {|key, value| key.match(/new/) }
         end
         lines.push('  {')
-        lines.push("  :status => :#{status},")
+        lines.push("    :status => :#{status},")
         change_data.each_pair do |k, v|
-          lines.push("  :#{k} => #{v},")
+          lines.push("    :#{k} => #{v},")
         end
         lines.push('  },')
       end

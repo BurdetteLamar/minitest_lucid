@@ -11,8 +11,8 @@ class MinitestLucidTest < Minitest::Test
     refute_nil ::MinitestLucid::VERSION
   end
 
-  class MyArray < Array; end
-  def zzz_test_array
+  class SubArray < Array; end
+  def test_array
     expected = [
         'Cia ina do ip ocat doat.',
         'Dua sarat rad noad maat caea.',
@@ -33,75 +33,21 @@ class MinitestLucidTest < Minitest::Test
         'laboab vaga dat maaua in venima.',
         'Eser in dolo eaata labor ut.',
     ]
-    lucid_format = <<EOT
-Message:  %s
-Expected class:  %s
-Actual class:  %s
-elucidation = [
-  {
-    :status => :unchanged,
-    :old_index_0 => "Cia ina do ip ocat doat.",
-    :new_index_0 => "Cia ina do ip ocat doat.",
-  },
-  {
-    :status => :changed,
-    :old_index_1 => "Dua sarat rad noad maat caea.",
-    :new_index_1 => "dua sarat rad noad maat caea.",
-  },
-  {
-    :status => :missing,
-    :old_index_2 => "Eser in dolo eaata labor ut.",
-  },
-  {
-    :status => :missing,
-    :old_index_3 => "Ipaat paal doat iruat ala magabor.",
-  },
-  {
-    :status => :unchanged,
-    :old_index_4 => "Ut dolore ua consal vaba caea.",
-    :new_index_2 => "Ut dolore ua consal vaba caea.",
-  },
-  {
-    :status => :unchanged,
-    :old_index_5 => "Sunt sed te coma teu alaaame.",
-    :new_index_3 => "Sunt sed te coma teu alaaame.",
-  },
-  {
-    :status => :changed,
-    :old_index_6 => "Laboab vaga dat maaua in venima.",
-    :new_index_4 => "Eser in dolo eaata labor ut.",
-  },
-  {
-    :status => :unexpected,
-    :new_index_5 => "Ipaat paal doat iruat ala magabor.",
-  },
-  {
-    :status => :unexpected,
-    :new_index_6 => "laboab vaga dat maaua in venima.",
-  },
-  {
-    :status => :unchanged,
-    :old_index_7 => "Eser in dolo eaata labor ut.",
-    :new_index_7 => "Eser in dolo eaata labor ut.",
-  },
-]
-
-EOT
-    my_expected = MyArray.new + expected
-    my_actual = MyArray.new + actual
+    sub_expected = SubArray.new
+    expected.each do |x|
+      sub_expected << x
+    end
+    sub_actual = SubArray.new
+    actual.each do |x|
+      sub_actual << x
+    end
     [
         [expected, actual],
-        [my_expected, actual],
-        [expected, my_actual],
-        [my_expected, my_actual]
+        [sub_expected, actual],
+        [expected, sub_actual],
+        [sub_expected, sub_actual]
     ].each do |pair|
-      exp, act = *pair
-      msg = "#{exp.class} and #{act.class}"
-      x = assert_raises (Minitest::Assertion) do
-        assert_equal(exp, act, msg)
-      end
-      lucid = format(lucid_format, msg, exp.class, act.class)
-      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+      do_test(Array, *pair)
     end
   end
 
@@ -314,6 +260,11 @@ EOT
 
   def names_for_class(klass)
     {
+        Array => {
+            :dir_name => 'array',
+            :name => 'array',
+            :subname => 'subarray',
+        },
         Hash => {
             :dir_name => 'hash',
             :name => 'hash',
