@@ -1,0 +1,41 @@
+{
+  :message => 'MinitestLucidTest::SubSet and MinitestLucidTest::SubSet',
+  :expected => {
+    :class => MinitestLucidTest::SubSet,
+    :size => 18,
+  },
+  :actual => {
+    :class => MinitestLucidTest::SubSet,
+    :size => 18,
+  },
+  :missing => [
+    'Uati nua iaam caea.',
+    'Veaat ea conaaectat noat.',
+    'Prem fatiaa fad ulpaat.',
+    'Utaag quis aut ing.',
+    'Enaat alam nonse magnaat.',
+    'Vate eu adip quata.',
+  ],
+  :unexpected => [
+    'Suntat fugiame sici exad.',
+    'Dolo mod eaamet ena.',
+    'Dat dolor laboat caalit.',
+    'Dolo esera id samcomaa.',
+    'Cuate adid do nim.',
+    'Ocaada iaamaa fatioa anaat.',
+  ],
+  :ok => [
+    'Euaab voat doloa caecat.',
+    'Idatia naat paaat inia.',
+    'Ea re deni utat.',
+    'Eia do elab same.',
+    'Nulla paal dolor maatat.',
+    'Exerad iame ulpa ipari.',
+    'Ut dolla laat nonse.',
+    'Sequaa nulp duisic na.',
+    'Seqa quips sitataa exae.',
+    'Irud ming fat int.',
+    'Siaa miaation vagna alaa.',
+    'Tatua ididun offia doaut.',
+  ],
+}

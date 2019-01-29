@@ -135,8 +135,8 @@ EOT
     end
   end
 
-  class MySet < Set; end
-  def zzz_test_set
+  class SubSet < Set; end
+  def test_set
     expected = Set.new([
                            'Eia do elab same.',
                            'Uati nua iaam caea.',
@@ -178,67 +178,15 @@ EOT
                          'Ocaada iaamaa fatioa anaat.',
                      ])
     msg = 'My message'
-    lucid_format = <<EOT
-
-{
-  :message => '%s and %s',
-  :expected => {
-    :class => %s,
-    :size => 18,
-  },
-  :actual => {
-    :class => %s,
-    :size => 18,
-  },
-  :elucidation => {
-    :missing => {
-      'Uati nua iaam caea.',
-      'Veaat ea conaaectat noat.',
-      'Prem fatiaa fad ulpaat.',
-      'Utaag quis aut ing.',
-      'Enaat alam nonse magnaat.',
-      'Vate eu adip quata.',
-    },
-    :unexpected => {
-      'Suntat fugiame sici exad.',
-      'Dolo mod eaamet ena.',
-      'Dat dolor laboat caalit.',
-      'Dolo esera id samcomaa.',
-      'Cuate adid do nim.',
-      'Ocaada iaamaa fatioa anaat.',
-    },
-    :ok => {
-      'Euaab voat doloa caecat.',
-      'Idatia naat paaat inia.',
-      'Ea re deni utat.',
-      'Eia do elab same.',
-      'Nulla paal dolor maatat.',
-      'Exerad iame ulpa ipari.',
-      'Ut dolla laat nonse.',
-      'Sequaa nulp duisic na.',
-      'Seqa quips sitataa exae.',
-      'Irud ming fat int.',
-      'Siaa miaation vagna alaa.',
-      'Tatua ididun offia doaut.',
-    },
-  }
-}
-EOT
-    my_expected = MySet.new.merge(expected)
-    my_actual = MySet.new.merge(actual)
+    sub_expected = SubSet.new.merge(expected)
+    sub_actual = SubSet.new.merge(actual)
     [
         [expected, actual],
-        [my_expected, actual],
-        [expected, my_actual],
-        [my_expected, my_actual]
+        [sub_expected, actual],
+        [expected, sub_actual],
+        [sub_expected, sub_actual]
     ].each do |pair|
-      exp, act = *pair
-      msg = "#{exp.class} and #{act.class}"
-      x = assert_raises (Minitest::Assertion) do
-        assert_equal(exp, act, msg)
-      end
-      lucid = format(lucid_format, exp.class, act.class, exp.class, act.class)
-      assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+      do_test(Set, *pair)
     end
   end
 
@@ -370,6 +318,11 @@ EOT
             :dir_name => 'hash',
             :name => 'hash',
             :subname => 'subhash',
+        },
+        Set => {
+          :dir_name => 'set',
+          :name => 'set',
+          :subname => 'subset',
         },
         Struct::MyStruct => {
             :dir_name => 'struct',
