@@ -1,4 +1,3 @@
-
 {
   :expected => {
     :class => Struct::MyStruct,

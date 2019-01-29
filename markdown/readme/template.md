@@ -62,6 +62,7 @@ For other classes and assertion methods, the original assertion behaviors are un
 
 The supported classes:
 
+- [Array](#array)
 - [Hash](#hash)
 - [Set](#set)
 - [Struct](#struct)
@@ -71,6 +72,8 @@ The examples below show:
 - The message from a normal failed assertion.
 - The message as modified by the use of ```make_my_diffs_pretty!``` (which is part of ```minitest``` itself).
 - The message as modified by the use of ```minitest_lucid```.
+
+@[:markdown](array/template.md)
 
 @[:markdown](hash/template.md)
 
