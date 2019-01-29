@@ -123,31 +123,15 @@ EOT
         :tauro => 'cia ina do ip ocat doat.',
         :amcae => 'Utatu cilaa cit siat commag seqa.',
     }
-    my_expected = SubHash.new.merge(expected)
-    my_actual = SubHash.new.merge(actual)
-    hash_dir_path = File.join(File.dirname(__FILE__), 'hash')
-    Dir.chdir(hash_dir_path) do
-      [
-          [expected, actual],
-          [my_expected, actual],
-          [expected, my_actual],
-          [my_expected, my_actual]
-      ].each do |pair|
-        exp, act = *pair
-        msg = "#{exp.class} and #{act.class}"
-        x = assert_raises (Minitest::Assertion) do
-          assert_equal(exp, act, msg)
-        end
-        exp_name = exp.class == Hash ? 'hash' : 'SubHash'
-        act_name = act.class == Hash ? 'hash' : 'SubHash'
-        exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
-        act_file_path = "actual/#{exp_name}.#{act_name}.txt"
-        File.write(act_file_path, x.message)
-        exp_lines = File.readlines(exp_file_path)
-        act_lines = File.readlines(act_file_path)
-        diffs = Diff::LCS.diff(exp_lines, act_lines)
-        assert_empty(diffs)
-      end
+    sub_expected = SubHash.new.merge(expected)
+    sub_actual = SubHash.new.merge(actual)
+    [
+        [expected, actual],
+        [sub_expected, actual],
+        [expected, sub_actual],
+        [sub_expected, sub_actual]
+    ].each do |pair|
+      do_test(Hash, *pair)
     end
   end
 
@@ -458,6 +442,25 @@ EOT
     end
     lucid = format(lucid_format, expected.class, actual.class)
     assert_match(Regexp.new(lucid, Regexp::MULTILINE), x.message)
+  end
+
+  def do_test(klass, expected, actual)
+    hash_dir_path = File.join(File.dirname(__FILE__), klass.name)
+    Dir.chdir(hash_dir_path) do
+      msg = "#{expected.class} and #{actual.class}"
+      x = assert_raises (Minitest::Assertion) do
+        assert_equal(expected, actual, msg)
+      end
+      exp_name = expected.class == Hash ? klass.name : "sub#{klass.name}"
+      act_name = actual.class == Hash ? klass.name : "sub#{klass.name}"
+      exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
+      act_file_path = "actual/#{exp_name}.#{act_name}.txt"
+      File.write(act_file_path, x.message)
+      exp_lines = File.readlines(exp_file_path)
+      act_lines = File.readlines(act_file_path)
+      diffs = Diff::LCS.diff(exp_lines, act_lines)
+      assert_empty(diffs)
+    end
   end
 
 end
