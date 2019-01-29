@@ -1,11 +1,11 @@
 {
-  :message => 'MinitestLucidTest::MyHash and Hash',
+  :message => 'MinitestLucidTest::SubHash and MinitestLucidTest::SubHash',
   :expected => {
-    :class => MinitestLucidTest::MyHash,
+    :class => MinitestLucidTest::SubHash,
     :size => 6,
   },
   :actual => {
-    :class => Hash,
+    :class => MinitestLucidTest::SubHash,
     :size => 6,
   },
   :elucidation => {

@@ -105,7 +105,7 @@ EOT
     end
   end
 
-  class MyHash < Hash; end
+  class SubHash < Hash; end
   def test_hash
     expected = {
         :tauro => 'Cia ina do ip ocat doat.',
@@ -123,8 +123,8 @@ EOT
         :tauro => 'cia ina do ip ocat doat.',
         :amcae => 'Utatu cilaa cit siat commag seqa.',
     }
-    my_expected = MyHash.new.merge(expected)
-    my_actual = MyHash.new.merge(actual)
+    my_expected = SubHash.new.merge(expected)
+    my_actual = SubHash.new.merge(actual)
     hash_dir_path = File.join(File.dirname(__FILE__), 'hash')
     Dir.chdir(hash_dir_path) do
       [
@@ -138,8 +138,8 @@ EOT
         x = assert_raises (Minitest::Assertion) do
           assert_equal(exp, act, msg)
         end
-        exp_name = exp.class == Hash ? 'hash' : 'myhash'
-        act_name = act.class == Hash ? 'hash' : 'myhash'
+        exp_name = exp.class == Hash ? 'hash' : 'SubHash'
+        act_name = act.class == Hash ? 'hash' : 'SubHash'
         exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
         act_file_path = "actual/#{exp_name}.#{act_name}.txt"
         File.write(act_file_path, x.message)
