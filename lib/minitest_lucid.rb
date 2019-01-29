@@ -76,13 +76,26 @@ module Minitest
 
     def elucidate_array(exception, expected, actual, lines)
       sdiff = Diff::LCS.sdiff(expected, actual)
-      changes = {}
       statuses = {
           '!' => 'changed',
           '+' => 'unexpected',
           '-' => 'missing',
           '=' => 'unchanged'
       }
+      elucidation = {
+          :changed => [],
+          :unexpected => [],
+          :missing => [],
+          :unchanged => [],
+      }
+      sdiff.each do |change|
+        status = statuses.fetch(change.action)
+        elucidation[status.to_sym].push(change)
+      end
+      p elucidation[:changed]
+
+
+      changes = {}
       sdiff.each_with_index do |change, i|
         status = statuses.fetch(change.action)
         key = "change_#{i}"
