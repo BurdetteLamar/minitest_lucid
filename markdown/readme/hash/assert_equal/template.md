@@ -6,12 +6,12 @@ Here are hashes, expected and actual, to be compared.
 
 The default ```Minitest::Assertion``` message:
 
-@[diff](default.txt)
+@[txt](default.txt)
 
 Message using ```make_my_diffs_pretty!```:
 
-@[diff](better.txt)
+@[txt](better.txt)
 
 Message using ```minitest_lucid```
 
-@[ruby](lucid.txt)
+@[txt](lucid.txt)

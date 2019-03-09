@@ -134,7 +134,7 @@ end
 The default message:
 
 ```default.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1 +1 @@
@@ -145,7 +145,7 @@ The default message:
 Message using ```make_my_diffs_pretty!```:
 
 ```better.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1,19 +1,19 @@
@@ -182,7 +182,7 @@ Message using ```make_my_diffs_pretty!```:
 Message using ```minitest_lucid```
 
 ```lucid.txt```:
-```ruby
+```txt
 {
 elucidation = [
   {
@@ -360,7 +360,7 @@ end
 The default ```Minitest::Assertion``` message:
 
 ```default.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1 +1 @@
@@ -371,7 +371,7 @@ The default ```Minitest::Assertion``` message:
 Message using ```make_my_diffs_pretty!```:
 
 ```better.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1,19 +1,19 @@
@@ -408,7 +408,7 @@ Message using ```make_my_diffs_pretty!```:
 Message using ```minitest_lucid```
 
 ```lucid.txt```:
-```ruby
+```txt
 {
   :expected => {
     :class => Hash,
@@ -524,7 +524,7 @@ end
 The default ```Minitest::Assertion``` message:
 
 ```default.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1 +1 @@
@@ -535,7 +535,7 @@ The default ```Minitest::Assertion``` message:
 Message using ```make_my_diffs_pretty!```:
 
 ```better.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1,18 +1,18 @@
@@ -575,7 +575,7 @@ Message using ```make_my_diffs_pretty!```:
 Message using ```minitest_lucid```
 
 ```lucid.txt```:
-```ruby
+```txt
 {
   :expected => {
     :class => Set,
@@ -716,7 +716,7 @@ end
 The default ```Minitest::Assertion``` message:
 
 ```default.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1 +1 @@
@@ -727,7 +727,7 @@ The default ```Minitest::Assertion``` message:
 Message using ```make_my_diffs_pretty!```:
 
 ```better.txt```:
-```diff
+```txt
 --- expected
 +++ actual
 @@ -1,26 +1,26 @@
@@ -775,7 +775,7 @@ Message using ```make_my_diffs_pretty!```:
 Message using ```minitest_lucid```
 
 ```lucid.txt```:
-```ruby
+```txt
 {
   :expected => {
     :class => Struct::MyStruct,

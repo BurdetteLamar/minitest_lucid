@@ -6,12 +6,12 @@ Here are the arrays, expected and actual, that we'll use for comparison:
 
 The default message:
 
-@[diff](default.txt)
+@[txt](default.txt)
 
 Message using ```make_my_diffs_pretty!```:
 
-@[diff](better.txt)
+@[txt](better.txt)
 
 Message using ```minitest_lucid```
 
-@[ruby](lucid.txt)
+@[txt](lucid.txt)
