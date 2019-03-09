@@ -92,8 +92,6 @@ module Minitest
         status = statuses.fetch(change.action)
         elucidation[status.to_sym].push(change)
       end
-      p elucidation[:changed]
-
 
       changes = {}
       sdiff.each_with_index do |change, i|
