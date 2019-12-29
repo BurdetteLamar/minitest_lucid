@@ -1,41 +1,11 @@
-{
-  :message => 'Set and Set',
-  :expected => {
-    :class => Set,
-    :size => 18,
-  },
-  :actual => {
-    :class => Set,
-    :size => 18,
-  },
-  :missing => [
-    'Uati nua iaam caea.',
-    'Veaat ea conaaectat noat.',
-    'Prem fatiaa fad ulpaat.',
-    'Utaag quis aut ing.',
-    'Enaat alam nonse magnaat.',
-    'Vate eu adip quata.',
-  ],
-  :unexpected => [
-    'Suntat fugiame sici exad.',
-    'Dolo mod eaamet ena.',
-    'Dat dolor laboat caalit.',
-    'Dolo esera id samcomaa.',
-    'Cuate adid do nim.',
-    'Ocaada iaamaa fatioa anaat.',
-  ],
-  :ok => [
-    'Euaab voat doloa caecat.',
-    'Idatia naat paaat inia.',
-    'Ea re deni utat.',
-    'Eia do elab same.',
-    'Nulla paal dolor maatat.',
-    'Exerad iame ulpa ipari.',
-    'Ut dolla laat nonse.',
-    'Sequaa nulp duisic na.',
-    'Seqa quips sitataa exae.',
-    'Irud ming fat int.',
-    'Siaa miaation vagna alaa.',
-    'Tatua ididun offia doaut.',
-  ],
-}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head><style>        
+    .good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
+    .neutral { color: rgb(156,101,0) ; background-color: rgb(255,236,156) }
+    .bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
+    .data { font-family: Courier New, monospace }
+    .data_changed { font-family: Courier New, monospace; font-weight: bold; font-style: italic }
+</style></head>
+<body><h1>Elucidation</h1></body>
+</html>

@@ -106,7 +106,7 @@ EOT
   end
 
   class SubHash < Hash; end
-  def test_hash
+  def zzz_test_hash
     expected = {
         :tauro => 'Cia ina do ip ocat doat.',
         :loquens => 'Dua sarat rad noad maat caea.',
@@ -220,7 +220,7 @@ EOT
 
   class SubStruct < Struct::MyStruct; end
 
-  def test_struct
+  def zzz_test_struct
     expected = Struct::MyStruct.new(
         'Venia con maga qaboadaa.',
         'Esea alit ut ofabo.',

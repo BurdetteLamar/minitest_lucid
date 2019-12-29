@@ -1,6 +1,7 @@
 require 'minitest/autorun'
 require 'diff/lcs'
 require 'set'
+require 'nokogiri'
 
 module Minitest
 
@@ -17,12 +18,21 @@ module Minitest
     end
 
     METHOD_FOR_CLASS = {
-        Hash => :elucidate_hash,
+        # Hash => :elucidate_hash,
         Set => :elucidate_set,
-        Struct => :elucidate_struct,
+        # Struct => :elucidate_struct,
         # Array => :elucidate_array,
     }
     ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
+
+    STYLES = <<EOT
+        
+    .good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
+    .neutral { color: rgb(156,101,0) ; background-color: rgb(255,236,156) }
+    .bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
+    .data { font-family: Courier New, monospace }
+    .data_changed { font-family: Courier New, monospace; font-weight: bold; font-style: italic }
+EOT
 
     # Lookup objects in hash.
     def lookup(one_object, other_object)
@@ -50,18 +60,51 @@ module Minitest
           lookup(actual, expected) ||
           poll(expected, actual)
       if elucidation_method
-        lines = []
-        lines.push('{')
-        lines.push("  :message => '#{msg}',") if msg
-        send(elucidation_method, exception, expected, actual, lines)
-        lines.push('}')
-        lines.push('')
-        message = lines.join("\n")
-        new_exception = exception.exception(message)
-        new_exception.set_backtrace(exception.backtrace)
-        raise new_exception
-      else
-        raise
+        builder = Nokogiri::HTML::Builder.new do |doc|
+          doc.html do
+            doc.head do
+              doc.style do
+                doc.text(STYLES)
+              end
+            end
+            doc.body do
+              doc.h1 do
+                doc.text('Elucidation')
+              end
+              send(elucidation_method, doc, exception, expected, actual)
+            end
+          end
+          new_message = doc.to_html
+          new_exception = exception.exception(new_message)
+          new_exception.set_backtrace(exception.backtrace)
+          raise new_exception
+        end
+
+        # HTML document.
+#         doc = Document.new
+#         doc << html_ele = REXML::Element.new('html')
+#         head_ele = html_ele.add_element('head')
+#         style_ele = head_ele.add_element('style')
+#         styles = <<EOT
+#     .good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
+#     .neutral { color: rgb(156,101,0); background-color: rgb(255,236,156) }
+#     .bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
+# EOT
+#         style_ele << REXML::Text.new(styles)
+#         body_ele = html_ele.add_element('body')
+#         puts doc.to_s
+#         lines = []
+#         lines.push('{')
+#         lines.push("  :message => '#{msg}',") if msg
+#         send(elucidation_method, exception, expected, actual, lines)
+#         lines.push('}')
+#         lines.push('')
+#         message = lines.join("\n")
+#         new_exception = exception.exception(message)
+#         new_exception.set_backtrace(exception.backtrace)
+#         raise new_exception
+#       else
+#         raise
       end
     end
 
@@ -167,28 +210,28 @@ module Minitest
       lines.push('  }')
     end
 
-    def elucidate_set(exception, expected, actual, lines)
+    def elucidate_set(doc, exception, expected, actual)
       result = {
           :missing => expected - actual,
           :unexpected => actual - expected,
           :ok => expected & actual,
       }
 
-      lines.push('  :expected => {')
-      lines.push("    :class => #{expected.class},")
-      lines.push("    :size => #{expected.size},")
-      lines.push('  },')
-      lines.push('  :actual => {')
-      lines.push("    :class => #{actual.class},")
-      lines.push("    :size => #{actual.size},")
-      lines.push('  },')
-      result.each_pair do |category, items|
-        lines.push("  #{pretty(category)} => [")
-        items.each do |member|
-          lines.push("    #{pretty(member)},")
-        end
-        lines.push('  ],')
-      end
+      # lines.push('  :expected => {')
+      # lines.push("    :class => #{expected.class},")
+      # lines.push("    :size => #{expected.size},")
+      # lines.push('  },')
+      # lines.push('  :actual => {')
+      # lines.push("    :class => #{actual.class},")
+      # lines.push("    :size => #{actual.size},")
+      # lines.push('  },')
+      # result.each_pair do |category, items|
+      #   lines.push("  #{pretty(category)} => [")
+      #   items.each do |member|
+      #     lines.push("    #{pretty(member)},")
+      #   end
+      #   lines.push('  ],')
+      # end
     end
 
     def elucidate_struct(exception, expected, actual, lines)
