@@ -182,9 +182,9 @@ EOT
     sub_actual = SubSet.new.merge(actual)
     [
         [expected, actual],
-        [sub_expected, actual],
-        [expected, sub_actual],
-        [sub_expected, sub_actual]
+        # [sub_expected, actual],
+        # [expected, sub_actual],
+        # [sub_expected, sub_actual]
     ].each do |pair|
       do_test(Set, *pair)
     end
@@ -302,8 +302,8 @@ EOT
       subname = 'sub' + name
       exp_name = expected.class == klass ? names[:name] : names[:subname]
       act_name = actual.class == klass ? names[:name] : names[:subname]
-      exp_file_path = "expected/#{exp_name}.#{act_name}.txt"
-      act_file_path = "actual/#{exp_name}.#{act_name}.txt"
+      exp_file_path = "expected/#{exp_name}.#{act_name}.html"
+      act_file_path = "actual/#{exp_name}.#{act_name}.html"
       File.write(act_file_path, x.message)
       exp_lines = File.readlines(exp_file_path)
       act_lines = File.readlines(act_file_path)

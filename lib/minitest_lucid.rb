@@ -210,13 +210,69 @@ EOT
       lines.push('  }')
     end
 
-    def elucidate_set(doc, exception, expected, actual)
-      result = {
-          :missing => expected - actual,
-          :unexpected => actual - expected,
-          :ok => expected & actual,
-      }
+    def elucidate_expected_items(doc, expected)
+      header_text = "Expected:  class=#{expected.class} size=#{expected.size}"
+      elucidate_items(doc, 'data', header_text, expected)
+    end
 
+    def elucidate_actual_items(doc, actual)
+      header_text = "Got:  class=#{actual.class} size=#{actual.size}"
+      elucidate_items(doc, 'data', header_text, actual)
+    end
+
+    def elucidate_missing_items(doc, missing)
+      header_text = "Missing items: #{missing.size}"
+      elucidate_items(doc, 'bad data', header_text, missing)
+    end
+
+    def elucidate_unexpected_items(doc, unexpected)
+      header_text = "Unexpected items: #{unexpected.size}"
+      elucidate_items(doc, 'bad data', header_text, unexpected)
+    end
+
+    def elucidate_ok_items(doc, ok)
+      header_text = "Ok items: #{ok.size}"
+      elucidate_items(doc, 'good data', header_text, ok)
+    end
+
+    def elucidate_items(doc, classes, header_text, items)
+      doc.h2 do
+        doc.text(header_text)
+      end
+      unless items.empty?
+        doc.table(:border => 1) do
+          doc.tr do
+            doc.th do
+              doc.text('Class')
+            end
+            doc.th do
+              doc.text('Inspect Value')
+            end
+          end
+          items.each do |item|
+            doc.tr do
+              doc.td(:class => classes) do
+                doc.text(item.class.name)
+              end
+              doc.td(:class => classes) do
+                doc.text(item.inspect)
+              end
+            end
+          end
+        end
+      end
+
+    end
+
+    def elucidate_set(doc, exception, expected, actual)
+      missing = expected - actual
+      unexpected = actual - expected
+      ok = expected & actual
+      elucidate_expected_items(doc, expected)
+      elucidate_actual_items(doc, actual)
+      elucidate_missing_items(doc, missing)
+      elucidate_unexpected_items(doc, unexpected)
+      elucidate_ok_items(doc, ok)
       # lines.push('  :expected => {')
       # lines.push("    :class => #{expected.class},")
       # lines.push("    :size => #{expected.size},")
