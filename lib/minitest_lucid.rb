@@ -96,6 +96,36 @@ EOT
 
     end
 
+    def self.elucidate_expected_items(doc, expected)
+      id = 'Expected'
+      header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
+      Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, expected)
+    end
+
+    def self.elucidate_actual_items(doc, actual)
+      id = 'Got'
+      header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
+      Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, actual)
+    end
+
+    def self.elucidate_missing_items(doc, missing)
+      id = 'Missing'
+      header_text = "#{id} items: #{missing.size}"
+      Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, missing)
+    end
+
+    def self.elucidate_unexpected_items(doc, unexpected)
+      id = 'Unexpected'
+      header_text = "#{id} items: #{unexpected.size}"
+      Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, unexpected)
+    end
+
+    def self.elucidate_ok_items(doc, ok)
+      id = 'Ok'
+      header_text = "#{id} items: #{ok.size}"
+      Minitest::Assertions.elucidate_items(doc, 'good data', id, header_text, ok)
+    end
+
     # Element-by-element comparison.
     #     Diff-LCS comparison.
     #     Missing elements: expected - actual.
@@ -212,41 +242,11 @@ EOT
             end
           end
         end
-        self.elucidate_expected_items(doc, expected)
-        self.elucidate_actual_items(doc, actual)
-        self.elucidate_missing_items(doc, missing)
-        self.elucidate_unexpected_items(doc, unexpected)
-        self.elucidate_ok_items(doc, ok)
-      end
-
-      def self.elucidate_expected_items(doc, expected)
-        id = 'Expected'
-        header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
-        Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, expected)
-      end
-
-      def self.elucidate_actual_items(doc, actual)
-        id = 'Got'
-        header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
-        Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, actual)
-      end
-
-      def self.elucidate_missing_items(doc, missing)
-        id = 'Missing'
-        header_text = "#{id} items: #{missing.size}"
-        Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, missing)
-      end
-
-      def self.elucidate_unexpected_items(doc, unexpected)
-        id = 'Unexpected'
-        header_text = "#{id} items: #{unexpected.size}"
-        Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, unexpected)
-      end
-
-      def self.elucidate_ok_items(doc, ok)
-        id = 'Ok'
-        header_text = "#{id} items: #{ok.size}"
-        Minitest::Assertions.elucidate_items(doc, 'good data', id, header_text, ok)
+        Minitest::Assertions.elucidate_expected_items(doc, expected)
+        Minitest::Assertions.elucidate_actual_items(doc, actual)
+        Minitest::Assertions.elucidate_missing_items(doc, missing)
+        Minitest::Assertions.elucidate_unexpected_items(doc, unexpected)
+        Minitest::Assertions.elucidate_ok_items(doc, ok)
       end
 
     end
