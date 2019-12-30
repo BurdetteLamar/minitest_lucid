@@ -182,9 +182,9 @@ EOT
     sub_actual = SubSet.new.merge(actual)
     [
         [expected, actual],
-        # [sub_expected, actual],
-        # [expected, sub_actual],
-        # [sub_expected, sub_actual]
+        [sub_expected, actual],
+        [expected, sub_actual],
+        [sub_expected, sub_actual]
     ].each do |pair|
       do_test(Set, *pair)
     end
