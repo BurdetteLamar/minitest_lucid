@@ -64,35 +64,37 @@ EOT
           new_exception.set_backtrace(exception.backtrace)
           raise new_exception
         end
-
-        # HTML document.
-#         doc = Document.new
-#         doc << html_ele = REXML::Element.new('html')
-#         head_ele = html_ele.add_element('head')
-#         style_ele = head_ele.add_element('style')
-#         styles = <<EOT
-#     .good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
-#     .neutral { color: rgb(156,101,0); background-color: rgb(255,236,156) }
-#     .bad { color: rgb(156,0,6); background-color: rgb(255,199,206) }
-# EOT
-#         style_ele << REXML::Text.new(styles)
-#         body_ele = html_ele.add_element('body')
-#         puts doc.to_s
-#         lines = []
-#         lines.push('{')
-#         lines.push("  :message => '#{msg}',") if msg
-#         send(elucidation_method, exception, expected, actual, lines)
-#         lines.push('}')
-#         lines.push('')
-#         message = lines.join("\n")
-#         new_exception = exception.exception(message)
-#         new_exception.set_backtrace(exception.backtrace)
-#         raise new_exception
-#       else
-#         raise
       end
     end
 
+    def self.elucidate_items(doc, classes, id, header_text, items)
+      doc.h2(:id => id) do
+        doc.text(header_text)
+      end
+      unless items.empty?
+        doc.table(:border => 1) do
+          doc.tr do
+            doc.th do
+              doc.text('Class')
+            end
+            doc.th do
+              doc.text('Inspect Value')
+            end
+          end
+          items.each do |item|
+            doc.tr do
+              doc.td(:class => classes) do
+                doc.text(item.class.name)
+              end
+              doc.td(:class => classes) do
+                doc.text(item.inspect)
+              end
+            end
+          end
+        end
+      end
+
+    end
 
     # Element-by-element comparison.
     #     Diff-LCS comparison.
@@ -220,60 +222,31 @@ EOT
       def self.elucidate_expected_items(doc, expected)
         id = 'Expected'
         header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
-        self.elucidate_items(doc, 'data', id, header_text, expected)
+        Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, expected)
       end
 
       def self.elucidate_actual_items(doc, actual)
         id = 'Got'
         header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
-        self.elucidate_items(doc, 'data', id, header_text, actual)
+        Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, actual)
       end
 
       def self.elucidate_missing_items(doc, missing)
         id = 'Missing'
         header_text = "#{id} items: #{missing.size}"
-        self.elucidate_items(doc, 'bad data', id, header_text, missing)
+        Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, missing)
       end
 
       def self.elucidate_unexpected_items(doc, unexpected)
         id = 'Unexpected'
         header_text = "#{id} items: #{unexpected.size}"
-        self.elucidate_items(doc, 'bad data', id, header_text, unexpected)
+        Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, unexpected)
       end
 
       def self.elucidate_ok_items(doc, ok)
         id = 'Ok'
         header_text = "#{id} items: #{ok.size}"
-        self.elucidate_items(doc, 'good data', id, header_text, ok)
-      end
-
-      def self.elucidate_items(doc, classes, id, header_text, items)
-        doc.h2(:id => id) do
-          doc.text(header_text)
-        end
-        unless items.empty?
-          doc.table(:border => 1) do
-            doc.tr do
-              doc.th do
-                doc.text('Class')
-              end
-              doc.th do
-                doc.text('Inspect Value')
-              end
-            end
-            items.each do |item|
-              doc.tr do
-                doc.td(:class => classes) do
-                  doc.text(item.class.name)
-                end
-                doc.td(:class => classes) do
-                  doc.text(item.inspect)
-                end
-              end
-            end
-          end
-        end
-
+        Minitest::Assertions.elucidate_items(doc, 'good data', id, header_text, ok)
       end
 
     end
