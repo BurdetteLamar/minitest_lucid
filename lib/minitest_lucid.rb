@@ -71,6 +71,7 @@ EOT
               doc.h1 do
                 doc.text('Elucidation')
               end
+              @ul = doc.ul
               send(elucidation_method, doc, exception, expected, actual)
             end
           end
@@ -236,7 +237,7 @@ EOT
     end
 
     def elucidate_items(doc, classes, header_text, items)
-      doc.h2 do
+      doc.h2(:id => header_text) do
         doc.text(header_text)
       end
       unless items.empty?
@@ -273,21 +274,6 @@ EOT
       elucidate_missing_items(doc, missing)
       elucidate_unexpected_items(doc, unexpected)
       elucidate_ok_items(doc, ok)
-      # lines.push('  :expected => {')
-      # lines.push("    :class => #{expected.class},")
-      # lines.push("    :size => #{expected.size},")
-      # lines.push('  },')
-      # lines.push('  :actual => {')
-      # lines.push("    :class => #{actual.class},")
-      # lines.push("    :size => #{actual.size},")
-      # lines.push('  },')
-      # result.each_pair do |category, items|
-      #   lines.push("  #{pretty(category)} => [")
-      #   items.each do |member|
-      #     lines.push("    #{pretty(member)},")
-      #   end
-      #   lines.push('  ],')
-      # end
     end
 
     def elucidate_struct(exception, expected, actual, lines)
