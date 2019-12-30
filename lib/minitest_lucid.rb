@@ -71,7 +71,6 @@ EOT
               doc.h1 do
                 doc.text('Elucidation')
               end
-              @ul = doc.ul
               send(elucidation_method, doc, exception, expected, actual)
             end
           end
@@ -212,32 +211,37 @@ EOT
     end
 
     def elucidate_expected_items(doc, expected)
-      header_text = "Expected:  class=#{expected.class} size=#{expected.size}"
-      elucidate_items(doc, 'data', header_text, expected)
+      id = 'Expected'
+      header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
+      elucidate_items(doc, 'data', id, header_text, expected)
     end
 
     def elucidate_actual_items(doc, actual)
-      header_text = "Got:  class=#{actual.class} size=#{actual.size}"
-      elucidate_items(doc, 'data', header_text, actual)
+      id = 'Got'
+      header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
+      elucidate_items(doc, 'data', id, header_text, actual)
     end
 
     def elucidate_missing_items(doc, missing)
-      header_text = "Missing items: #{missing.size}"
-      elucidate_items(doc, 'bad data', header_text, missing)
+      id = 'Missing'
+      header_text = "#{id} items: #{missing.size}"
+      elucidate_items(doc, 'bad data', id, header_text, missing)
     end
 
     def elucidate_unexpected_items(doc, unexpected)
-      header_text = "Unexpected items: #{unexpected.size}"
-      elucidate_items(doc, 'bad data', header_text, unexpected)
+      id = 'Unexpected'
+      header_text = "#{id} items: #{unexpected.size}"
+      elucidate_items(doc, 'bad data', id, header_text, unexpected)
     end
 
     def elucidate_ok_items(doc, ok)
-      header_text = "Ok items: #{ok.size}"
-      elucidate_items(doc, 'good data', header_text, ok)
+      id = 'Ok'
+      header_text = "#{id} items: #{ok.size}"
+      elucidate_items(doc, 'good data', id, header_text, ok)
     end
 
-    def elucidate_items(doc, classes, header_text, items)
-      doc.h2(:id => header_text) do
+    def elucidate_items(doc, classes, id, header_text, items)
+      doc.h2(:id => id) do
         doc.text(header_text)
       end
       unless items.empty?
@@ -269,6 +273,15 @@ EOT
       missing = expected - actual
       unexpected = actual - expected
       ok = expected & actual
+      doc.ul do
+        %w/Expected Got Missing Unexpected Ok/.each do |word|
+          doc.li do
+            doc.a(:href => "##{word}") do
+              doc.text(word)
+            end
+          end
+        end
+      end
       elucidate_expected_items(doc, expected)
       elucidate_actual_items(doc, actual)
       elucidate_missing_items(doc, missing)
