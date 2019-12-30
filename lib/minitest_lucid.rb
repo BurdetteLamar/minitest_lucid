@@ -17,14 +17,12 @@ module Minitest
       end
     end
 
-    METHOD_FOR_CLASS = {
-        # Hash => :elucidate_hash,
-        Set => :elucidate_set,
-        # Struct => :elucidate_struct,
-        # Array => :elucidate_array,
-    }
-    ELUCIDATABLE_CLASSES = METHOD_FOR_CLASS.keys
-
+    ELUCIDATABLE_CLASSES = [
+      Array,
+      Hash,
+      Set,
+      Struct,
+    ]
     STYLES = <<EOT
         
     .good {color: rgb(0,97,0) ; background-color: rgb(198,239,206) }
@@ -34,32 +32,19 @@ module Minitest
     .data_changed { font-family: Courier New, monospace; font-weight: bold; font-style: italic }
 EOT
 
-    # Lookup objects in hash.
-    def lookup(one_object, other_object)
-      if ELUCIDATABLE_CLASSES.include?(one_object.class)
-        if other_object.kind_of?(one_object.class)
-          return METHOD_FOR_CLASS.fetch(one_object.class)
-        end
-      end
-      nil
-    end
-
     # Poll with kind_of?.
-    def poll(expected, actual)
-      METHOD_FOR_CLASS.each_pair do |klass, method|
+    def get_class(expected, actual)
+      ELUCIDATABLE_CLASSES.each do |klass|
         next unless expected.kind_of?(klass)
         next unless actual.kind_of?(klass)
-        return method
+        return Object.const_get("#{self.class.name}::#{klass.name}Elucidation")
       end
       nil
     end
 
     def elucidate(exception, expected, actual, msg)
-      elucidation_method  =
-          lookup(expected, actual) ||
-          lookup(actual, expected) ||
-          poll(expected, actual)
-      if elucidation_method
+      elucidation_class  = get_class(expected, actual)
+      if elucidation_class
         builder = Nokogiri::HTML::Builder.new do |doc|
           doc.html do
             doc.head do
@@ -71,7 +56,7 @@ EOT
               doc.h1 do
                 doc.text('Elucidation')
               end
-              send(elucidation_method, doc, exception, expected, actual)
+              elucidation_class.elucidate(doc, exception, expected, actual)
             end
           end
           new_message = doc.to_html
@@ -210,83 +195,87 @@ EOT
       lines.push('  }')
     end
 
-    def elucidate_expected_items(doc, expected)
-      id = 'Expected'
-      header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
-      elucidate_items(doc, 'data', id, header_text, expected)
-    end
+    class SetElucidation
 
-    def elucidate_actual_items(doc, actual)
-      id = 'Got'
-      header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
-      elucidate_items(doc, 'data', id, header_text, actual)
-    end
-
-    def elucidate_missing_items(doc, missing)
-      id = 'Missing'
-      header_text = "#{id} items: #{missing.size}"
-      elucidate_items(doc, 'bad data', id, header_text, missing)
-    end
-
-    def elucidate_unexpected_items(doc, unexpected)
-      id = 'Unexpected'
-      header_text = "#{id} items: #{unexpected.size}"
-      elucidate_items(doc, 'bad data', id, header_text, unexpected)
-    end
-
-    def elucidate_ok_items(doc, ok)
-      id = 'Ok'
-      header_text = "#{id} items: #{ok.size}"
-      elucidate_items(doc, 'good data', id, header_text, ok)
-    end
-
-    def elucidate_items(doc, classes, id, header_text, items)
-      doc.h2(:id => id) do
-        doc.text(header_text)
-      end
-      unless items.empty?
-        doc.table(:border => 1) do
-          doc.tr do
-            doc.th do
-              doc.text('Class')
-            end
-            doc.th do
-              doc.text('Inspect Value')
+      def self.elucidate(doc, exception, expected, actual)
+        missing = expected - actual
+        unexpected = actual - expected
+        ok = expected & actual
+        doc.ul do
+          %w/Expected Got Missing Unexpected Ok/.each do |word|
+            doc.li do
+              doc.a(:href => "##{word}") do
+                doc.text(word)
+              end
             end
           end
-          items.each do |item|
+        end
+        self.elucidate_expected_items(doc, expected)
+        self.elucidate_actual_items(doc, actual)
+        self.elucidate_missing_items(doc, missing)
+        self.elucidate_unexpected_items(doc, unexpected)
+        self.elucidate_ok_items(doc, ok)
+      end
+
+      def self.elucidate_expected_items(doc, expected)
+        id = 'Expected'
+        header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
+        self.elucidate_items(doc, 'data', id, header_text, expected)
+      end
+
+      def self.elucidate_actual_items(doc, actual)
+        id = 'Got'
+        header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
+        self.elucidate_items(doc, 'data', id, header_text, actual)
+      end
+
+      def self.elucidate_missing_items(doc, missing)
+        id = 'Missing'
+        header_text = "#{id} items: #{missing.size}"
+        self.elucidate_items(doc, 'bad data', id, header_text, missing)
+      end
+
+      def self.elucidate_unexpected_items(doc, unexpected)
+        id = 'Unexpected'
+        header_text = "#{id} items: #{unexpected.size}"
+        self.elucidate_items(doc, 'bad data', id, header_text, unexpected)
+      end
+
+      def self.elucidate_ok_items(doc, ok)
+        id = 'Ok'
+        header_text = "#{id} items: #{ok.size}"
+        self.elucidate_items(doc, 'good data', id, header_text, ok)
+      end
+
+      def self.elucidate_items(doc, classes, id, header_text, items)
+        doc.h2(:id => id) do
+          doc.text(header_text)
+        end
+        unless items.empty?
+          doc.table(:border => 1) do
             doc.tr do
-              doc.td(:class => classes) do
-                doc.text(item.class.name)
+              doc.th do
+                doc.text('Class')
               end
-              doc.td(:class => classes) do
-                doc.text(item.inspect)
+              doc.th do
+                doc.text('Inspect Value')
+              end
+            end
+            items.each do |item|
+              doc.tr do
+                doc.td(:class => classes) do
+                  doc.text(item.class.name)
+                end
+                doc.td(:class => classes) do
+                  doc.text(item.inspect)
+                end
               end
             end
           end
         end
+
       end
 
-    end
-
-    def elucidate_set(doc, exception, expected, actual)
-      missing = expected - actual
-      unexpected = actual - expected
-      ok = expected & actual
-      doc.ul do
-        %w/Expected Got Missing Unexpected Ok/.each do |word|
-          doc.li do
-            doc.a(:href => "##{word}") do
-              doc.text(word)
-            end
-          end
-        end
-      end
-      elucidate_expected_items(doc, expected)
-      elucidate_actual_items(doc, actual)
-      elucidate_missing_items(doc, missing)
-      elucidate_unexpected_items(doc, unexpected)
-      elucidate_ok_items(doc, ok)
     end
 
     def elucidate_struct(exception, expected, actual, lines)

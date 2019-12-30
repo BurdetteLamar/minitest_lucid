@@ -126,7 +126,7 @@ EOT
     sub_expected = SubHash.new.merge(expected)
     sub_actual = SubHash.new.merge(actual)
     [
-        [expected, actual],
+        # [expected, actual],
         # [sub_expected, actual],
         # [expected, sub_actual],
         # [sub_expected, sub_actual]
