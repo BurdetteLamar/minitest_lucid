@@ -1,13 +1,13 @@
 require 'minitest/autorun'
 require 'diff/lcs'
 require 'set'
-require 'nokogiri'
+require 'rexml/document'
 
 module Minitest
 
   module Assertions
 
-    alias :old_assert_equal :assert_equal
+    alias old_assert_equal assert_equal
 
     def assert_equal(expected, actual, msg=nil)
       begin
@@ -45,85 +45,86 @@ EOT
     def elucidate(exception, expected, actual, msg)
       elucidation_class  = get_class(expected, actual)
       if elucidation_class
-        builder = Nokogiri::HTML::Builder.new do |doc|
-          doc.html do
-            doc.head do
-              doc.style do
-                doc.text(STYLES)
-              end
-            end
-            doc.body do
-              doc.h1 do
-                doc.text('Elucidation')
-              end
-              elucidation_class.elucidate(doc, exception, expected, actual)
-            end
-          end
-          new_message = doc.to_html
-          new_exception = exception.exception(new_message)
-          new_exception.set_backtrace(exception.backtrace)
-          raise new_exception
-        end
+        doc = REXML::Document.new
+        html_ele = doc.add_element('html')
+        head_ele = html_ele.add_element('head')
+        style_ele = head_ele.add_element('style')
+        style_ele.text = STYLES
+        body_ele = html_ele.add_element('body')
+        h1_ele = body_ele.add_element('h1')
+        h1_ele.text = 'Elucidation'
+        elucidation_class.elucidate(body_ele, exception, expected, actual)
+        output = ""
+        doc.write(:output => output, :indent => 0)
+        new_message = output
+        new_exception = exception.exception(new_message)
+        new_exception.set_backtrace(exception.backtrace)
+        raise new_exception
       end
     end
 
-    def self.elucidate_items(doc, classes, id, header_text, items)
-      doc.h2(:id => id) do
-        doc.text(header_text)
-      end
+    def self.elucidate_items(body_ele, ul_ele, classes, id, header_text, items)
+      # Link in TOC.
+      li_ele = ul_ele.add_element('li')
+      a_ele = li_ele.add_element('a')
+      a_ele.attributes['href'] = "##{id}"
+      a_ele.text = id.capitalize
+      # Header.
+      h2_ele = body_ele.add_element('h2')
+      h2_ele.attributes['id'] = id
+      h2_ele.text = header_text
       unless items.empty?
-        doc.table(:border => 1) do
-          doc.tr do
-            doc.th do
-              doc.text('Class')
-            end
-            doc.th do
-              doc.text('Inspect Value')
-            end
-          end
-          items.each do |item|
-            doc.tr do
-              doc.td(:class => classes) do
-                doc.text(item.class.name)
-              end
-              doc.td(:class => classes) do
-                doc.text(item.inspect)
-              end
-            end
-          end
+        # Table.
+        table_ele = body_ele.add_element('table')
+        table_ele.attributes['border'] = '1'
+        # Header row.
+        tr_ele = table_ele.add_element('tr')
+        th_ele = tr_ele.add_element('th')
+        th_ele.text = 'Class'
+        th_ele = tr_ele.add_element('th')
+        th_ele.text = 'Inspect Value'
+        # Data rows.
+        items.each do |item|
+          tr_ele = table_ele.add_element('tr')
+          td_ele = tr_ele.add_element('td')
+          td_ele.attributes['class'] = classes
+          td_ele.text = item.class.name
+          td_ele = tr_ele.add_element('td')
+          td_ele.attributes['class'] = classes
+          td_ele.text = item.inspect
         end
       end
 
     end
 
-    def self.elucidate_expected_items(doc, expected)
+    def self.elucidate_expected_items(body_ele, ul_ele, expected)
       id = 'Expected'
       header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
-      Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, expected)
+      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'data', id, header_text, expected)
     end
 
-    def self.elucidate_actual_items(doc, actual)
+    def self.elucidate_actual_items(body_ele, ul_ele, actual)
       id = 'Got'
       header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
-      Minitest::Assertions.elucidate_items(doc, 'data', id, header_text, actual)
+      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'data', id, header_text, actual)
     end
 
-    def self.elucidate_missing_items(doc, missing)
+    def self.elucidate_missing_items(body_ele, ul_ele, missing)
       id = 'Missing'
       header_text = "#{id} items: #{missing.size}"
-      Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, missing)
+      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'bad data', id, header_text, missing)
     end
 
-    def self.elucidate_unexpected_items(doc, unexpected)
+    def self.elucidate_unexpected_items(body_ele, ul_ele, unexpected)
       id = 'Unexpected'
       header_text = "#{id} items: #{unexpected.size}"
-      Minitest::Assertions.elucidate_items(doc, 'bad data', id, header_text, unexpected)
+      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'bad data', id, header_text, unexpected)
     end
 
-    def self.elucidate_ok_items(doc, ok)
+    def self.elucidate_ok_items(body_ele, ul_ele, ok)
       id = 'Ok'
       header_text = "#{id} items: #{ok.size}"
-      Minitest::Assertions.elucidate_items(doc, 'good data', id, header_text, ok)
+      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'good data', id, header_text, ok)
     end
 
     # Element-by-element comparison.
@@ -138,18 +139,18 @@ EOT
       sdiff = Diff::LCS.sdiff(expected, actual)
       changes = {}
       statuses = {
-          '!' => 'changed',
-          '+' => 'unexpected',
-          '-' => 'missing',
-          '=' => 'unchanged'
+        '!' => 'changed',
+        '+' => 'unexpected',
+        '-' => 'missing',
+        '=' => 'unchanged'
       }
       sdiff.each_with_index do |change, i|
         status = statuses.fetch(change.action)
         key = "change_#{i}"
         change_data = {
-            :status => status,
-            :"old_index_#{change.old_position}" => change.old_element.inspect,
-            :"new_index_#{change.new_position}" => change.new_element.inspect,
+          :status => status,
+          :"old_index_#{change.old_position}" => change.old_element.inspect,
+          :"new_index_#{change.new_position}" => change.new_element.inspect,
         }
         changes.store(key, change_data)
       end
@@ -177,27 +178,27 @@ EOT
       actual_keys = actual.keys
       keys = Set.new(expected_keys + actual_keys)
       h = {
-          :missing_pairs => {},
-          :unexpected_pairs => {},
-          :changed_values => {},
-          :ok_pairs => {},
+        :missing_pairs => {},
+        :unexpected_pairs => {},
+        :changed_values => {},
+        :ok_pairs => {},
       }
       keys.each do |key|
         expected_value = expected[key]
         actual_value = actual[key]
         case
-          when expected_value && actual_value
-            if expected_value == actual_value
-              h[:ok_pairs].store(key, expected_value)
-            else
-              h[:changed_values].store(key, [expected_value, actual_value])
-            end
-          when expected_value
-            h[:missing_pairs].store(key, expected_value)
-          when actual_value
-            h[:unexpected_pairs].store(key, actual_value)
+        when expected_value && actual_value
+          if expected_value == actual_value
+            h[:ok_pairs].store(key, expected_value)
           else
-            fail [expected_value, actual_value].inspect
+            h[:changed_values].store(key, [expected_value, actual_value])
+          end
+        when expected_value
+          h[:missing_pairs].store(key, expected_value)
+        when actual_value
+          h[:unexpected_pairs].store(key, actual_value)
+        else
+          fail [expected_value, actual_value].inspect
         end
       end
       lines.push('  :expected => {')
@@ -229,24 +230,16 @@ EOT
 
     class SetElucidation
 
-      def self.elucidate(doc, exception, expected, actual)
+      def self.elucidate(body_ele, exception, expected, actual)
         missing = expected - actual
         unexpected = actual - expected
         ok = expected & actual
-        doc.ul do
-          %w/Expected Got Missing Unexpected Ok/.each do |word|
-            doc.li do
-              doc.a(:href => "##{word}") do
-                doc.text(word)
-              end
-            end
-          end
-        end
-        Minitest::Assertions.elucidate_expected_items(doc, expected)
-        Minitest::Assertions.elucidate_actual_items(doc, actual)
-        Minitest::Assertions.elucidate_missing_items(doc, missing)
-        Minitest::Assertions.elucidate_unexpected_items(doc, unexpected)
-        Minitest::Assertions.elucidate_ok_items(doc, ok)
+        ul_ele = body_ele.add_element('ul')
+        Minitest::Assertions.elucidate_expected_items(body_ele, ul_ele, expected)
+        Minitest::Assertions.elucidate_actual_items(body_ele, ul_ele, actual)
+        Minitest::Assertions.elucidate_missing_items(body_ele, ul_ele, missing)
+        Minitest::Assertions.elucidate_unexpected_items(body_ele, ul_ele, unexpected)
+        Minitest::Assertions.elucidate_ok_items(body_ele, ul_ele, ok)
       end
 
     end
@@ -256,8 +249,8 @@ EOT
       actual_members = actual.members
       members = Set.new(expected_members + actual_members)
       h = {
-          :changed_values => {},
-          :ok_values => {},
+        :changed_values => {},
+        :ok_values => {},
       }
       members.each do |member|
         expected_value = expected[member]
@@ -293,64 +286,6 @@ EOT
         lines.push('    },')
       end
       lines.push('  }')
-    end
-
-    def pretty(arg)
-      case
-        when arg.kind_of?(Symbol)
-          ":#{arg}"
-        when arg.kind_of?(String)
-          "'#{arg}'"
-        when arg.kind_of?(Numeric)
-          arg
-        else
-          arg.inspect
-      end
-    end
-
-    def h2_ele(parent)
-      h2_ele = parent.add_element('h2')
-    end
-
-    def table_ele(parent, attributes = {})
-      ele = REXML::Element.new('table', parent)
-      ele.attributes['border'] = 0
-      attributes.each_pair do |k, v|
-        ele.attributes[k.to_s] = v
-      end
-      ele
-    end
-
-    def tr_ele(parent)
-      parent << REXML::Element.new('tr')
-    end
-
-    def th_ele(parent, text)
-      ele = REXML::Element.new('th')
-      parent << ele
-      ele.text = text
-      ele
-    end
-
-    def th_eles(parent, *texts)
-      texts.each do |text|
-        th_ele(parent, text)
-      end
-    end
-
-    def td_ele(parent, text)
-      ele = REXML::Element.new('td')
-      parent << ele
-      ele.text = text
-      ele
-    end
-
-    def td_eles(parent, *texts)
-      eles = []
-      texts.each do |text|
-        eles << td_ele(parent, text)
-      end
-      eles
     end
 
   end
