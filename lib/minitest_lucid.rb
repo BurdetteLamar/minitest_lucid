@@ -63,38 +63,47 @@ EOT
       end
     end
 
-    def self.elucidate_items(body_ele, ul_ele, classes, id, header_text, items)
+    def self.add_toc_link(ul_ele, id)
       # Link in TOC.
       li_ele = ul_ele.add_element('li')
       a_ele = li_ele.add_element('a')
       a_ele.attributes['href'] = "##{id}"
       a_ele.text = id.capitalize
-      # Header.
+    end
+
+    def self.add_section_header(body_ele, id, header_text)
       h2_ele = body_ele.add_element('h2')
       h2_ele.attributes['id'] = id
       h2_ele.text = header_text
-      unless items.empty?
-        # Table.
-        table_ele = body_ele.add_element('table')
-        table_ele.attributes['border'] = '1'
-        # Header row.
-        tr_ele = table_ele.add_element('tr')
-        th_ele = tr_ele.add_element('th')
-        th_ele.text = 'Class'
-        th_ele = tr_ele.add_element('th')
-        th_ele.text = 'Inspect Value'
-        # Data rows.
-        items.each do |item|
-          tr_ele = table_ele.add_element('tr')
-          td_ele = tr_ele.add_element('td')
-          td_ele.attributes['class'] = classes
-          td_ele.text = item.class.name
-          td_ele = tr_ele.add_element('td')
-          td_ele.attributes['class'] = classes
-          td_ele.text = item.inspect
-        end
-      end
+    end
 
+    def self.add_items_table(body_ele, classes, items)
+      return if items.empty?
+      # Table.
+      table_ele = body_ele.add_element('table')
+      table_ele.attributes['border'] = '1'
+      # Header row.
+      tr_ele = table_ele.add_element('tr')
+      th_ele = tr_ele.add_element('th')
+      th_ele.text = 'Class'
+      th_ele = tr_ele.add_element('th')
+      th_ele.text = 'Inspect Value'
+      # Data rows.
+      items.each do |item|
+        tr_ele = table_ele.add_element('tr')
+        td_ele = tr_ele.add_element('td')
+        td_ele.attributes['class'] = classes
+        td_ele.text = item.class.name
+        td_ele = tr_ele.add_element('td')
+        td_ele.attributes['class'] = classes
+        td_ele.text = item.inspect
+      end
+    end
+
+    def self.elucidate_items(body_ele, ul_ele, classes, id, header_text, items)
+      self.add_toc_link(ul_ele, id)
+      self.add_section_header(body_ele, id, header_text)
+      self.add_items_table(body_ele, classes, items)
     end
 
     def self.elucidate_expected_items(body_ele, ul_ele, expected)
