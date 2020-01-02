@@ -63,24 +63,23 @@ EOT
       end
     end
 
-    def self.add_toc_link(ul_ele, id)
-      # Link in TOC.
-      li_ele = ul_ele.add_element('li')
+    def self.toc_link(id)
+      li_ele = REXML::Element.new('li')
       a_ele = li_ele.add_element('a')
       a_ele.attributes['href'] = "##{id}"
       a_ele.text = id.capitalize
+      li_ele
     end
 
-    def self.add_section_header(body_ele, id, header_text)
-      h2_ele = body_ele.add_element('h2')
+    def self.section_header(id, header_text)
+      h2_ele = REXML::Element.new('h2')
       h2_ele.attributes['id'] = id
       h2_ele.text = header_text
+      h2_ele
     end
 
-    def self.add_items_table(body_ele, classes, items)
-      return if items.empty?
-      # Table.
-      table_ele = body_ele.add_element('table')
+    def self.items_table(classes, items)
+      table_ele = REXML::Element.new('table')
       table_ele.attributes['border'] = '1'
       # Header row.
       tr_ele = table_ele.add_element('tr')
@@ -98,12 +97,13 @@ EOT
         td_ele.attributes['class'] = classes
         td_ele.text = item.inspect
       end
+      table_ele
     end
 
     def self.elucidate_items(body_ele, ul_ele, classes, id, header_text, items)
-      self.add_toc_link(ul_ele, id)
-      self.add_section_header(body_ele, id, header_text)
-      self.add_items_table(body_ele, classes, items)
+      ul_ele.add_element(self.toc_link(id))
+      body_ele.add_element(self.section_header(id, header_text))
+      body_ele.add_element(self.items_table(classes, items)) unless items.empty?
     end
 
     def self.elucidate_expected_items(body_ele, ul_ele, expected)
