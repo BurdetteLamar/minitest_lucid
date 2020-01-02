@@ -78,7 +78,7 @@ EOT
       h2_ele
     end
 
-    def self.items_table(classes, items)
+    def self.items_table(class_names, items)
       table_ele = REXML::Element.new('table')
       table_ele.attributes['border'] = '1'
       # Header row.
@@ -91,19 +91,19 @@ EOT
       items.each do |item|
         tr_ele = table_ele.add_element('tr')
         td_ele = tr_ele.add_element('td')
-        td_ele.attributes['class'] = classes
+        td_ele.attributes['class'] = class_names
         td_ele.text = item.class.name
         td_ele = tr_ele.add_element('td')
-        td_ele.attributes['class'] = classes
+        td_ele.attributes['class'] = class_names
         td_ele.text = item.inspect
       end
       table_ele
     end
 
-    def self.elucidate_items(body_ele, ul_ele, classes, id, header_text, items)
+    def self.elucidate_items(body_ele, ul_ele, class_names, id, header_text, items)
       ul_ele.add_element(self.toc_link(id))
       body_ele.add_element(self.section_header(id, header_text))
-      body_ele.add_element(self.items_table(classes, items)) unless items.empty?
+      body_ele.add_element(self.items_table(class_names, items)) unless items.empty?
     end
 
     def self.elucidate_expected_items(body_ele, ul_ele, expected)
