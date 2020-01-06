@@ -54,9 +54,12 @@ EOT
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Elucidation'
       toc_ul_ele = body_ele.add_element('ul')
-      toc_ul_ele.add_element('li').text = 'Minitest'
+      toc_ul_ele.add_element(self.toc_link('minitest'))
+      h2_ele = body_ele.add_element('h2')
+      h2_ele.attributes['id'] = 'minitest'
+      h2_ele.text = 'Minitest'
       minitest_toc_ul_ele = toc_ul_ele.add_element('ul')
-      toc_ul_ele.add_element('li').text = 'Analysis'
+      toc_ul_ele.add_element(self.toc_link('analysis'))
       analysis_toc_ul_ele = toc_ul_ele.add_element('ul')
       yield body_ele, minitest_toc_ul_ele, analysis_toc_ul_ele
       output = ""
@@ -75,11 +78,11 @@ EOT
       li_ele
     end
 
-    def self.section_header(id, header_text)
-      h2_ele = REXML::Element.new('h2')
-      h2_ele.attributes['id'] = id
-      h2_ele.text = header_text
-      h2_ele
+    def self.section_header(level, id, header_text)
+      h_ele = REXML::Element.new("h#{level}")
+      h_ele.attributes['id'] = id
+      h_ele.text = header_text
+      h_ele
     end
 
     def self.items_table(class_names, items)
@@ -107,7 +110,7 @@ EOT
     def self.elucidate_exception(body_ele, minitest_toc_ul_ele, exception)
       id = 'exception'
       minitest_toc_ul_ele.add_element(self.toc_link(id))
-      body_ele.add_element(self.section_header(id, 'Exception'))
+      body_ele.add_element(self.section_header(3, id, 'Exception'))
       table_ele = body_ele.add_element('table')
       table_ele.attributes['border'] = '1'
       tr_ele = table_ele.add_element('tr')
@@ -129,7 +132,7 @@ EOT
 
     def self.elucidate_items(body_ele, ul_ele, class_names, id, header_text, items)
       ul_ele.add_element(self.toc_link(id))
-      body_ele.add_element(self.section_header(id, header_text))
+      body_ele.add_element(self.section_header(3, id, header_text))
       body_ele.add_element(self.items_table(class_names, items)) unless items.empty?
     end
 
@@ -274,6 +277,9 @@ EOT
           Minitest::Assertions.elucidate_expected_items(body_ele, minitest_toc_ul_ele, expected)
           Minitest::Assertions.elucidate_actual_items(body_ele, minitest_toc_ul_ele, actual)
           Minitest::Assertions.elucidate_exception(body_ele, minitest_toc_ul_ele, exception)
+          h2_ele = body_ele.add_element('h2')
+          h2_ele.attributes['id'] = 'analysis'
+          h2_ele.text = 'Analysis'
           Minitest::Assertions.elucidate_missing_items(body_ele, analysis_toc_ul_ele, missing)
           Minitest::Assertions.elucidate_unexpected_items(body_ele, analysis_toc_ul_ele, unexpected)
           Minitest::Assertions.elucidate_ok_items(body_ele, analysis_toc_ul_ele, ok)
