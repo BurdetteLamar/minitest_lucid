@@ -67,27 +67,6 @@ EOT
       raise new_exception
     end
 
-    def zzz_elucidate(exception, expected, actual, msg)
-      elucidation_class  = get_class(expected, actual)
-      if elucidation_class
-        doc = REXML::Document.new
-        html_ele = doc.add_element('html')
-        head_ele = html_ele.add_element('head')
-        style_ele = head_ele.add_element('style')
-        style_ele.text = STYLES
-        body_ele = html_ele.add_element('body')
-        h1_ele = body_ele.add_element('h1')
-        h1_ele.text = 'Elucidation'
-        elucidation_class.elucidate(body_ele, exception, expected, actual)
-        output = ""
-        doc.write(:output => output, :indent => 0)
-        new_message = output
-        new_exception = exception.exception(new_message)
-        new_exception.set_backtrace(exception.backtrace)
-        raise new_exception
-      end
-    end
-
     def self.toc_link(id)
       li_ele = REXML::Element.new('li')
       a_ele = li_ele.add_element('a')
@@ -123,6 +102,29 @@ EOT
         td_ele.text = item.inspect
       end
       table_ele
+    end
+
+    def self.elucidate_exception(body_ele, minitest_toc_ul_ele, exception)
+      id = 'exception'
+      minitest_toc_ul_ele.add_element(self.toc_link(id))
+      body_ele.add_element(self.section_header(id, 'Exception'))
+      table_ele = body_ele.add_element('table')
+      table_ele.attributes['border'] = '1'
+      tr_ele = table_ele.add_element('tr')
+      th_ele = tr_ele.add_element('th')
+      th_ele.text = 'Class'
+      td_ele = tr_ele.add_element('td')
+      td_ele.text = exception.class.name
+      tr_ele = table_ele.add_element('tr')
+      th_ele = tr_ele.add_element('th')
+      th_ele.text = 'Message'
+      td_ele = tr_ele.add_element('td')
+      td_ele.text = exception.message
+      tr_ele = table_ele.add_element('tr')
+      th_ele = tr_ele.add_element('th')
+      th_ele.text = 'Backtrace'
+      td_ele = tr_ele.add_element('td')
+      td_ele.add_element(self.items_table('data', exception.backtrace))
     end
 
     def self.elucidate_items(body_ele, ul_ele, class_names, id, header_text, items)
@@ -271,6 +273,7 @@ EOT
         Assertions.elucidate(exception) do |body_ele, minitest_toc_ul_ele, analysis_toc_ul_ele|
           Minitest::Assertions.elucidate_expected_items(body_ele, minitest_toc_ul_ele, expected)
           Minitest::Assertions.elucidate_actual_items(body_ele, minitest_toc_ul_ele, actual)
+          Minitest::Assertions.elucidate_exception(body_ele, minitest_toc_ul_ele, exception)
           Minitest::Assertions.elucidate_missing_items(body_ele, analysis_toc_ul_ele, missing)
           Minitest::Assertions.elucidate_unexpected_items(body_ele, analysis_toc_ul_ele, unexpected)
           Minitest::Assertions.elucidate_ok_items(body_ele, analysis_toc_ul_ele, ok)
