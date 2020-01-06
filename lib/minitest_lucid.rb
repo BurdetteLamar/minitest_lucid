@@ -13,7 +13,9 @@ module Minitest
       begin
         old_assert_equal(expected, actual, msg)
       rescue Minitest::Assertion => x
-        elucidate(x, expected, actual, msg)
+        elucidation_class  = get_class(expected, actual)
+        return unless elucidation_class
+        elucidation_class.elucidate(x, expected, actual)
       end
     end
 
@@ -42,7 +44,26 @@ EOT
       nil
     end
 
-    def elucidate(exception, expected, actual, msg)
+    def self.elucidate(exception)
+      doc = REXML::Document.new
+      html_ele = doc.add_element('html')
+      head_ele = html_ele.add_element('head')
+      style_ele = head_ele.add_element('style')
+      style_ele.text = STYLES
+      body_ele = html_ele.add_element('body')
+      h1_ele = body_ele.add_element('h1')
+      h1_ele.text = 'Elucidation'
+      toc_ul_ele = body_ele.add_element('ul')
+      yield body_ele, toc_ul_ele
+      output = ""
+      doc.write(:output => output, :indent => 0)
+      new_message = output
+      new_exception = exception.exception(new_message)
+      new_exception.set_backtrace(exception.backtrace)
+      raise new_exception
+    end
+
+    def zzz_elucidate(exception, expected, actual, msg)
       elucidation_class  = get_class(expected, actual)
       if elucidation_class
         doc = REXML::Document.new
@@ -239,16 +260,17 @@ EOT
 
     class SetElucidation
 
-      def self.elucidate(body_ele, exception, expected, actual)
+      def self.elucidate(exception, expected, actual)
         missing = expected - actual
         unexpected = actual - expected
         ok = expected & actual
-        ul_ele = body_ele.add_element('ul')
-        Minitest::Assertions.elucidate_expected_items(body_ele, ul_ele, expected)
-        Minitest::Assertions.elucidate_actual_items(body_ele, ul_ele, actual)
-        Minitest::Assertions.elucidate_missing_items(body_ele, ul_ele, missing)
-        Minitest::Assertions.elucidate_unexpected_items(body_ele, ul_ele, unexpected)
-        Minitest::Assertions.elucidate_ok_items(body_ele, ul_ele, ok)
+        Assertions.elucidate(exception) do |body_ele, toc_ul_ele|
+          Minitest::Assertions.elucidate_expected_items(body_ele, toc_ul_ele, expected)
+          Minitest::Assertions.elucidate_actual_items(body_ele, toc_ul_ele, actual)
+          Minitest::Assertions.elucidate_missing_items(body_ele, toc_ul_ele, missing)
+          Minitest::Assertions.elucidate_unexpected_items(body_ele, toc_ul_ele, unexpected)
+          Minitest::Assertions.elucidate_ok_items(body_ele, toc_ul_ele, ok)
+        end
       end
 
     end
@@ -273,7 +295,7 @@ EOT
       lines.push('  :expected => {')
       lines.push("    :class => #{expected.class},")
       lines.push("    :size => #{expected.size},")
-      lines.push('  },')
+        lines.push('  },')
       lines.push('  :actual => {')
       lines.push("    :class => #{actual.class},")
       lines.push("    :size => #{actual.size},")
