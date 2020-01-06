@@ -54,7 +54,11 @@ EOT
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Elucidation'
       toc_ul_ele = body_ele.add_element('ul')
-      yield body_ele, toc_ul_ele
+      toc_ul_ele.add_element('li').text = 'Minitest'
+      minitest_toc_ul_ele = toc_ul_ele.add_element('ul')
+      toc_ul_ele.add_element('li').text = 'Analysis'
+      analysis_toc_ul_ele = toc_ul_ele.add_element('ul')
+      yield body_ele, minitest_toc_ul_ele, analysis_toc_ul_ele
       output = ""
       doc.write(:output => output, :indent => 0)
       new_message = output
@@ -264,12 +268,12 @@ EOT
         missing = expected - actual
         unexpected = actual - expected
         ok = expected & actual
-        Assertions.elucidate(exception) do |body_ele, toc_ul_ele|
-          Minitest::Assertions.elucidate_expected_items(body_ele, toc_ul_ele, expected)
-          Minitest::Assertions.elucidate_actual_items(body_ele, toc_ul_ele, actual)
-          Minitest::Assertions.elucidate_missing_items(body_ele, toc_ul_ele, missing)
-          Minitest::Assertions.elucidate_unexpected_items(body_ele, toc_ul_ele, unexpected)
-          Minitest::Assertions.elucidate_ok_items(body_ele, toc_ul_ele, ok)
+        Assertions.elucidate(exception) do |body_ele, minitest_toc_ul_ele, analysis_toc_ul_ele|
+          Minitest::Assertions.elucidate_expected_items(body_ele, minitest_toc_ul_ele, expected)
+          Minitest::Assertions.elucidate_actual_items(body_ele, minitest_toc_ul_ele, actual)
+          Minitest::Assertions.elucidate_missing_items(body_ele, analysis_toc_ul_ele, missing)
+          Minitest::Assertions.elucidate_unexpected_items(body_ele, analysis_toc_ul_ele, unexpected)
+          Minitest::Assertions.elucidate_ok_items(body_ele, analysis_toc_ul_ele, ok)
         end
       end
 
