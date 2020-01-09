@@ -127,7 +127,14 @@ EOT
       th_ele = tr_ele.add_element('th')
       th_ele.text = 'Backtrace'
       td_ele = tr_ele.add_element('td')
-      td_ele.add_element(self.items_table('data', exception.backtrace))
+      gem_dir_path = File.dirname(`gem which minitest`)
+      backtrace = exception.backtrace.map { |x| x.sub(gem_dir_path, '<GEM_DIR>')}
+      home_dir_path = ENV['HOME'].gsub('\\', '/')
+      backtrace = backtrace.map { |x| x.sub(home_dir_path, '<HOME_DIR>')}
+      while backtrace.last.start_with?('<GEM_DIR>')
+        backtrace.pop
+      end
+      td_ele.add_element(self.items_table('data', backtrace))
     end
 
     def self.elucidate_items(body_ele, ul_ele, class_names, id, header_text, items)
