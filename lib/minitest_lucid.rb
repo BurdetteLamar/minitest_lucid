@@ -51,15 +51,15 @@ EOT
       head_ele = html_ele.add_element('head')
       style_ele = head_ele.add_element('style')
       style_ele.text = STYLES
-      body_ele = html_ele.add_element('body')
-      h1_ele = body_ele.add_element('h1')
+      @body_ele = html_ele.add_element('body')
+      h1_ele = @body_ele.add_element('h1')
       h1_ele.text = 'Elucidation'
-      toc_ul_ele = body_ele.add_element('ul')
-      Minitest::Assertions.elucidate_expected_items(body_ele, toc_ul_ele, expected)
-      Minitest::Assertions.elucidate_actual_items(body_ele, toc_ul_ele, actual)
-      yield body_ele, toc_ul_ele
-      Minitest::Assertions.elucidate_exception(body_ele, toc_ul_ele, exception)
-      Minitest::Assertions.elucidate_backtrace(body_ele, toc_ul_ele, exception.backtrace)
+      @toc_ul_ele = @body_ele.add_element('ul')
+      Minitest::Assertions.elucidate_expected_items(expected)
+      Minitest::Assertions.elucidate_actual_items(actual)
+      yield
+      Minitest::Assertions.elucidate_exception(exception)
+      Minitest::Assertions.elucidate_backtrace(exception.backtrace)
       output = ""
       doc.write(:output => output, :indent => 0)
       new_message = output
@@ -105,11 +105,11 @@ EOT
       table_ele
     end
 
-    def self.elucidate_exception(body_ele, toc_ul_ele, exception)
+    def self.elucidate_exception(exception)
       id = 'exception'
-      toc_ul_ele.add_element(self.toc_link(id))
-      body_ele.add_element(self.section_header(3, id, 'Exception'))
-      table_ele = body_ele.add_element('table')
+      @toc_ul_ele.add_element(self.toc_link(id))
+      @body_ele.add_element(self.section_header(3, id, 'Exception'))
+      table_ele = @body_ele.add_element('table')
       table_ele.attributes['border'] = '1'
       tr_ele = table_ele.add_element('tr')
       th_ele = tr_ele.add_element('th')
@@ -132,10 +132,10 @@ EOT
       td_ele.add_element(self.items_table('data', backtrace))
     end
 
-    def self.elucidate_backtrace(body_ele, toc_ul_ele, backtrace)
+    def self.elucidate_backtrace(backtrace)
       id = 'backtrace'
-      toc_ul_ele.add_element(self.toc_link(id))
-      body_ele.add_element(self.section_header(3, id, 'Backtrace (Filtered)'))
+      @toc_ul_ele.add_element(self.toc_link(id))
+      @body_ele.add_element(self.section_header(3, id, 'Backtrace (Filtered)'))
       gem_dir_path = File.dirname(`gem which minitest`)
       backtrace = backtrace.map { |x| x.sub(gem_dir_path, '<GEM_DIR>')}
       while backtrace.last.start_with?('<GEM_DIR>')
@@ -147,43 +147,43 @@ EOT
       end
       home_dir_path = ENV['HOME'].gsub('\\', '/')
       backtrace = backtrace.map { |x| x.sub(home_dir_path, '<HOME_DIR>')}
-      body_ele.add_element(self.items_table('data', backtrace))
+      @body_ele.add_element(self.items_table('data', backtrace))
     end
 
-    def self.elucidate_items(body_ele, ul_ele, class_names, id, header_text, items)
-      ul_ele.add_element(self.toc_link(id))
-      body_ele.add_element(self.section_header(3, id, header_text))
-      body_ele.add_element(self.items_table(class_names, items)) unless items.empty?
+    def self.elucidate_items(class_names, id, header_text, items)
+      @toc_ul_ele.add_element(self.toc_link(id))
+      @body_ele.add_element(self.section_header(3, id, header_text))
+      @body_ele.add_element(self.items_table(class_names, items)) unless items.empty?
     end
 
-    def self.elucidate_expected_items(body_ele, ul_ele, expected)
+    def self.elucidate_expected_items(expected)
       id = 'Expected'
       header_text = "#{id}:  class=#{expected.class} size=#{expected.size}"
-      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'data', id, header_text, expected)
+      Minitest::Assertions.elucidate_items('data', id, header_text, expected)
     end
 
-    def self.elucidate_actual_items(body_ele, ul_ele, actual)
+    def self.elucidate_actual_items(actual)
       id = 'Got'
       header_text = "#{id}:  class=#{actual.class} size=#{actual.size}"
-      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'data', id, header_text, actual)
+      Minitest::Assertions.elucidate_items('data', id, header_text, actual)
     end
 
-    def self.elucidate_missing_items(body_ele, ul_ele, missing)
+    def self.elucidate_missing_items(missing)
       id = 'Missing'
       header_text = "#{id} items: #{missing.size}"
-      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'bad data', id, header_text, missing)
+      Minitest::Assertions.elucidate_items('bad data', id, header_text, missing)
     end
 
-    def self.elucidate_unexpected_items(body_ele, ul_ele, unexpected)
+    def self.elucidate_unexpected_items(unexpected)
       id = 'Unexpected'
       header_text = "#{id} items: #{unexpected.size}"
-      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'bad data', id, header_text, unexpected)
+      Minitest::Assertions.elucidate_items('bad data', id, header_text, unexpected)
     end
 
-    def self.elucidate_ok_items(body_ele, ul_ele, ok)
+    def self.elucidate_ok_items(ok)
       id = 'Ok'
       header_text = "#{id} items: #{ok.size}"
-      Minitest::Assertions.elucidate_items(body_ele, ul_ele, 'good data', id, header_text, ok)
+      Minitest::Assertions.elucidate_items('good data', id, header_text, ok)
     end
 
     # Element-by-element comparison.
