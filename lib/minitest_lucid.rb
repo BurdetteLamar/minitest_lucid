@@ -46,6 +46,7 @@ EOT
     end
 
     def self.elucidate(exception, expected, actual)
+      # Start HTML doc.
       doc = REXML::Document.new
       html_ele = doc.add_element('html')
       head_ele = html_ele.add_element('head')
@@ -58,6 +59,7 @@ EOT
       Minitest::Assertions.elucidate_expected_items(expected)
       Minitest::Assertions.elucidate_actual_items(actual)
       yield
+      # Finish HTML doc.
       Minitest::Assertions.elucidate_exception(exception)
       Minitest::Assertions.elucidate_backtrace(exception.backtrace)
       output = ""
