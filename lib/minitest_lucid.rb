@@ -54,14 +54,7 @@ EOT
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Elucidation'
       toc_ul_ele = body_ele.add_element('ul')
-      toc_ul_ele.add_element(self.toc_link('minitest'))
-      h2_ele = body_ele.add_element('h2')
-      h2_ele.attributes['id'] = 'minitest'
-      h2_ele.text = 'Minitest'
-      minitest_toc_ul_ele = toc_ul_ele.add_element('ul')
-      toc_ul_ele.add_element(self.toc_link('analysis'))
-      analysis_toc_ul_ele = toc_ul_ele.add_element('ul')
-      yield body_ele, minitest_toc_ul_ele, analysis_toc_ul_ele
+      yield body_ele, toc_ul_ele
       output = ""
       doc.write(:output => output, :indent => 0)
       new_message = output
@@ -107,9 +100,9 @@ EOT
       table_ele
     end
 
-    def self.elucidate_exception(body_ele, minitest_toc_ul_ele, exception)
+    def self.elucidate_exception(body_ele, toc_ul_ele, exception)
       id = 'exception'
-      minitest_toc_ul_ele.add_element(self.toc_link(id))
+      toc_ul_ele.add_element(self.toc_link(id))
       body_ele.add_element(self.section_header(3, id, 'Exception'))
       table_ele = body_ele.add_element('table')
       table_ele.attributes['border'] = '1'
@@ -131,10 +124,25 @@ EOT
       backtrace = exception.backtrace.map { |x| x.sub(gem_dir_path, '<GEM_DIR>')}
       home_dir_path = ENV['HOME'].gsub('\\', '/')
       backtrace = backtrace.map { |x| x.sub(home_dir_path, '<HOME_DIR>')}
+      td_ele.add_element(self.items_table('data', backtrace))
+    end
+
+    def self.elucidate_backtrace(body_ele, toc_ul_ele, backtrace)
+      id = 'backtrace'
+      toc_ul_ele.add_element(self.toc_link(id))
+      body_ele.add_element(self.section_header(3, id, 'Backtrace (Filtered)'))
+      gem_dir_path = File.dirname(`gem which minitest`)
+      backtrace = backtrace.map { |x| x.sub(gem_dir_path, '<GEM_DIR>')}
       while backtrace.last.start_with?('<GEM_DIR>')
         backtrace.pop
       end
-      td_ele.add_element(self.items_table('data', backtrace))
+      until backtrace.empty? do
+        line = backtrace.shift
+        break if line.match(/minitest_lucid\.rb/)
+      end
+      home_dir_path = ENV['HOME'].gsub('\\', '/')
+      backtrace = backtrace.map { |x| x.sub(home_dir_path, '<HOME_DIR>')}
+      body_ele.add_element(self.items_table('data', backtrace))
     end
 
     def self.elucidate_items(body_ele, ul_ele, class_names, id, header_text, items)
@@ -280,16 +288,14 @@ EOT
         missing = expected - actual
         unexpected = actual - expected
         ok = expected & actual
-        Assertions.elucidate(exception) do |body_ele, minitest_toc_ul_ele, analysis_toc_ul_ele|
-          Minitest::Assertions.elucidate_expected_items(body_ele, minitest_toc_ul_ele, expected)
-          Minitest::Assertions.elucidate_actual_items(body_ele, minitest_toc_ul_ele, actual)
-          Minitest::Assertions.elucidate_exception(body_ele, minitest_toc_ul_ele, exception)
-          h2_ele = body_ele.add_element('h2')
-          h2_ele.attributes['id'] = 'analysis'
-          h2_ele.text = 'Analysis'
-          Minitest::Assertions.elucidate_missing_items(body_ele, analysis_toc_ul_ele, missing)
-          Minitest::Assertions.elucidate_unexpected_items(body_ele, analysis_toc_ul_ele, unexpected)
-          Minitest::Assertions.elucidate_ok_items(body_ele, analysis_toc_ul_ele, ok)
+        Assertions.elucidate(exception) do |body_ele, toc_ul_ele|
+          Minitest::Assertions.elucidate_expected_items(body_ele, toc_ul_ele, expected)
+          Minitest::Assertions.elucidate_actual_items(body_ele, toc_ul_ele, actual)
+          Minitest::Assertions.elucidate_missing_items(body_ele, toc_ul_ele, missing)
+          Minitest::Assertions.elucidate_unexpected_items(body_ele, toc_ul_ele, unexpected)
+          Minitest::Assertions.elucidate_ok_items(body_ele, toc_ul_ele, ok)
+          Minitest::Assertions.elucidate_exception(body_ele, toc_ul_ele, exception)
+          Minitest::Assertions.elucidate_backtrace(body_ele, toc_ul_ele, exception.backtrace)
         end
       end
 
