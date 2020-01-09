@@ -1,7 +1,8 @@
 require 'minitest/autorun'
 require 'diff/lcs'
-require 'set'
 require 'rexml/document'
+
+require 'minitest_lucid/lucid_set'
 
 module Minitest
 
@@ -284,21 +285,6 @@ EOT
         lines.push('    },')
       end
       lines.push('  }')
-    end
-
-    class LucidSet
-
-      def self.elucidate(exception, expected, actual)
-        missing = expected - actual
-        unexpected = actual - expected
-        ok = expected & actual
-        Assertions.elucidate(exception, expected, actual) do |body_ele, toc_ul_ele|
-          Minitest::Assertions.elucidate_missing_items(body_ele, toc_ul_ele, missing)
-          Minitest::Assertions.elucidate_unexpected_items(body_ele, toc_ul_ele, unexpected)
-          Minitest::Assertions.elucidate_ok_items(body_ele, toc_ul_ele, ok)
-        end
-      end
-
     end
 
     def elucidate_struct(exception, expected, actual, lines)
