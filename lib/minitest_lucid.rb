@@ -39,12 +39,12 @@ EOT
       ELUCIDATABLE_CLASSES.each do |klass|
         next unless expected.kind_of?(klass)
         next unless actual.kind_of?(klass)
-        return Object.const_get("#{self.class.name}::#{klass.name}Elucidation")
+        return Object.const_get("#{self.class.name}::Lucid#{klass.name}")
       end
       nil
     end
 
-    def self.elucidate(exception)
+    def self.elucidate(exception, expected, actual)
       doc = REXML::Document.new
       html_ele = doc.add_element('html')
       head_ele = html_ele.add_element('head')
@@ -54,7 +54,11 @@ EOT
       h1_ele = body_ele.add_element('h1')
       h1_ele.text = 'Elucidation'
       toc_ul_ele = body_ele.add_element('ul')
+      Minitest::Assertions.elucidate_expected_items(body_ele, toc_ul_ele, expected)
+      Minitest::Assertions.elucidate_actual_items(body_ele, toc_ul_ele, actual)
       yield body_ele, toc_ul_ele
+      Minitest::Assertions.elucidate_exception(body_ele, toc_ul_ele, exception)
+      Minitest::Assertions.elucidate_backtrace(body_ele, toc_ul_ele, exception.backtrace)
       output = ""
       doc.write(:output => output, :indent => 0)
       new_message = output
@@ -282,20 +286,16 @@ EOT
       lines.push('  }')
     end
 
-    class SetElucidation
+    class LucidSet
 
       def self.elucidate(exception, expected, actual)
         missing = expected - actual
         unexpected = actual - expected
         ok = expected & actual
-        Assertions.elucidate(exception) do |body_ele, toc_ul_ele|
-          Minitest::Assertions.elucidate_expected_items(body_ele, toc_ul_ele, expected)
-          Minitest::Assertions.elucidate_actual_items(body_ele, toc_ul_ele, actual)
+        Assertions.elucidate(exception, expected, actual) do |body_ele, toc_ul_ele|
           Minitest::Assertions.elucidate_missing_items(body_ele, toc_ul_ele, missing)
           Minitest::Assertions.elucidate_unexpected_items(body_ele, toc_ul_ele, unexpected)
           Minitest::Assertions.elucidate_ok_items(body_ele, toc_ul_ele, ok)
-          Minitest::Assertions.elucidate_exception(body_ele, toc_ul_ele, exception)
-          Minitest::Assertions.elucidate_backtrace(body_ele, toc_ul_ele, exception.backtrace)
         end
       end
 
