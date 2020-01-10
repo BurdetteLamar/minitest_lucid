@@ -1,6 +1,7 @@
 require 'minitest/autorun'
 require 'diff/lcs'
 require 'rexml/document'
+require 'fileutils'
 
 require 'minitest_lucid/lucid_set'
 
@@ -16,7 +17,7 @@ module Minitest
       rescue Minitest::Assertion => x
         elucidation_class  = get_class(expected, actual)
         return unless elucidation_class
-        elucidation_class.elucidate(x, expected, actual)
+        elucidation_class.elucidate(self, x, expected, actual)
       end
     end
 
@@ -45,7 +46,7 @@ EOT
       nil
     end
 
-    def self.elucidate(exception, expected, actual)
+    def self.elucidate(test, exception, expected, actual)
       # Start HTML doc.
       doc = REXML::Document.new
       html_ele = doc.add_element('html')
@@ -62,9 +63,14 @@ EOT
       # Finish HTML doc.
       Minitest::Assertions.elucidate_exception(exception)
       Minitest::Assertions.elucidate_backtrace(exception.backtrace)
-      output = ""
-      doc.write(:output => output, :indent => 0)
-      new_message = output
+      home = ENV['HOME'].gsub(File::ALT_SEPARATOR, File::SEPARATOR)
+      dir_path = File.join(home, '.minitest_lucid')
+      FileUtils.mkdir_p(dir_path)
+      file_path = File.join(dir_path, test.name + '.html')
+      file = File.open(file_path, 'w')
+      doc.write(:output => file, :indent => 0)
+      file.close
+      new_message = "Your elucidation is in #{file.path}"
       new_exception = exception.exception(new_message)
       new_exception.set_backtrace(exception.backtrace)
       raise new_exception

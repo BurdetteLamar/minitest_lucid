@@ -303,8 +303,9 @@ EOT
       exp_name = expected.class == klass ? names[:name] : names[:subname]
       act_name = actual.class == klass ? names[:name] : names[:subname]
       exp_file_path = "expected/#{exp_name}.#{act_name}.html"
+      file_path = x.message.split(' ').last
       act_file_path = "actual/#{exp_name}.#{act_name}.html"
-      File.write(act_file_path, x.message)
+      FileUtils.copy(file_path, act_file_path)
       exp_lines = File.readlines(exp_file_path)
       act_lines = File.readlines(act_file_path)
       diffs = Diff::LCS.diff(exp_lines, act_lines)
