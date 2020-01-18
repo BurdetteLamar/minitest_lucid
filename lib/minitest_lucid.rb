@@ -62,7 +62,7 @@ EOT
       yield
       # Finish HTML doc.
       Minitest::Assertions.elucidate_exception(exception)
-      Minitest::Assertions.elucidate_backtrace(exception.backtrace)
+      Minitest::Assertions.elucidate_backtrace(exception)
       home = ENV['HOME'].gsub(File::ALT_SEPARATOR, File::SEPARATOR)
       dir_path = File.join(home, '.minitest_lucid')
       FileUtils.mkdir_p(dir_path)
@@ -133,29 +133,39 @@ EOT
       th_ele = tr_ele.add_element('th')
       th_ele.text = 'Backtrace'
       td_ele = tr_ele.add_element('td')
-      gem_dir_path = File.dirname(`gem which minitest`)
-      backtrace = exception.backtrace.map { |x| x.sub(gem_dir_path, '<GEM_DIR>')}
-      home_dir_path = ENV['HOME'].gsub('\\', '/')
-      backtrace = backtrace.map { |x| x.sub(home_dir_path, '<HOME_DIR>')}
-      td_ele.add_element(self.items_table('data', backtrace))
+      td_ele.add_element(items_table('data', exception.backtrace))
     end
 
-    def self.elucidate_backtrace(backtrace)
+    def self.home_dir_path
+      ENV['HOME'].gsub('\\', '/')
+    end
+
+    def self.gem_dir_path
+      File.dirname(`gem which minitest`)
+    end
+
+    def self.condition_file(file_path, conditioned_file_path)
+      text = File.read(file_path)
+      text.gsub!(home_dir_path, '<HOME_DIR>')
+      text.gsub!(gem_dir_path, '<GEM_DIR>')
+      text.gsub!(/\.rb:\d+:in/, '.rb:<LINE_NO>:in')
+      File.write(conditioned_file_path, text)
+    end
+
+    def self.elucidate_backtrace(exception)
+      backtrace = exception.backtrace.clone
       id = 'backtrace'
-      @toc_ul_ele.add_element(self.toc_link(id))
-      @body_ele.add_element(self.section_header(3, id, 'Backtrace (Filtered)'))
+      @toc_ul_ele.add_element(toc_link(id))
+      @body_ele.add_element(section_header(3, id, 'Backtrace (Filtered)'))
       gem_dir_path = File.dirname(`gem which minitest`)
-      backtrace = backtrace.map { |x| x.sub(gem_dir_path, '<GEM_DIR>')}
-      while backtrace.last.start_with?('<GEM_DIR>')
+      while backtrace.last.start_with?(gem_dir_path)
         backtrace.pop
       end
       until backtrace.empty? do
         line = backtrace.shift
         break if line.match(/minitest_lucid\.rb/)
       end
-      home_dir_path = ENV['HOME'].gsub('\\', '/')
-      backtrace = backtrace.map { |x| x.sub(home_dir_path, '<HOME_DIR>')}
-      @body_ele.add_element(self.items_table('data', backtrace))
+      @body_ele.add_element(items_table('data', backtrace))
     end
 
     def self.elucidate_items(class_names, id, header_text, items)
