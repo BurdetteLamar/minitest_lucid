@@ -146,9 +146,10 @@ EOT
 
     def self.condition_file(file_path, conditioned_file_path)
       text = File.read(file_path)
-      text.gsub!(home_dir_path, '<HOME_DIR>')
-      text.gsub!(gem_dir_path, '<GEM_DIR>')
-      text.gsub!(/\.rb:\d+:in/, '.rb:<LINE_NO>:in')
+      # Careful with the angle brackets.
+      text.gsub!(Regexp.new(home_dir_path), '&lt;HOME_DIR&gt;')
+      text.gsub!(Regexp.new(gem_dir_path), '&lt;GEM_DIR&gt;')
+      text.gsub!(/\.rb:\d+:in/, '.rb:&lt;LINE_NO&gt;:in')
       File.write(conditioned_file_path, text)
     end
 
